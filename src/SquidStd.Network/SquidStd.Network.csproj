@@ -10,4 +10,8 @@
       <ProjectReference Include="..\SquidStd.Core\SquidStd.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <InternalsVisibleTo Include="SquidStd.Tests" />
+    </ItemGroup>
+
 </Project>
