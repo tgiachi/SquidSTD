@@ -5,6 +5,7 @@
 <h1 align="center">squid-std</h1>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/.NET-10.0-512BD4.svg" alt=".NET 10" />
   <a href="https://github.com/tgiachi/SquidStd/actions/workflows/ci.yml"><img src="https://github.com/tgiachi/SquidStd/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/tgiachi/SquidStd/gh-pages/badges/tests.json" alt="tests" />
   <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/tgiachi/SquidStd/gh-pages/badges/coverage.json" alt="coverage" />
@@ -29,6 +30,39 @@ it bundles the foundations you reach for again and again behind small, well-defi
 Everything is modular: take only the packages you need, each behind a clean abstraction with an
 in-memory implementation for tests and an external backend for production.
 
+## Requirements
+
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [Docker](https://www.docker.com/) — only for running the integration tests (Testcontainers spin up RabbitMQ and Redis).
+
+## Quick Start
+
+```bash
+dotnet add package SquidStd.Services.Core
+```
+
+```csharp
+using SquidStd.Caching.Abstractions.Interfaces;
+using SquidStd.Caching.Extensions;
+using SquidStd.Services.Core.Services.Bootstrap;
+
+// Create the bootstrapper (registers the core services), then opt into the modules you need.
+var bootstrap = SquidStdBootstrap.Create()
+    .ConfigureServices(container => container.AddInMemoryCache());
+
+await bootstrap.StartAsync();
+
+var cache = bootstrap.Resolve<ICacheService>();
+await cache.SetAsync("answer", 42, TimeSpan.FromMinutes(5));
+var answer = await cache.GetAsync<int>("answer");
+
+await bootstrap.StopAsync();
+```
+
+`SquidStdBootstrap` owns a DryIoc container, wires the core services, and drives the
+`StartAsync` / `StopAsync` lifecycle of every registered `ISquidStdService`. Use `RunAsync` to
+block until cancellation for long-running hosts.
+
 ## Packages
 
 | Package | Description | Links |
@@ -49,6 +83,27 @@ in-memory implementation for tests and an external backend for production.
 | `SquidStd.Caching.Redis` | Redis cache backend (`AddRedisCache`). | [readme](src/SquidStd.Caching.Redis/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Caching.Redis.svg)](https://www.nuget.org/packages/SquidStd.Caching.Redis/) |
 | `SquidStd.Scripting.Lua` | Lua scripting engine with attribute-based modules and event bridging. | [readme](src/SquidStd.Scripting.Lua/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Scripting.Lua.svg)](https://www.nuget.org/packages/SquidStd.Scripting.Lua/) |
 
+## Architecture
+
+squid-std follows a few consistent principles across every module:
+
+- **KISS** — small, focused types; one class / record / enum per file.
+- **Abstractions first** — each capability is split into an `*.Abstractions` package (interfaces,
+  DTOs, shared facade) plus one or more provider packages. Consumers depend on the abstraction.
+- **In-memory + external provider** — every infrastructure module ships an in-memory provider
+  (great for tests and local dev) and a production backend behind the same interface
+  (messaging: in-memory / RabbitMQ; caching: in-memory / Redis).
+- **DI-driven** — services are registered with DryIoc through `AddXxx(...)` extensions and resolved
+  through `SquidStdBootstrap`, which manages the `ISquidStdService` lifecycle.
+- **Convention over restructure** — interfaces under `Interfaces`, DTOs under `Data`, enums under
+  `Types`, internals under `Internal`. See [`CODE_CONVENTION.md`](CODE_CONVENTION.md).
+
+## Documentation
+
+Full API documentation is published with DocFX to GitHub Pages:
+**[tgiachi.github.io/SquidStd](https://tgiachi.github.io/SquidStd/)**. Each package also ships its
+own README (linked in the table above).
+
 ## Build
 
 ```bash
@@ -60,6 +115,23 @@ dotnet build SquidStd.slnx
 ```bash
 dotnet test SquidStd.slnx
 ```
+
+Integration tests (RabbitMQ, Redis) need Docker running; they use Testcontainers to start
+disposable containers automatically.
+
+## Contributing
+
+- Work happens on `develop`; `main` holds released code.
+- Use [Conventional Commits](https://www.conventionalcommits.org/) for messages
+  (`feat:`, `fix:`, `refactor:`, `docs:`, `build:`, `test:`).
+- Follow the project conventions in [`CODE_CONVENTION.md`](CODE_CONVENTION.md).
+- Add tests for new behaviour and keep the suite green before opening a PR.
+
+## Versioning & Releases
+
+Releases are automated with [semantic-release](https://semantic-release.gitbook.io/): version
+numbers and the changelog are derived from the conventional-commit history, and the NuGet packages
+are published on release. Package versions follow [Semantic Versioning](https://semver.org/).
 
 ## License
 
