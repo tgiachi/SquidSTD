@@ -4,6 +4,7 @@ using SquidStd.Abstractions.Extensions.Services;
 using SquidStd.Database.Abstractions.Data.Database;
 using SquidStd.Database.Abstractions.Interfaces.Data;
 using SquidStd.Database.Data;
+using SquidStd.Database.Interfaces.Services;
 using SquidStd.Database.Services;
 
 namespace SquidStd.Database.Extensions;

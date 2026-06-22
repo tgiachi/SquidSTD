@@ -1,7 +1,7 @@
 using FreeSql;
 using SquidStd.Abstractions.Interfaces.Services;
 
-namespace SquidStd.Database.Services;
+namespace SquidStd.Database.Interfaces.Services;
 
 /// <summary>
 /// Owns the application's singleton FreeSql instance and its lifecycle.

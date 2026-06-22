@@ -4,7 +4,7 @@ using Serilog;
 using SquidStd.Database.Abstractions.Data;
 using SquidStd.Database.Abstractions.Data.Entities;
 using SquidStd.Database.Abstractions.Interfaces.Data;
-using SquidStd.Database.Services;
+using SquidStd.Database.Interfaces.Services;
 
 namespace SquidStd.Database.Data;
 

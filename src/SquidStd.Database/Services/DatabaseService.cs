@@ -3,6 +3,7 @@ using Serilog;
 using SquidStd.Database.Abstractions.Data.Database;
 using SquidStd.Database.Abstractions.Types.Data;
 using SquidStd.Database.Connection;
+using SquidStd.Database.Interfaces.Services;
 
 namespace SquidStd.Database.Services;
 
