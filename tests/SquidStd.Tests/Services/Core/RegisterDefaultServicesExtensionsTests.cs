@@ -3,8 +3,10 @@ using SquidStd.Abstractions.Data.Internal.Config;
 using SquidStd.Abstractions.Data.Internal.Services;
 using SquidStd.Core.Data.Bootstrap;
 using SquidStd.Core.Data.Jobs;
+using SquidStd.Core.Data.Metrics;
 using SquidStd.Core.Data.Timing;
 using SquidStd.Core.Interfaces.Config;
+using SquidStd.Core.Interfaces.Metrics;
 using SquidStd.Services.Core.Extensions;
 using SquidStd.Services.Core.Services;
 using SquidStd.Tests.Support;
@@ -101,5 +103,45 @@ public class RegisterDefaultServicesExtensionsTests
             entry => entry.SectionName == "logger" && entry.ConfigType == typeof(SquidStdLoggerOptions)
         );
         Assert.False(container.IsRegistered<SquidStdLoggerOptions>());
+    }
+
+    [Fact]
+    public void RegisterDefaultCoreConfigSections_RegistersMetricsMetadata()
+    {
+        using var container = new Container();
+
+        container.RegisterDefaultCoreConfigSections();
+
+        var entries = container.Resolve<List<ConfigRegistrationData>>();
+
+        Assert.Contains(entries, entry => entry.SectionName == "metrics" && entry.ConfigType == typeof(MetricsConfig));
+        Assert.False(container.IsRegistered<MetricsConfig>());
+    }
+
+    [Fact]
+    public void RegisterMetricsCollectionService_AddsLateServiceRegistrationData()
+    {
+        using var container = new Container();
+
+        container.RegisterMetricsCollectionService();
+
+        var entry = Assert.Single(
+            container.Resolve<List<ServiceRegistrationData>>(),
+            registration => registration.ServiceType == typeof(IMetricsCollectionService)
+        );
+
+        Assert.Equal(typeof(MetricsCollectionService), entry.ImplementationType);
+        Assert.Equal(1000, entry.Priority);
+    }
+
+    [Fact]
+    public void RegisterCoreServices_RegistersMetricsCollectionService()
+    {
+        using var temp = new TempDirectory();
+        using var container = new Container();
+
+        container.RegisterCoreServices("app", temp.Path);
+
+        Assert.True(container.IsRegistered<IMetricsCollectionService>());
     }
 }

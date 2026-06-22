@@ -8,6 +8,7 @@ using SquidStd.Core.Interfaces.Bootstrap;
 using SquidStd.Core.Interfaces.Config;
 using SquidStd.Core.Types;
 using SquidStd.Services.Core.Services;
+using SquidStd.Services.Core.Services.Bootstrap;
 using SquidStd.Tests.Support;
 
 namespace SquidStd.Tests.Bootstrap;

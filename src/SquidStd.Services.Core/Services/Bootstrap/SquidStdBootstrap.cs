@@ -1,16 +1,17 @@
 using DryIoc;
 using Serilog;
-using Serilog.Events;
 using SquidStd.Abstractions.Data.Internal.Services;
 using SquidStd.Abstractions.Interfaces.Services;
 using SquidStd.Core.Data.Bootstrap;
+using SquidStd.Core.Extensions.Logger;
 using SquidStd.Core.Interfaces.Bootstrap;
 using SquidStd.Core.Interfaces.Config;
 using SquidStd.Core.Types;
 using SquidStd.Services.Core.Extensions;
+using SquidStd.Services.Core.Extensions.Logger;
 using SquidStd.Services.Core.Types;
 
-namespace SquidStd.Services.Core.Services;
+namespace SquidStd.Services.Core.Services.Bootstrap;
 
 /// <summary>
 /// Default SquidStd bootstrapper and service lifecycle orchestrator.
@@ -205,7 +206,7 @@ public sealed class SquidStdBootstrap : ISquidStdBootstrap
 
         if (options.MinimumLevel != LogLevelType.None)
         {
-            var minimumLevel = MapLogLevel(options.MinimumLevel);
+            var minimumLevel = options.MinimumLevel.ToSerilogLogLevel();
             loggerConfiguration.MinimumLevel.Is(minimumLevel);
 
             if (options.EnableConsole)
@@ -217,7 +218,7 @@ public sealed class SquidStdBootstrap : ISquidStdBootstrap
             {
                 loggerConfiguration.WriteTo.File(
                     ResolveLogPath(options),
-                    rollingInterval: MapRollingInterval(options.RollingInterval),
+                    rollingInterval: options.RollingInterval.ToSerilogRollingInterval(),
                     restrictedToMinimumLevel: minimumLevel
                 );
             }
@@ -244,30 +245,6 @@ public sealed class SquidStdBootstrap : ISquidStdBootstrap
                         .ThenBy(registration => registration.ImplementationType.FullName, StringComparer.Ordinal)
         ];
     }
-
-    private LogEventLevel MapLogLevel(LogLevelType level)
-        => level switch
-        {
-            LogLevelType.Trace       => LogEventLevel.Verbose,
-            LogLevelType.Debug       => LogEventLevel.Debug,
-            LogLevelType.Information => LogEventLevel.Information,
-            LogLevelType.Warning     => LogEventLevel.Warning,
-            LogLevelType.Error       => LogEventLevel.Error,
-            LogLevelType.Critical    => LogEventLevel.Fatal,
-            _                        => LogEventLevel.Fatal
-        };
-
-    private RollingInterval MapRollingInterval(SquidStdLogRollingIntervalType interval)
-        => interval switch
-        {
-            SquidStdLogRollingIntervalType.Year     => RollingInterval.Year,
-            SquidStdLogRollingIntervalType.Month    => RollingInterval.Month,
-            SquidStdLogRollingIntervalType.Day      => RollingInterval.Day,
-            SquidStdLogRollingIntervalType.Hour     => RollingInterval.Hour,
-            SquidStdLogRollingIntervalType.Minute   => RollingInterval.Minute,
-            SquidStdLogRollingIntervalType.Infinite => RollingInterval.Infinite,
-            _                                       => RollingInterval.Day
-        };
 
     private string ResolveLogPath(SquidStdLoggerOptions options)
     {

@@ -5,10 +5,12 @@ using SquidStd.Abstractions.Extensions.Container;
 using SquidStd.Abstractions.Extensions.Services;
 using SquidStd.Core.Data.Bootstrap;
 using SquidStd.Core.Data.Jobs;
+using SquidStd.Core.Data.Metrics;
 using SquidStd.Core.Data.Timing;
 using SquidStd.Core.Interfaces.Config;
 using SquidStd.Core.Interfaces.Events;
 using SquidStd.Core.Interfaces.Jobs;
+using SquidStd.Core.Interfaces.Metrics;
 using SquidStd.Core.Interfaces.Threading;
 using SquidStd.Core.Interfaces.Timing;
 using SquidStd.Services.Core.Services;
@@ -62,6 +64,7 @@ public static class RegisterDefaultServicesExtensions
             container.RegisterJobSystemService();
             container.RegisterMainThreadDispatcherService();
             container.RegisterTimerWheelService();
+            container.RegisterMetricsCollectionService();
 
             return container;
         }
@@ -75,6 +78,7 @@ public static class RegisterDefaultServicesExtensions
             container.RegisterConfigSection("logger", static () => new SquidStdLoggerOptions(), -1000);
             container.RegisterConfigSection("jobs", static () => new JobsConfig(), -100);
             container.RegisterConfigSection("timerWheel", static () => new TimerWheelConfig(), -90);
+            container.RegisterConfigSection("metrics", static () => new MetricsConfig(), -80);
 
             return container;
         }
@@ -95,6 +99,17 @@ public static class RegisterDefaultServicesExtensions
             container.RegisterConfigSection("jobs", static () => new JobsConfig(), -100);
 
             return container.RegisterStdService<IJobSystem, JobSystemService>(-1);
+        }
+
+        /// <summary>
+        /// Registers the default metrics collection service in the container.
+        /// </summary>
+        /// <returns>The same container for chaining.</returns>
+        public IContainer RegisterMetricsCollectionService()
+        {
+            container.RegisterConfigSection("metrics", static () => new MetricsConfig(), -80);
+
+            return container.RegisterStdService<IMetricsCollectionService, MetricsCollectionService>(1000);
         }
 
         /// <summary>
