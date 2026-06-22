@@ -1,6 +1,6 @@
 using SquidStd.Core.Interfaces.Config;
 
-namespace SquidStd.Core.Data.Storage;
+namespace SquidStd.Storage.Abstractions.Data.Config;
 
 /// <summary>
 /// Configuration for local file storage.

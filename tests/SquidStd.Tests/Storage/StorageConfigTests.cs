@@ -1,4 +1,5 @@
 using SquidStd.Core.Data.Storage;
+using SquidStd.Storage.Abstractions.Data.Config;
 using SquidStd.Core.Interfaces.Config;
 
 namespace SquidStd.Tests.Storage;

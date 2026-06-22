@@ -1,5 +1,5 @@
-using SquidStd.Core.Data.Storage;
-using SquidStd.Core.Interfaces.Storage;
+using SquidStd.Storage.Abstractions.Data.Config;
+using SquidStd.Storage.Abstractions.Interfaces;
 using SquidStd.Services.Core.Services.Internal;
 
 namespace SquidStd.Services.Core.Services.Storage;

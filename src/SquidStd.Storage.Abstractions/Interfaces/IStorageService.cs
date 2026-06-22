@@ -1,4 +1,4 @@
-namespace SquidStd.Core.Interfaces.Storage;
+namespace SquidStd.Storage.Abstractions.Interfaces;
 
 /// <summary>
 /// Stores binary payloads by logical key.

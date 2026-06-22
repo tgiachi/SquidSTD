@@ -1,5 +1,5 @@
 using System.Text;
-using SquidStd.Core.Interfaces.Storage;
+using SquidStd.Storage.Abstractions.Interfaces;
 using SquidStd.Core.Yaml;
 
 namespace SquidStd.Services.Core.Services.Storage;

@@ -1,7 +1,7 @@
 using System.Text;
 using SquidStd.Core.Data.Storage;
 using SquidStd.Core.Interfaces.Secrets;
-using SquidStd.Core.Interfaces.Storage;
+using SquidStd.Storage.Abstractions.Interfaces;
 
 namespace SquidStd.Services.Core.Services.Storage;
 
