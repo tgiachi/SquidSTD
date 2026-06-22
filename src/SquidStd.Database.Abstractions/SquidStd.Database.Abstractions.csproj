@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\SquidStd.Core\SquidStd.Core.csproj" />
+    <ProjectReference Include="..\SquidStd.Abstractions\SquidStd.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>
