@@ -46,6 +46,21 @@ public static class YamlUtils
     }
 
     /// <summary>
+    /// Deserializes YAML from a file using reflection-based metadata.
+    /// </summary>
+    /// <param name="filePath">The YAML file path.</param>
+    /// <typeparam name="T">The target type.</typeparam>
+    /// <returns>The deserialized object.</returns>
+    public static T DeserializeFromFile<T>(string filePath)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
+
+        var yaml = File.ReadAllText(GetExistingFilePath(filePath));
+
+        return Deserialize<T>(yaml);
+    }
+
+    /// <summary>
     /// Deserializes a top-level YAML section to the specified runtime type.
     /// </summary>
     /// <param name="yaml">The YAML document.</param>
@@ -66,21 +81,6 @@ public static class YamlUtils
         }
 
         return Deserialize(Serializer.Serialize(section), type);
-    }
-
-    /// <summary>
-    /// Deserializes YAML from a file using reflection-based metadata.
-    /// </summary>
-    /// <param name="filePath">The YAML file path.</param>
-    /// <typeparam name="T">The target type.</typeparam>
-    /// <returns>The deserialized object.</returns>
-    public static T DeserializeFromFile<T>(string filePath)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
-
-        var yaml = File.ReadAllText(GetExistingFilePath(filePath));
-
-        return Deserialize<T>(yaml);
     }
 
     /// <summary>

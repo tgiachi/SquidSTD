@@ -1,33 +1,50 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="coverlet.collector" Version="10.0.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
-    <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="coverlet.collector" Version="10.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="10.0.9" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
+        <PackageReference Include="Testcontainers.RabbitMq" Version="4.12.0" />
+        <PackageReference Include="Testcontainers.Redis" Version="4.12.0" />
+        <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Using Include="Xunit" />
-  </ItemGroup>
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Support/Resources/sample.txt" />
-  </ItemGroup>
+    <ItemGroup>
+        <Using Include="Xunit" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\SquidStd.Core\SquidStd.Core.csproj" />
-    <ProjectReference Include="..\..\src\SquidStd.Abstractions\SquidStd.Abstractions.csproj" />
-    <ProjectReference Include="..\..\src\SquidStd.Plugin.Abstractions\SquidStd.Plugin.Abstractions.csproj" />
-    <ProjectReference Include="..\..\src\SquidStd.Network\SquidStd.Network.csproj" />
-    <ProjectReference Include="..\..\src\SquidStd.Services.Core\SquidStd.Services.Core.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="Support/Resources/sample.txt" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\SquidStd.Core\SquidStd.Core.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Abstractions\SquidStd.Abstractions.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.AspNetCore\SquidStd.AspNetCore.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Plugin.Abstractions\SquidStd.Plugin.Abstractions.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Network\SquidStd.Network.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Services.Core\SquidStd.Services.Core.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Scripting.Lua\SquidStd.Scripting.Lua.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Messaging.Abstractions\SquidStd.Messaging.Abstractions.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Messaging\SquidStd.Messaging.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Database.Abstractions\SquidStd.Database.Abstractions.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Database\SquidStd.Database.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Messaging.RabbitMq\SquidStd.Messaging.RabbitMq.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Caching.Abstractions\SquidStd.Caching.Abstractions.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Caching\SquidStd.Caching.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Caching.Redis\SquidStd.Caching.Redis.csproj" />
+    </ItemGroup>
 
 </Project>

@@ -1,4 +1,3 @@
-using SquidStd.Core.Data.Jobs;
 using SquidStd.Core.Interfaces.Jobs;
 using SquidStd.Services.Core.Services;
 
@@ -7,35 +6,35 @@ namespace SquidStd.Tests.Services.Core;
 public class JobSystemServiceTests
 {
     [Fact]
-    public async Task Schedule_Action_RunsAndCompletes()
+    public async Task ScheduleAsync_Action_RunsAndCompletes()
     {
-        using var jobs = NewService(workerCount: 1);
+        using var jobs = NewService(1);
         IJobSystem system = jobs;
         var called = false;
         await jobs.StartAsync(CancellationToken.None);
 
-        await system.Schedule(() => called = true);
+        await system.ScheduleAsync(() => called = true);
 
         Assert.True(called);
         Assert.Equal(1, system.CompletedCount);
     }
 
     [Fact]
-    public async Task Schedule_Func_ReturnsValue()
+    public async Task ScheduleAsync_Func_ReturnsValue()
     {
-        using var jobs = NewService(workerCount: 2);
+        using var jobs = NewService(2);
         IJobSystem system = jobs;
         await jobs.StartAsync(CancellationToken.None);
 
-        var result = await system.Schedule(() => 42);
+        var result = await system.ScheduleAsync(() => 42);
 
         Assert.Equal(42, result);
     }
 
     [Fact]
-    public async Task Schedule_ManyJobs_AllComplete()
+    public async Task ScheduleAsync_ManyJobs_AllComplete()
     {
-        using var jobs = NewService(workerCount: 4);
+        using var jobs = NewService(4);
         IJobSystem system = jobs;
         var sum = 0;
         var sync = new Lock();
@@ -46,7 +45,7 @@ public class JobSystemServiceTests
         {
             var value = i;
             tasks.Add(
-                system.Schedule(
+                system.ScheduleAsync(
                     () =>
                     {
                         lock (sync)
@@ -65,43 +64,43 @@ public class JobSystemServiceTests
     }
 
     [Fact]
-    public async Task Schedule_ThrowingAction_PropagatesExceptionToAwaiter()
+    public async Task ScheduleAsync_ThrowingAction_PropagatesExceptionToAwaiter()
     {
-        using var jobs = NewService(workerCount: 1);
+        using var jobs = NewService(1);
         IJobSystem system = jobs;
         await jobs.StartAsync(CancellationToken.None);
 
         await Assert.ThrowsAsync<InvalidOperationException>(
-            () => system.Schedule(() => throw new InvalidOperationException("boom"))
+            () => system.ScheduleAsync(() => throw new InvalidOperationException("boom"))
         );
     }
 
     [Fact]
-    public async Task Schedule_TokenAlreadyCancelled_ReturnsCanceledTask()
+    public async Task ScheduleAsync_TokenAlreadyCancelled_ReturnsCanceledTask()
     {
-        using var jobs = NewService(workerCount: 1);
+        using var jobs = NewService(1);
         IJobSystem system = jobs;
         using var cancellationTokenSource = new CancellationTokenSource();
         await jobs.StartAsync(CancellationToken.None);
         await cancellationTokenSource.CancelAsync();
 
-        var task = system.Schedule(() => { }, cancellationTokenSource.Token);
+        var task = system.ScheduleAsync(() => { }, cancellationTokenSource.Token);
 
         await Assert.ThrowsAsync<TaskCanceledException>(() => task);
         Assert.Equal(TaskStatus.Canceled, task.Status);
     }
 
     [Fact]
-    public async Task Schedule_TokenCancelledBeforePickup_TransitionsToCanceled()
+    public async Task ScheduleAsync_TokenCancelledBeforePickup_TransitionsToCanceled()
     {
-        using var jobs = NewService(workerCount: 1);
+        using var jobs = NewService(1);
         IJobSystem system = jobs;
         using var gate = new ManualResetEventSlim(false);
         using var firstStarted = new ManualResetEventSlim(false);
         using var cancellationTokenSource = new CancellationTokenSource();
         await jobs.StartAsync(CancellationToken.None);
 
-        _ = system.Schedule(
+        _ = system.ScheduleAsync(
             () =>
             {
                 firstStarted.Set();
@@ -110,7 +109,7 @@ public class JobSystemServiceTests
         );
         Assert.True(firstStarted.Wait(TimeSpan.FromSeconds(2)), "first job did not start");
 
-        var task = system.Schedule(() => Assert.Fail("queued job should not run"), cancellationTokenSource.Token);
+        var task = system.ScheduleAsync(() => Assert.Fail("queued job should not run"), cancellationTokenSource.Token);
         await cancellationTokenSource.CancelAsync();
         gate.Set();
 
@@ -121,13 +120,13 @@ public class JobSystemServiceTests
     [Fact]
     public async Task StopAsync_CancelsQueuedJobsAndPreventsNewSchedules()
     {
-        var jobs = NewService(workerCount: 1);
+        var jobs = NewService(1);
         IJobSystem system = jobs;
         using var gate = new ManualResetEventSlim(false);
         using var firstStarted = new ManualResetEventSlim(false);
         await jobs.StartAsync(CancellationToken.None);
 
-        _ = system.Schedule(
+        _ = system.ScheduleAsync(
             () =>
             {
                 firstStarted.Set();
@@ -135,7 +134,7 @@ public class JobSystemServiceTests
             }
         );
         Assert.True(firstStarted.Wait(TimeSpan.FromSeconds(2)), "first job did not start");
-        var queued = system.Schedule(() => Assert.Fail("queued job should not run"));
+        var queued = system.ScheduleAsync(() => Assert.Fail("queued job should not run"));
 
         await jobs.StopAsync(CancellationToken.None);
         gate.Set();
@@ -144,31 +143,31 @@ public class JobSystemServiceTests
         Assert.Throws<ObjectDisposedException>(
             () =>
             {
-                _ = system.Schedule(() => { });
+                _ = system.ScheduleAsync(() => { });
             }
         );
         jobs.Dispose();
     }
 
     [Fact]
-    public void WorkerCount_UsesExplicitValue()
-    {
-        using var jobs = NewService(workerCount: 3);
-
-        Assert.Equal(3, jobs.WorkerCount);
-    }
-
-    [Fact]
     public void WorkerCount_AutoDetectsAtLeastOne()
     {
-        using var jobs = NewService(workerCount: 0);
+        using var jobs = NewService(0);
 
         Assert.True(jobs.WorkerCount >= 1);
     }
 
+    [Fact]
+    public void WorkerCount_UsesExplicitValue()
+    {
+        using var jobs = NewService(3);
+
+        Assert.Equal(3, jobs.WorkerCount);
+    }
+
     private static JobSystemService NewService(int workerCount)
         => new(
-            new JobsConfig
+            new()
             {
                 WorkerThreadCount = workerCount,
                 ShutdownTimeoutSeconds = 1.0

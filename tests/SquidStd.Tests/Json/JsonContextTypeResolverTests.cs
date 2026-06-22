@@ -15,20 +15,12 @@ public class JsonContextTypeResolverTests
     }
 
     [Fact]
-    public void IsTypeRegistered_RegisteredType_ReturnsTrue()
-        => Assert.True(JsonContextTypeResolver.IsTypeRegistered(TestJsonContext.Default, typeof(SampleDto)));
-
-    [Fact]
-    public void IsTypeRegistered_UnregisteredType_ReturnsFalse()
-        => Assert.False(JsonContextTypeResolver.IsTypeRegistered(TestJsonContext.Default, typeof(JsonContextTypeResolverTests)));
-
-    [Fact]
-    public void GetTypeInfo_RegisteredType_ReturnsTypeInfo()
+    public void GetRegisteredTypesGeneric_FiltersByBaseType()
     {
-        var typeInfo = JsonContextTypeResolver.GetTypeInfo<SampleDto>(TestJsonContext.Default);
+        var types = JsonContextTypeResolver.GetRegisteredTypes<SampleDto>(TestJsonContext.Default).ToList();
 
-        Assert.NotNull(typeInfo);
-        Assert.Equal(typeof(SampleDto), typeInfo.Type);
+        Assert.Contains(typeof(SampleDto), types);
+        Assert.DoesNotContain(typeof(OtherDto), types);
     }
 
     [Fact]
@@ -41,11 +33,21 @@ public class JsonContextTypeResolverTests
     }
 
     [Fact]
-    public void GetRegisteredTypesGeneric_FiltersByBaseType()
+    public void GetTypeInfo_RegisteredType_ReturnsTypeInfo()
     {
-        var types = JsonContextTypeResolver.GetRegisteredTypes<SampleDto>(TestJsonContext.Default).ToList();
+        var typeInfo = JsonContextTypeResolver.GetTypeInfo<SampleDto>(TestJsonContext.Default);
 
-        Assert.Contains(typeof(SampleDto), types);
-        Assert.DoesNotContain(typeof(OtherDto), types);
+        Assert.NotNull(typeInfo);
+        Assert.Equal(typeof(SampleDto), typeInfo.Type);
     }
+
+    [Fact]
+    public void IsTypeRegistered_RegisteredType_ReturnsTrue()
+        => Assert.True(JsonContextTypeResolver.IsTypeRegistered(TestJsonContext.Default, typeof(SampleDto)));
+
+    [Fact]
+    public void IsTypeRegistered_UnregisteredType_ReturnsFalse()
+        => Assert.False(
+            JsonContextTypeResolver.IsTypeRegistered(TestJsonContext.Default, typeof(JsonContextTypeResolverTests))
+        );
 }

@@ -11,42 +11,14 @@ public class PluginMetadataTests
         {
             Id = "squidstd.weather",
             Name = "Weather",
-            Version = new Version(2, 1, 0),
+            Version = new(2, 1, 0),
             Author = "squid"
         };
 
         Assert.Equal("squidstd.weather", metadata.Id);
         Assert.Equal("Weather", metadata.Name);
-        Assert.Equal(new Version(2, 1, 0), metadata.Version);
+        Assert.Equal(new(2, 1, 0), metadata.Version);
         Assert.Equal("squid", metadata.Author);
-    }
-
-    [Fact]
-    public void Description_DefaultsToNull()
-    {
-        var metadata = new PluginMetadata
-        {
-            Id = "id",
-            Name = "name",
-            Version = new Version(1, 0),
-            Author = "author"
-        };
-
-        Assert.Null(metadata.Description);
-    }
-
-    [Fact]
-    public void Dependencies_DefaultsToEmpty()
-    {
-        var metadata = new PluginMetadata
-        {
-            Id = "id",
-            Name = "name",
-            Version = new Version(1, 0),
-            Author = "author"
-        };
-
-        Assert.Empty(metadata.Dependencies);
     }
 
     [Fact]
@@ -56,11 +28,39 @@ public class PluginMetadataTests
         {
             Id = "id",
             Name = "name",
-            Version = new Version(1, 0),
+            Version = new(1, 0),
             Author = "author",
             Dependencies = ["squidstd.core", "squidstd.net"]
         };
 
         Assert.Equal(["squidstd.core", "squidstd.net"], metadata.Dependencies);
+    }
+
+    [Fact]
+    public void Dependencies_DefaultsToEmpty()
+    {
+        var metadata = new PluginMetadata
+        {
+            Id = "id",
+            Name = "name",
+            Version = new(1, 0),
+            Author = "author"
+        };
+
+        Assert.Empty(metadata.Dependencies);
+    }
+
+    [Fact]
+    public void Description_DefaultsToNull()
+    {
+        var metadata = new PluginMetadata
+        {
+            Id = "id",
+            Name = "name",
+            Version = new(1, 0),
+            Author = "author"
+        };
+
+        Assert.Null(metadata.Description);
     }
 }

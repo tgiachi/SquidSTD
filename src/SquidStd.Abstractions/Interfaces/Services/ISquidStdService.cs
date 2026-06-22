@@ -14,5 +14,4 @@ public interface ISquidStdService
     /// <param name="cancellationToken">Token used to cancel the asynchronous operation.</param>
     /// <returns>A task that represents the asynchronous stop operation.</returns>
     ValueTask StopAsync(CancellationToken cancellationToken = default);
-
 }

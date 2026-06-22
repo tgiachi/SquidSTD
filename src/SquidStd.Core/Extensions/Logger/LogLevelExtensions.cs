@@ -21,6 +21,7 @@ public static class LogLevelExtensions
             LogLevelType.Information => LogEventLevel.Information,
             LogLevelType.Warning     => LogEventLevel.Warning,
             LogLevelType.Error       => LogEventLevel.Error,
+            LogLevelType.Critical    => LogEventLevel.Fatal,
             _                        => LogEventLevel.Information
         };
 }

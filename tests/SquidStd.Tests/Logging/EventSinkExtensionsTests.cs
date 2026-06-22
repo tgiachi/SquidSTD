@@ -11,13 +11,16 @@ public class EventSinkExtensionsTests
     public void EventSink_WiredIntoSerilog_RaisesEventsForLogs()
     {
         LogEventData? captured = null;
-        void Handler(object? sender, LogEventData data) => captured = data;
+
+        void Handler(object? sender, LogEventData data)
+            => captured = data;
 
         EventSink.OnLogReceived += Handler;
 
         var logger = new LoggerConfiguration()
-                    .WriteTo.EventSink()
-                    .CreateLogger();
+                     .WriteTo
+                     .EventSink()
+                     .CreateLogger();
 
         try
         {

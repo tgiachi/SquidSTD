@@ -74,7 +74,7 @@ public sealed class SquidTcpServer : INetworkServer, IAsyncDisposable, IDisposab
     /// <summary>
     /// Initializes a TCP server bound to the given endpoint.
     /// </summary>
-    /// <param name="endPoint">Endpoint to bind on every <see cref="StartAsync" />.</param>
+    /// <param name="endPoint">Endpoint to bind on every <c>StartAsync</c>.</param>
     /// <param name="framer">
     /// Optional framer template. The same instance is shared by all accepted clients,
     /// so implementations must be stateless or thread-safe.
@@ -108,14 +108,6 @@ public sealed class SquidTcpServer : INetworkServer, IAsyncDisposable, IDisposab
 
         return this;
     }
-
-    /// <inheritdoc />
-    public void Dispose()
-        => DisposeAsync().AsTask().GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public async ValueTask DisposeAsync()
-        => await StopAsync(CancellationToken.None);
 
     /// <summary>
     /// Starts accepting clients. Recreates the listening socket on every call,
@@ -312,4 +304,12 @@ public sealed class SquidTcpServer : INetworkServer, IAsyncDisposable, IDisposab
                                      OnClientDisconnect?.Invoke(this, args);
                                  };
     }
+
+    /// <inheritdoc />
+    public void Dispose()
+        => DisposeAsync().AsTask().GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+        => await StopAsync(CancellationToken.None);
 }

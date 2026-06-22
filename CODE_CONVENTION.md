@@ -99,7 +99,7 @@ public enum DirectoryType { Scripts, Logs, Plugins, Configs }
 
 ## 7. Strings
 
-- Always use `""` instead of `string.Empty`.
+- Always use `string.Empty` instead of `""`.
 
 ## 8. Logging
 
@@ -201,7 +201,7 @@ tests/SquidStd.Tests/Support/FakeSourcePlugin.cs    → namespace SquidStd.Tests
 - No TODO comments without a tracked follow-up.
 - No inconsistent naming across domains.
 - Keep warnings under control; do not normalize noisy warnings.
-- No `string.Empty` — use `""`.
+- No literal `""` — use `string.Empty`.
 - No primary constructors.
 - No expression-bodied constructors.
 

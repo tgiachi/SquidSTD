@@ -6,6 +6,10 @@ public class EnvExtensionsTests
 {
     private const string TestVariable = "SQUIDSTD_UNIT_TEST_VAR";
 
+    [Theory, InlineData(""), InlineData("no variables here")]
+    public void ExpandEnvironmentVariables_NoMatch_ReturnsInput(string input)
+        => Assert.Equal(input, input.ExpandEnvironmentVariables());
+
     [Fact]
     public void ExpandEnvironmentVariables_ReplacesDollarPrefixedVariable()
     {
@@ -22,10 +26,4 @@ public class EnvExtensionsTests
             Environment.SetEnvironmentVariable(TestVariable, null);
         }
     }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData("no variables here")]
-    public void ExpandEnvironmentVariables_NoMatch_ReturnsInput(string input)
-        => Assert.Equal(input, input.ExpandEnvironmentVariables());
 }

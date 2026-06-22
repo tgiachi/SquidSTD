@@ -72,4 +72,12 @@
         <None Include="$(MSBuildThisFileDirectory)assets/icon.png" Pack="true" PackagePath="" Visible="false" />
     </ItemGroup>
 
+    <!-- Package Readme (opt-in per project that ships a README.md) -->
+    <PropertyGroup Condition="Exists('$(MSBuildProjectDirectory)/README.md')">
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+    <ItemGroup Condition="Exists('$(MSBuildProjectDirectory)/README.md')">
+        <None Include="README.md" Pack="true" PackagePath="\" Visible="false" />
+    </ItemGroup>
+
 </Project>

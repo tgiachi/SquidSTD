@@ -1,4 +1,5 @@
 using System.Net;
+using SquidStd.Network.Data.Events;
 using SquidStd.Network.Sessions;
 using SquidStd.Tests.Support;
 
@@ -9,9 +10,21 @@ public class SessionTests
     private static readonly DateTimeOffset CreatedAt = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
     [Fact]
+    public async Task CloseAsync_DelegatesToConnection()
+    {
+        var connection = new FakeNetworkConnection();
+        var session = new Session<string>(1, connection, "s", CreatedAt);
+
+        await session.CloseAsync();
+
+        Assert.Equal(1, connection.CloseCount);
+        Assert.False(session.IsConnected);
+    }
+
+    [Fact]
     public void Constructor_PopulatesProperties()
     {
-        var connection = new FakeNetworkConnection(sessionId: 42, remoteEndPoint: new IPEndPoint(IPAddress.Loopback, 7000));
+        var connection = new FakeNetworkConnection(42, new IPEndPoint(IPAddress.Loopback, 7000));
         var session = new Session<string>(42, connection, "state", CreatedAt);
 
         Assert.Equal(42, session.SessionId);
@@ -35,33 +48,21 @@ public class SessionTests
     }
 
     [Fact]
-    public async Task CloseAsync_DelegatesToConnection()
+    public void SessionDataEventArgs_CarriesSessionAndData()
     {
-        var connection = new FakeNetworkConnection();
-        var session = new Session<string>(1, connection, "s", CreatedAt);
+        var session = new Session<string>(1, new FakeNetworkConnection(), "s", CreatedAt);
+        var args = new SquidStdSessionDataEventArgs<string>(session, new byte[] { 9 });
 
-        await session.CloseAsync();
-
-        Assert.Equal(1, connection.CloseCount);
-        Assert.False(session.IsConnected);
+        Assert.Same(session, args.Session);
+        Assert.Equal([9], args.Data.ToArray());
     }
 
     [Fact]
     public void SessionEventArgs_CarriesSession()
     {
         var session = new Session<string>(1, new FakeNetworkConnection(), "s", CreatedAt);
-        var args = new SquidStd.Network.Data.Events.SquidStdSessionEventArgs<string>(session);
+        var args = new SquidStdSessionEventArgs<string>(session);
 
         Assert.Same(session, args.Session);
-    }
-
-    [Fact]
-    public void SessionDataEventArgs_CarriesSessionAndData()
-    {
-        var session = new Session<string>(1, new FakeNetworkConnection(), "s", CreatedAt);
-        var args = new SquidStd.Network.Data.Events.SquidStdSessionDataEventArgs<string>(session, new byte[] { 9 });
-
-        Assert.Same(session, args.Session);
-        Assert.Equal([9], args.Data.ToArray());
     }
 }

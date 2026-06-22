@@ -1,8 +1,22 @@
 <Solution>
-    <Project Path="src/SquidStd.Abstractions/SquidStd.Abstractions.csproj" />
-    <Project Path="src/SquidStd.Core/SquidStd.Core.csproj" />
-    <Project Path="src/SquidStd.Network/SquidStd.Network.csproj" />
-    <Project Path="src/SquidStd.Plugin.Abstractions/SquidStd.Plugin.Abstractions.csproj" />
-    <Project Path="src/SquidStd.Services.Core/SquidStd.Services.Core.csproj" />
-    <Project Path="tests/SquidStd.Tests/SquidStd.Tests.csproj" />
+    <Folder Name="/src/">
+        <Project Path="src/SquidStd.Abstractions/SquidStd.Abstractions.csproj" />
+        <Project Path="src/SquidStd.AspNetCore/SquidStd.AspNetCore.csproj" />
+        <Project Path="src/SquidStd.Caching.Abstractions/SquidStd.Caching.Abstractions.csproj" />
+        <Project Path="src/SquidStd.Caching.Redis/SquidStd.Caching.Redis.csproj" />
+        <Project Path="src/SquidStd.Caching/SquidStd.Caching.csproj" />
+        <Project Path="src/SquidStd.Core/SquidStd.Core.csproj" />
+        <Project Path="src/SquidStd.Database.Abstractions/SquidStd.Database.Abstractions.csproj" />
+        <Project Path="src/SquidStd.Database/SquidStd.Database.csproj" />
+        <Project Path="src/SquidStd.Messaging.Abstractions/SquidStd.Messaging.Abstractions.csproj" />
+        <Project Path="src/SquidStd.Messaging.RabbitMq/SquidStd.Messaging.RabbitMq.csproj" />
+        <Project Path="src/SquidStd.Messaging/SquidStd.Messaging.csproj" />
+        <Project Path="src/SquidStd.Network/SquidStd.Network.csproj" />
+        <Project Path="src/SquidStd.Plugin.Abstractions/SquidStd.Plugin.Abstractions.csproj" />
+        <Project Path="src/SquidStd.Scripting.Lua/SquidStd.Scripting.Lua.csproj" />
+        <Project Path="src/SquidStd.Services.Core/SquidStd.Services.Core.csproj" />
+    </Folder>
+    <Folder Name="/tests/">
+        <Project Path="tests/SquidStd.Tests/SquidStd.Tests.csproj" />
+    </Folder>
 </Solution>

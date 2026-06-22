@@ -288,34 +288,6 @@ public sealed class SquidStdTcpClient : INetworkConnection, IAsyncDisposable, ID
         where TMiddleware : INetMiddleware
         => _middlewarePipeline.ContainsMiddleware<TMiddleware>();
 
-    /// <inheritdoc />
-    public void Dispose() // Sync-over-async: best effort. Prefer DisposeAsync.
-        => DisposeAsync().AsTask().GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public async ValueTask DisposeAsync()
-    {
-        await CloseAsync(CancellationToken.None);
-
-        // Drain the receive loop before disposing the resources it relies on.
-        if (_receiveLoopTask is not null)
-        {
-            try
-            {
-                await _receiveLoopTask;
-            }
-            catch
-            {
-                // Loop failures are already surfaced via OnException.
-            }
-        }
-
-        await _stream.DisposeAsync();
-        _sendLock.Dispose();
-        _internalCancellationTokenSource.Dispose();
-        _socket.Dispose();
-    }
-
     /// <summary>
     /// Returns a snapshot of recent received bytes from the circular history buffer.
     /// </summary>
@@ -601,5 +573,33 @@ public sealed class SquidStdTcpClient : INetworkConnection, IAsyncDisposable, ID
         ArrayPool<byte>.Shared.Return(_pendingBuffer);
         _pendingBuffer = null;
         _pendingLength = 0;
+    }
+
+    /// <inheritdoc />
+    public void Dispose() // Sync-over-async: best effort. Prefer DisposeAsync.
+        => DisposeAsync().AsTask().GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        await CloseAsync(CancellationToken.None);
+
+        // Drain the receive loop before disposing the resources it relies on.
+        if (_receiveLoopTask is not null)
+        {
+            try
+            {
+                await _receiveLoopTask;
+            }
+            catch
+            {
+                // Loop failures are already surfaced via OnException.
+            }
+        }
+
+        await _stream.DisposeAsync();
+        _sendLock.Dispose();
+        _internalCancellationTokenSource.Dispose();
+        _socket.Dispose();
     }
 }

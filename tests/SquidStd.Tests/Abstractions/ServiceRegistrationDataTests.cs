@@ -5,6 +5,14 @@ namespace SquidStd.Tests.Abstractions;
 public class ServiceRegistrationDataTests
 {
     [Fact]
+    public void Constructor_DefaultPriority_IsZero()
+    {
+        var data = new ServiceRegistrationData(typeof(IDisposable), typeof(string));
+
+        Assert.Equal(0, data.Priority);
+    }
+
+    [Fact]
     public void Constructor_SetsProperties()
     {
         var data = new ServiceRegistrationData(typeof(IDisposable), typeof(string), 3);
@@ -15,11 +23,12 @@ public class ServiceRegistrationDataTests
     }
 
     [Fact]
-    public void Constructor_DefaultPriority_IsZero()
+    public void Records_WithDifferentPriority_AreNotEqual()
     {
-        var data = new ServiceRegistrationData(typeof(IDisposable), typeof(string));
+        var first = new ServiceRegistrationData(typeof(IDisposable), typeof(string), 1);
+        var second = new ServiceRegistrationData(typeof(IDisposable), typeof(string), 2);
 
-        Assert.Equal(0, data.Priority);
+        Assert.NotEqual(first, second);
     }
 
     [Fact]
@@ -29,14 +38,5 @@ public class ServiceRegistrationDataTests
         var second = new ServiceRegistrationData(typeof(IDisposable), typeof(string), 1);
 
         Assert.Equal(first, second);
-    }
-
-    [Fact]
-    public void Records_WithDifferentPriority_AreNotEqual()
-    {
-        var first = new ServiceRegistrationData(typeof(IDisposable), typeof(string), 1);
-        var second = new ServiceRegistrationData(typeof(IDisposable), typeof(string), 2);
-
-        Assert.NotEqual(first, second);
     }
 }

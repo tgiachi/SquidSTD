@@ -53,7 +53,7 @@ public sealed class TimerWheelService : ITimerService, ISquidStdService
 
         for (var i = 0; i < _wheel.Length; i++)
         {
-            _wheel[i] = new LinkedList<TimerEntry>();
+            _wheel[i] = new();
         }
     }
 

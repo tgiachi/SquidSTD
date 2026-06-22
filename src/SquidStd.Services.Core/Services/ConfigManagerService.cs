@@ -1,6 +1,8 @@
+using System.Reflection;
 using DryIoc;
 using SquidStd.Abstractions.Data.Internal.Config;
 using SquidStd.Abstractions.Interfaces.Services;
+using SquidStd.Core.Extensions.Env;
 using SquidStd.Core.Interfaces.Config;
 using SquidStd.Core.Yaml;
 
@@ -15,24 +17,6 @@ public sealed class ConfigManagerService : IConfigManagerService, ISquidStdServi
     private readonly Dictionary<Type, object> _values = [];
     private int _started;
 
-    /// <summary>
-    /// Initializes the config manager service.
-    /// </summary>
-    /// <param name="container">Container that receives loaded configuration sections.</param>
-    /// <param name="configName">Logical configuration name or YAML file name.</param>
-    /// <param name="configDirectory">Directory where the configuration file is searched.</param>
-    public ConfigManagerService(IContainer container, string configName, string configDirectory)
-    {
-        ArgumentNullException.ThrowIfNull(container);
-        ArgumentException.ThrowIfNullOrWhiteSpace(configName);
-        ArgumentException.ThrowIfNullOrWhiteSpace(configDirectory);
-
-        _container = container;
-        ConfigName = configName;
-        ConfigDirectory = Path.GetFullPath(configDirectory);
-        ConfigPath = ResolveConfigPath(configName, ConfigDirectory);
-    }
-
     /// <inheritdoc />
     public string ConfigName { get; }
 
@@ -44,6 +28,23 @@ public sealed class ConfigManagerService : IConfigManagerService, ISquidStdServi
 
     /// <inheritdoc />
     public IReadOnlyCollection<IConfigEntry> Entries => GetEntries();
+
+    /// <summary>
+    /// Initializes the config manager service.
+    /// </summary>
+    /// <param name="container">Container that receives loaded configuration sections.</param>
+    /// <param name="configName">Logical configuration name or YAML file name.</param>
+    /// <param name="configDirectory">Directory where the configuration file is searched.</param>
+    public ConfigManagerService(IContainer container, string configName, string configDirectory)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(configName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(configDirectory);
+
+        _container = container;
+        ConfigName = configName;
+        ConfigDirectory = Path.GetFullPath(configDirectory);
+        ConfigPath = ResolveConfigPath(configName, ConfigDirectory);
+    }
 
     /// <inheritdoc />
     public string Compose()
@@ -66,7 +67,10 @@ public sealed class ConfigManagerService : IConfigManagerService, ISquidStdServi
             var entry = entries[i];
             var value = string.IsNullOrWhiteSpace(yaml)
                             ? entry.CreateDefault()
-                            : YamlUtils.DeserializeSection(yaml, entry.SectionName, entry.ConfigType) ?? entry.CreateDefault();
+                            : YamlUtils.DeserializeSection(yaml, entry.SectionName, entry.ConfigType) ??
+                              entry.CreateDefault();
+
+            ApplyEnvSubstitution(value, new HashSet<object>(ReferenceEqualityComparer.Instance));
 
             _values[entry.ConfigType] = value;
             _container.RegisterInstance(entry.ConfigType, value, IfAlreadyRegistered.Replace);
@@ -135,10 +139,52 @@ public sealed class ConfigManagerService : IConfigManagerService, ISquidStdServi
             return [];
         }
 
-        return _container.Resolve<List<ConfigRegistrationData>>()
+        return
+        [
+            .. _container.Resolve<List<ConfigRegistrationData>>()
                          .OrderBy(entry => entry.Priority)
                          .ThenBy(entry => entry.SectionName, StringComparer.Ordinal)
-                         .ToList();
+        ];
+    }
+
+    private static void ApplyEnvSubstitution(object? instance, HashSet<object> visited)
+    {
+        if (instance is null || !visited.Add(instance))
+        {
+            return;
+        }
+
+        var type = instance.GetType();
+
+        if (type.Namespace is null || !type.Namespace.StartsWith("SquidStd", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        {
+            if (property.GetIndexParameters().Length > 0)
+            {
+                continue;
+            }
+
+            if (property.PropertyType == typeof(string) && property.CanRead && property.CanWrite)
+            {
+                var current = (string?)property.GetValue(instance);
+
+                if (!string.IsNullOrEmpty(current))
+                {
+                    property.SetValue(instance, current.ReplaceEnv());
+                }
+
+                continue;
+            }
+
+            if (property.PropertyType.IsClass && property.PropertyType != typeof(string) && property.CanRead)
+            {
+                ApplyEnvSubstitution(property.GetValue(instance), visited);
+            }
+        }
     }
 
     private static string ResolveConfigPath(string configName, string configDirectory)

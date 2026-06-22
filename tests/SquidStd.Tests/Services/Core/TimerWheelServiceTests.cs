@@ -1,4 +1,3 @@
-using SquidStd.Core.Data.Timing;
 using SquidStd.Core.Interfaces.Timing;
 using SquidStd.Services.Core.Services;
 
@@ -7,50 +6,32 @@ namespace SquidStd.Tests.Services.Core;
 public class TimerWheelServiceTests
 {
     [Fact]
-    public void RegisterTimer_ReturnsNonEmptyDistinctIds()
+    public void CallbackException_DoesNotStopOtherTimers()
     {
-        ITimerService timer = NewService();
-
-        var first = timer.RegisterTimer("timer", TimeSpan.FromMilliseconds(8), () => { });
-        var second = timer.RegisterTimer("timer", TimeSpan.FromMilliseconds(8), () => { });
-
-        Assert.False(string.IsNullOrEmpty(first));
-        Assert.False(string.IsNullOrEmpty(second));
-        Assert.NotEqual(first, second);
-    }
-
-    [Fact]
-    public void OneShot_FiresExactlyOnceAtDueTime()
-    {
-        ITimerService timer = NewService(tickDurationMs: 8, wheelSize: 8);
+        ITimerService timer = NewService(8, 8);
         var calls = 0;
-        timer.RegisterTimer("once", TimeSpan.FromMilliseconds(8), () => calls++);
+        timer.RegisterTimer("bad", TimeSpan.FromMilliseconds(8), () => throw new InvalidOperationException("boom"));
+        timer.RegisterTimer("good", TimeSpan.FromMilliseconds(8), () => calls++);
 
         timer.UpdateTicksDelta(0);
         timer.UpdateTicksDelta(8);
-        timer.UpdateTicksDelta(16);
-        timer.UpdateTicksDelta(24);
 
         Assert.Equal(1, calls);
     }
 
     [Fact]
-    public void Repeating_FiresEveryInterval()
+    public void Ctor_InvalidConfig_Throws()
     {
-        ITimerService timer = NewService(tickDurationMs: 8, wheelSize: 8);
-        var calls = 0;
-        timer.RegisterTimer("repeat", TimeSpan.FromMilliseconds(16), () => calls++, repeat: true);
-
-        timer.UpdateTicksDelta(0);
-        timer.UpdateTicksDelta(80);
-
-        Assert.Equal(5, calls);
+        Assert.Throws<ArgumentOutOfRangeException>(() => new TimerWheelService(new() { TickDuration = TimeSpan.Zero }));
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => new TimerWheelService(new() { TickDuration = TimeSpan.FromMilliseconds(8), WheelSize = 0 })
+        );
     }
 
     [Fact]
     public void Delay_PostponesFirstExecutionThenUsesInterval()
     {
-        ITimerService timer = NewService(tickDurationMs: 8, wheelSize: 16);
+        ITimerService timer = NewService();
         var timestamps = new List<long>();
         var current = 0L;
         timer.RegisterTimer(
@@ -58,7 +39,7 @@ public class TimerWheelServiceTests
             TimeSpan.FromMilliseconds(8),
             () => timestamps.Add(current),
             TimeSpan.FromMilliseconds(24),
-            repeat: true
+            true
         );
 
         timer.UpdateTicksDelta(0);
@@ -73,9 +54,64 @@ public class TimerWheelServiceTests
     }
 
     [Fact]
+    public void OneShot_FiresExactlyOnceAtDueTime()
+    {
+        ITimerService timer = NewService(8, 8);
+        var calls = 0;
+        timer.RegisterTimer("once", TimeSpan.FromMilliseconds(8), () => calls++);
+
+        timer.UpdateTicksDelta(0);
+        timer.UpdateTicksDelta(8);
+        timer.UpdateTicksDelta(16);
+        timer.UpdateTicksDelta(24);
+
+        Assert.Equal(1, calls);
+    }
+
+    [Fact]
+    public void RegisterTimer_ReturnsNonEmptyDistinctIds()
+    {
+        ITimerService timer = NewService();
+
+        var first = timer.RegisterTimer("timer", TimeSpan.FromMilliseconds(8), () => { });
+        var second = timer.RegisterTimer("timer", TimeSpan.FromMilliseconds(8), () => { });
+
+        Assert.False(string.IsNullOrEmpty(first));
+        Assert.False(string.IsNullOrEmpty(second));
+        Assert.NotEqual(first, second);
+    }
+
+    [Fact]
+    public void Repeating_FiresEveryInterval()
+    {
+        ITimerService timer = NewService(8, 8);
+        var calls = 0;
+        timer.RegisterTimer("repeat", TimeSpan.FromMilliseconds(16), () => calls++, repeat: true);
+
+        timer.UpdateTicksDelta(0);
+        timer.UpdateTicksDelta(80);
+
+        Assert.Equal(5, calls);
+    }
+
+    [Fact]
+    public async Task StopAsync_ClearsState()
+    {
+        var timer = NewService();
+        ITimerService service = timer;
+        service.RegisterTimer("first", TimeSpan.FromMilliseconds(8), () => { });
+        service.RegisterTimer("second", TimeSpan.FromMilliseconds(8), () => { });
+
+        await timer.StopAsync(CancellationToken.None);
+
+        Assert.Equal(0, service.UnregisterTimersByName("first"));
+        Assert.Equal(0, service.UnregisterTimersByName("second"));
+    }
+
+    [Fact]
     public void UnregisterTimer_BeforeDueTime_PreventsCallback()
     {
-        ITimerService timer = NewService(tickDurationMs: 8, wheelSize: 8);
+        ITimerService timer = NewService(8, 8);
         var calls = 0;
         var timerId = timer.RegisterTimer("cancel", TimeSpan.FromMilliseconds(8), () => calls++);
 
@@ -102,23 +138,9 @@ public class TimerWheelServiceTests
     }
 
     [Fact]
-    public void CallbackException_DoesNotStopOtherTimers()
-    {
-        ITimerService timer = NewService(tickDurationMs: 8, wheelSize: 8);
-        var calls = 0;
-        timer.RegisterTimer("bad", TimeSpan.FromMilliseconds(8), () => throw new InvalidOperationException("boom"));
-        timer.RegisterTimer("good", TimeSpan.FromMilliseconds(8), () => calls++);
-
-        timer.UpdateTicksDelta(0);
-        timer.UpdateTicksDelta(8);
-
-        Assert.Equal(1, calls);
-    }
-
-    [Fact]
     public void UpdateTicksDelta_AdvancesByWholeTicks()
     {
-        ITimerService timer = NewService(tickDurationMs: 8);
+        ITimerService timer = NewService();
         timer.UpdateTicksDelta(0);
 
         var processed = timer.UpdateTicksDelta(24);
@@ -126,34 +148,9 @@ public class TimerWheelServiceTests
         Assert.Equal(3, processed);
     }
 
-    [Fact]
-    public async Task StopAsync_ClearsState()
-    {
-        var timer = NewService();
-        ITimerService service = timer;
-        service.RegisterTimer("first", TimeSpan.FromMilliseconds(8), () => { });
-        service.RegisterTimer("second", TimeSpan.FromMilliseconds(8), () => { });
-
-        await timer.StopAsync(CancellationToken.None);
-
-        Assert.Equal(0, service.UnregisterTimersByName("first"));
-        Assert.Equal(0, service.UnregisterTimersByName("second"));
-    }
-
-    [Fact]
-    public void Ctor_InvalidConfig_Throws()
-    {
-        Assert.Throws<ArgumentOutOfRangeException>(
-            () => new TimerWheelService(new TimerWheelConfig { TickDuration = TimeSpan.Zero })
-        );
-        Assert.Throws<ArgumentOutOfRangeException>(
-            () => new TimerWheelService(new TimerWheelConfig { TickDuration = TimeSpan.FromMilliseconds(8), WheelSize = 0 })
-        );
-    }
-
     private static TimerWheelService NewService(int tickDurationMs = 8, int wheelSize = 16)
         => new(
-            new TimerWheelConfig
+            new()
             {
                 TickDuration = TimeSpan.FromMilliseconds(tickDurationMs),
                 WheelSize = wheelSize

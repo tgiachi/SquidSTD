@@ -289,13 +289,6 @@ public static class ResourceUtils
     }
 
     /// <summary>
-    /// Gets a stream for an embedded resource
-    /// </summary>
-    /// <param name="assembly">The assembly containing the resource</param>
-    /// <param name="resourceName">The full resource name</param>
-    /// <returns>A stream for the resource</returns>
-    /// <exception cref="FileNotFoundException">Thrown when the resource cannot be found</exception>
-    /// <summary>
     /// Gets a stream for an embedded resource, inferring the assembly from <typeparamref name="TClass" />.
     /// </summary>
     /// <typeparam name="TClass">Any type defined in the target assembly.</typeparam>
@@ -305,6 +298,13 @@ public static class ResourceUtils
     public static Stream GetEmbeddedResourceStream<TClass>(string resourceName)
         => GetEmbeddedResourceStream(typeof(TClass).Assembly, resourceName);
 
+    /// <summary>
+    /// Gets a stream for an embedded resource.
+    /// </summary>
+    /// <param name="assembly">The assembly containing the resource.</param>
+    /// <param name="resourceName">The full resource name.</param>
+    /// <returns>A stream for the resource.</returns>
+    /// <exception cref="FileNotFoundException">Thrown when the resource cannot be found.</exception>
     public static Stream GetEmbeddedResourceStream(Assembly assembly, string resourceName)
     {
         ArgumentNullException.ThrowIfNull(assembly);

@@ -47,13 +47,11 @@ jobs:
       - name: Pack publishable packages
         run: |
           set -euo pipefail
-          packages=(
-            "src/SquidStd.Abstractions/SquidStd.Abstractions.csproj"
-            "src/SquidStd.Core/SquidStd.Core.csproj"
-            "src/SquidStd.Network/SquidStd.Network.csproj"
-            "src/SquidStd.Plugin.Abstractions/SquidStd.Plugin.Abstractions.csproj"
-            "src/SquidStd.Services.Core/SquidStd.Services.Core.csproj"
-          )
+          # Discover every project opted-in with <PublishNuget>true</PublishNuget>.
+          mapfile -t packages < <(grep -ril --include='*.csproj' '<PublishNuget>true</PublishNuget>' src | sort)
+          if [[ ${#packages[@]} -eq 0 ]]; then
+            echo "No project has <PublishNuget>true</PublishNuget>"; exit 1
+          fi
           for project in "${packages[@]}"; do
             echo "Packing ${project}"
             dotnet pack "${project}" -c Release --no-build

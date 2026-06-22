@@ -8,10 +8,9 @@ public class PlatformUtilsTests
     [Fact]
     public void GetCurrentPlatform_MatchesOperatingSystemDetection()
     {
-        var expected = OperatingSystem.IsWindows() ? PlatformType.Windows
-            : OperatingSystem.IsMacOS() ? PlatformType.MacOS
-            : OperatingSystem.IsLinux() ? PlatformType.Linux
-            : PlatformType.Unknown;
+        var expected = OperatingSystem.IsWindows() ? PlatformType.Windows :
+                       OperatingSystem.IsMacOS() ? PlatformType.MacOS :
+                       OperatingSystem.IsLinux() ? PlatformType.Linux : PlatformType.Unknown;
 
         Assert.Equal(expected, PlatformUtils.GetCurrentPlatform());
     }

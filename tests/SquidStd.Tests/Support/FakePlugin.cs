@@ -16,7 +16,7 @@ public class FakePlugin : ISquidStdPlugin
     {
         Id = "squidstd.fake",
         Name = "Fake Plugin",
-        Version = new Version(1, 2, 3),
+        Version = new(1, 2, 3),
         Author = "tests"
     };
 

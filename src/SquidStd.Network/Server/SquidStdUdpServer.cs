@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using Serilog;
@@ -22,6 +23,7 @@ public sealed class SquidStdUdpServer : INetworkServer, IAsyncDisposable, IDispo
     private readonly ILogger _logger = Log.ForContext<SquidStdUdpServer>();
     private readonly List<Task> _receiveLoops = [];
     private readonly Lock _sync = new();
+    private readonly ConcurrentDictionary<IPEndPoint, UdpClient> _endpointListeners = new();
 
     private CancellationTokenSource? _cancellationTokenSource;
     private int _started;
@@ -79,12 +81,18 @@ public sealed class SquidStdUdpServer : INetworkServer, IAsyncDisposable, IDispo
     }
 
     /// <summary>
+    /// Raised for every datagram received, carrying the sender endpoint. Always raised, regardless of
+    /// <see cref="OnDatagram" />.
+    /// </summary>
+    public event EventHandler<SquidStdUdpDatagramReceivedEventArgs>? OnDatagramReceived;
+
+    /// <summary>
     /// Raised when receive loops throw an unexpected exception.
     /// </summary>
     public event EventHandler<SquidStdTcpExceptionEventArgs>? OnException;
 
     /// <summary>
-    /// Initializes a UDP server bound to the given endpoint on every <see cref="StartAsync" />.
+    /// Initializes a UDP server bound to the given endpoint on every <c>StartAsync</c>.
     /// </summary>
     /// <param name="endPoint">Endpoint supplying the port (and address when not binding all interfaces).</param>
     /// <param name="bindAllInterfaces">
@@ -98,14 +106,6 @@ public sealed class SquidStdUdpServer : INetworkServer, IAsyncDisposable, IDispo
         _endPoint = endPoint;
         _bindAllInterfaces = bindAllInterfaces;
     }
-
-    /// <inheritdoc />
-    public void Dispose()
-        => DisposeAsync().AsTask().GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public async ValueTask DisposeAsync()
-        => await StopAsync(CancellationToken.None);
 
     /// <summary>
     /// Starts listening, binding sockets and launching a receive loop per socket. Recreates the
@@ -236,6 +236,9 @@ public sealed class SquidStdUdpServer : INetworkServer, IAsyncDisposable, IDispo
             try
             {
                 var result = await listener.ReceiveAsync(cancellationToken);
+                _endpointListeners[result.RemoteEndPoint] = listener;
+                OnDatagramReceived?.Invoke(this, new(result.RemoteEndPoint, result.Buffer));
+
                 var response = OnDatagram is null
                                    ? result.Buffer
                                    : OnDatagram(result.Buffer, result.RemoteEndPoint);
@@ -265,6 +268,38 @@ public sealed class SquidStdUdpServer : INetworkServer, IAsyncDisposable, IDispo
         }
     }
 
+    /// <summary>
+    /// Sends a datagram to a specific endpoint, using the listener that last received from it
+    /// (falling back to the first listener). No-op when no listener is available.
+    /// </summary>
+    public async Task SendToAsync(IPEndPoint endPoint, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(endPoint);
+
+        if (!_endpointListeners.TryGetValue(endPoint, out var listener))
+        {
+            lock (_sync)
+            {
+                listener = _listeners.FirstOrDefault();
+            }
+        }
+
+        if (listener is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await listener.SendAsync(payload, endPoint, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.Warning(ex, "UDP SendToAsync failed for {EndPoint}", endPoint);
+            OnException?.Invoke(this, new(ex));
+        }
+    }
+
     private IEnumerable<IPEndPoint> ResolveBindEndPoints()
     {
         if (!_bindAllInterfaces)
@@ -272,6 +307,18 @@ public sealed class SquidStdUdpServer : INetworkServer, IAsyncDisposable, IDispo
             return [_endPoint];
         }
 
-        return [.. NetworkUtils.GetListeningAddresses(_endPoint).Select(address => new IPEndPoint(address.Address, _endPoint.Port))];
+        return
+        [
+            .. NetworkUtils.GetListeningAddresses(_endPoint)
+                           .Select(address => new IPEndPoint(address.Address, _endPoint.Port))
+        ];
     }
+
+    /// <inheritdoc />
+    public void Dispose()
+        => DisposeAsync().AsTask().GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+        => await StopAsync(CancellationToken.None);
 }

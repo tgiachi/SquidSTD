@@ -24,18 +24,18 @@ public sealed class FakeNetworkConnection : INetworkConnection
         RemoteEndPoint = remoteEndPoint ?? new IPEndPoint(IPAddress.Loopback, 1234);
     }
 
-    public Task SendAsync(ReadOnlyMemory<byte> payload, CancellationToken cancellationToken)
-    {
-        _sent.Add(payload.ToArray());
-
-        return SendCallback?.Invoke(payload) ?? Task.CompletedTask;
-    }
-
     public Task CloseAsync(CancellationToken cancellationToken = default)
     {
         CloseCount++;
         IsConnected = false;
 
         return Task.CompletedTask;
+    }
+
+    public Task SendAsync(ReadOnlyMemory<byte> payload, CancellationToken cancellationToken)
+    {
+        _sent.Add(payload.ToArray());
+
+        return SendCallback?.Invoke(payload) ?? Task.CompletedTask;
     }
 }

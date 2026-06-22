@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <PublishNuget>true</PublishNuget>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SquidStd.Messaging.Abstractions\SquidStd.Messaging.Abstractions.csproj" />
+        <ProjectReference Include="..\SquidStd.Core\SquidStd.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="DryIoc.dll" Version="5.4.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="SquidStd.Tests" />
+    </ItemGroup>
+
+</Project>

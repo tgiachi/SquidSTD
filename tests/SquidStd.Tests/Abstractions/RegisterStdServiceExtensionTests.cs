@@ -9,32 +9,9 @@ namespace SquidStd.Tests.Abstractions;
 public class RegisterStdServiceExtensionTests
 {
     [Fact]
-    public void RegisterStdService_ResolvesImplementation()
-    {
-        using var container = new DryIoc.Container();
-
-        container.RegisterStdService<ISquidStdService, FakeStdService>();
-
-        Assert.IsType<FakeStdService>(container.Resolve<ISquidStdService>());
-    }
-
-    [Fact]
-    public void RegisterStdService_RegistersAsSingleton()
-    {
-        using var container = new DryIoc.Container();
-
-        container.RegisterStdService<ISquidStdService, FakeStdService>();
-
-        var first = container.Resolve<ISquidStdService>();
-        var second = container.Resolve<ISquidStdService>();
-
-        Assert.Same(first, second);
-    }
-
-    [Fact]
     public void RegisterStdService_AddsRegistrationDataWithPriority()
     {
-        using var container = new DryIoc.Container();
+        using var container = new Container();
 
         container.RegisterStdService<ISquidStdService, FakeStdService>(5);
 
@@ -47,7 +24,7 @@ public class RegisterStdServiceExtensionTests
     [Fact]
     public void RegisterStdService_DefaultPriority_IsZero()
     {
-        using var container = new DryIoc.Container();
+        using var container = new Container();
 
         container.RegisterStdService<ISquidStdService, FakeStdService>();
 
@@ -56,9 +33,32 @@ public class RegisterStdServiceExtensionTests
     }
 
     [Fact]
+    public void RegisterStdService_RegistersAsSingleton()
+    {
+        using var container = new Container();
+
+        container.RegisterStdService<ISquidStdService, FakeStdService>();
+
+        var first = container.Resolve<ISquidStdService>();
+        var second = container.Resolve<ISquidStdService>();
+
+        Assert.Same(first, second);
+    }
+
+    [Fact]
+    public void RegisterStdService_ResolvesImplementation()
+    {
+        using var container = new Container();
+
+        container.RegisterStdService<ISquidStdService, FakeStdService>();
+
+        Assert.IsType<FakeStdService>(container.Resolve<ISquidStdService>());
+    }
+
+    [Fact]
     public void RegisterStdService_ReturnsSameContainerForChaining()
     {
-        using var container = new DryIoc.Container();
+        using var container = new Container();
 
         var result = container.RegisterStdService<ISquidStdService, FakeStdService>();
 

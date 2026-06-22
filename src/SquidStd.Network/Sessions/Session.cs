@@ -9,13 +9,11 @@ namespace SquidStd.Network.Sessions;
 /// <typeparam name="TState">Application-defined per-connection state.</typeparam>
 public sealed class Session<TState>
 {
-    private readonly INetworkConnection _connection;
-
     /// <summary>Unique connection identifier assigned by the transport.</summary>
     public long SessionId { get; }
 
     /// <summary>Underlying transport connection.</summary>
-    public INetworkConnection Connection => _connection;
+    public INetworkConnection Connection { get; }
 
     /// <summary>Application-defined state for this session.</summary>
     public TState State { get; }
@@ -24,26 +22,26 @@ public sealed class Session<TState>
     public DateTimeOffset CreatedAtUtc { get; }
 
     /// <summary>Remote endpoint of the connection, when available.</summary>
-    public EndPoint? RemoteEndPoint => _connection.RemoteEndPoint;
+    public EndPoint? RemoteEndPoint => Connection.RemoteEndPoint;
 
     /// <summary>Whether the underlying connection is still open.</summary>
-    public bool IsConnected => _connection.IsConnected;
+    public bool IsConnected => Connection.IsConnected;
 
     public Session(long sessionId, INetworkConnection connection, TState state, DateTimeOffset createdAtUtc)
     {
         ArgumentNullException.ThrowIfNull(connection);
 
-        _connection = connection;
+        Connection = connection;
         SessionId = sessionId;
         State = state;
         CreatedAtUtc = createdAtUtc;
     }
 
-    /// <summary>Sends a payload over the underlying connection.</summary>
-    public Task SendAsync(ReadOnlyMemory<byte> payload, CancellationToken cancellationToken = default)
-        => _connection.SendAsync(payload, cancellationToken);
-
     /// <summary>Closes the underlying connection.</summary>
     public Task CloseAsync(CancellationToken cancellationToken = default)
-        => _connection.CloseAsync(cancellationToken);
+        => Connection.CloseAsync(cancellationToken);
+
+    /// <summary>Sends a payload over the underlying connection.</summary>
+    public Task SendAsync(ReadOnlyMemory<byte> payload, CancellationToken cancellationToken = default)
+        => Connection.SendAsync(payload, cancellationToken);
 }

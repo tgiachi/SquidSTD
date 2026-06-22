@@ -6,16 +6,12 @@ namespace SquidStd.Tests.Abstractions;
 public class ConfigRegistrationDataTests
 {
     [Fact]
-    public void Ctor_InvalidSectionName_Throws()
-        => Assert.Throws<ArgumentException>(
-            () => new ConfigRegistrationData(string.Empty, typeof(TestConfig), () => new TestConfig())
-        );
+    public void CreateDefault_IncompatibleFactory_Throws()
+    {
+        var entry = new ConfigRegistrationData("test", typeof(TestConfig), () => new());
 
-    [Fact]
-    public void Ctor_NullType_Throws()
-        => Assert.Throws<ArgumentNullException>(
-            () => new ConfigRegistrationData("test", null!, () => new TestConfig())
-        );
+        Assert.Throws<InvalidOperationException>(() => entry.CreateDefault());
+    }
 
     [Fact]
     public void CreateDefault_UsesFactory()
@@ -24,7 +20,7 @@ public class ConfigRegistrationDataTests
             "test",
             typeof(TestConfig),
             () => new TestConfig { Name = "default", Count = 7 },
-            priority: 3
+            3
         );
 
         var config = Assert.IsType<TestConfig>(entry.CreateDefault());
@@ -37,10 +33,12 @@ public class ConfigRegistrationDataTests
     }
 
     [Fact]
-    public void CreateDefault_IncompatibleFactory_Throws()
-    {
-        var entry = new ConfigRegistrationData("test", typeof(TestConfig), () => new object());
+    public void Ctor_InvalidSectionName_Throws()
+        => Assert.Throws<ArgumentException>(
+            () => new ConfigRegistrationData(string.Empty, typeof(TestConfig), () => new TestConfig())
+        );
 
-        Assert.Throws<InvalidOperationException>(() => entry.CreateDefault());
-    }
+    [Fact]
+    public void Ctor_NullType_Throws()
+        => Assert.Throws<ArgumentNullException>(() => new ConfigRegistrationData("test", null!, () => new TestConfig()));
 }

@@ -42,10 +42,8 @@ public static class RegisterConfigSectionExtension
             }
         }
 
-        var factory = createDefault ?? (() => new TConfig());
-        container.AddToRegisterTypedList(
-            new ConfigRegistrationData(sectionName, configType, () => factory(), priority)
-        );
+        var factory = createDefault ?? (() => new());
+        container.AddToRegisterTypedList(new ConfigRegistrationData(sectionName, configType, () => factory(), priority));
 
         return container;
     }

@@ -1,0 +1,54 @@
+/* SquidStd theme — palette derived from the logo. */
+:root {
+  --sqd-brand: #1390A3;
+  --sqd-brand-dark: #0F404C;
+  --sqd-brand-deep: #0D7786;
+  --sqd-accent: #4BB4BD;
+  --sqd-warm: #E3BEBB;
+  --sqd-ink: #0B1418;
+
+  --bs-primary: var(--sqd-brand);
+  --bs-primary-rgb: 19, 144, 163;
+  --bs-link-color: var(--sqd-brand-deep);
+  --bs-link-hover-color: var(--sqd-brand);
+}
+
+[data-bs-theme="dark"] {
+  --bs-primary: var(--sqd-accent);
+  --bs-primary-rgb: 75, 180, 189;
+  --bs-link-color: var(--sqd-accent);
+  --bs-link-hover-color: #7fd0d7;
+  --bs-body-bg: var(--sqd-ink);
+}
+
+/* Navbar branded in brand-dark with light contrast. */
+.navbar {
+  background-color: var(--sqd-brand-dark) !important;
+  border-bottom: 2px solid var(--sqd-brand);
+}
+.navbar .navbar-brand,
+.navbar .nav-link,
+.navbar .navbar-nav .nav-link.active {
+  color: #eaf6f8 !important;
+}
+.navbar .nav-link:hover { color: var(--sqd-accent) !important; }
+
+/* Buttons / primary accents. */
+.btn-primary {
+  --bs-btn-bg: var(--sqd-brand);
+  --bs-btn-border-color: var(--sqd-brand);
+  --bs-btn-hover-bg: var(--sqd-brand-deep);
+  --bs-btn-hover-border-color: var(--sqd-brand-deep);
+  --bs-btn-active-bg: var(--sqd-brand-deep);
+}
+
+/* Active TOC item + focus ring. */
+.toc .nav-link.active { color: var(--sqd-brand) !important; }
+:focus-visible { outline-color: var(--sqd-accent); }
+
+/* Inline code accent + table header tint. */
+:not(pre) > code { color: var(--sqd-brand-deep); }
+table > thead { background-color: rgba(75, 180, 189, 0.12); }
+
+/* Affix (right-hand "In this article") active marker. */
+.affix ul li.active > a { color: var(--sqd-brand); border-left-color: var(--sqd-brand); }

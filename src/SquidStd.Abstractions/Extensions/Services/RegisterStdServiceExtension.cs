@@ -6,8 +6,7 @@ namespace SquidStd.Abstractions.Extensions.Services;
 
 public static class RegisterStdServiceExtension
 {
-
-    public static IContainer RegisterStdService<TService,TImplementation>(this IContainer container, int priority = 0)
+    public static IContainer RegisterStdService<TService, TImplementation>(this IContainer container, int priority = 0)
         where TService : class
         where TImplementation : class, TService
     {
@@ -17,5 +16,4 @@ public static class RegisterStdServiceExtension
 
         return container;
     }
-
 }

@@ -9,13 +9,8 @@ public class PluginContextTests
         => Assert.Empty(new PluginContext().Data);
 
     [Fact]
-    public void GetData_ValueType_ReturnsStoredValue()
-    {
-        var context = new PluginContext();
-        context.Data["count"] = 42;
-
-        Assert.Equal(42, context.GetData<int>("count"));
-    }
+    public void GetData_MissingKey_Throws()
+        => Assert.Throws<KeyNotFoundException>(() => { _ = new PluginContext().GetData<int>("missing"); });
 
     [Fact]
     public void GetData_ReferenceType_ReturnsStoredValue()
@@ -28,8 +23,13 @@ public class PluginContextTests
     }
 
     [Fact]
-    public void GetData_MissingKey_Throws()
-        => Assert.Throws<KeyNotFoundException>(() => { _ = new PluginContext().GetData<int>("missing"); });
+    public void GetData_ValueType_ReturnsStoredValue()
+    {
+        var context = new PluginContext();
+        context.Data["count"] = 42;
+
+        Assert.Equal(42, context.GetData<int>("count"));
+    }
 
     [Fact]
     public void GetData_WrongType_Throws()

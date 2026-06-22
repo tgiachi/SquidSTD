@@ -1,13 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <PublishNuget>true</PublishNuget>
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SquidStd.Core\SquidStd.Core.csproj" />
+        <ProjectReference Include="..\SquidStd.Core\SquidStd.Core.csproj"/>
     </ItemGroup>
 
 </Project>

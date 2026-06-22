@@ -94,18 +94,6 @@ public ref struct SpanWriter : IDisposable
         Position += count;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Dispose()
-    {
-        var toReturn = _arrayToReturnToPool;
-        this = default;
-
-        if (toReturn is not null)
-        {
-            ArrayPool<byte>.Shared.Return(toReturn);
-        }
-    }
-
     public void EnsureCapacity(int capacity)
     {
         if (capacity > _buffer.Length)
@@ -441,5 +429,17 @@ public ref struct SpanWriter : IDisposable
         }
 
         Grow(count);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Dispose()
+    {
+        var toReturn = _arrayToReturnToPool;
+        this = default;
+
+        if (toReturn is not null)
+        {
+            ArrayPool<byte>.Shared.Return(toReturn);
+        }
     }
 }

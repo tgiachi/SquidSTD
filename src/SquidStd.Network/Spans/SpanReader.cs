@@ -21,13 +21,6 @@ public ref struct SpanReader : IDisposable
         Length = span.Length;
     }
 
-    public void Dispose()
-    {
-        _buffer = default;
-        Position = 0;
-        Length = 0;
-    }
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Read(scoped Span<byte> bytes)
     {
@@ -398,4 +391,11 @@ public ref struct SpanReader : IDisposable
     [DoesNotReturn]
     private static void ThrowInsufficientData()
         => throw new InvalidOperationException("Insufficient data in buffer.");
+
+    public void Dispose()
+    {
+        _buffer = default;
+        Position = 0;
+        Length = 0;
+    }
 }

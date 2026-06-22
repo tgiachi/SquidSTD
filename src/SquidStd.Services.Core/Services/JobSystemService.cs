@@ -23,25 +23,6 @@ public sealed class JobSystemService : IJobSystem, ISquidStdService
     private int _pendingCount;
     private int _started;
 
-    /// <summary>
-    /// Initializes the job system service.
-    /// </summary>
-    /// <param name="config">Job system configuration.</param>
-    public JobSystemService(JobsConfig config)
-    {
-        ArgumentNullException.ThrowIfNull(config);
-        _config = config;
-        WorkerCount = ResolveWorkerCount(config.WorkerThreadCount);
-        _channel = Channel.CreateUnbounded<JobItem>(
-            new UnboundedChannelOptions
-            {
-                SingleReader = false,
-                SingleWriter = false
-            }
-        );
-        _workers = new Thread[WorkerCount];
-    }
-
     /// <inheritdoc />
     public int ActiveCount => Volatile.Read(ref _activeCount);
 
@@ -55,13 +36,26 @@ public sealed class JobSystemService : IJobSystem, ISquidStdService
     public int WorkerCount { get; }
 
     /// <summary>
-    /// Releases worker resources.
+    /// Initializes the job system service.
     /// </summary>
-    public void Dispose()
-        => Stop(CancellationToken.None);
+    /// <param name="config">Job system configuration.</param>
+    public JobSystemService(JobsConfig config)
+    {
+        ArgumentNullException.ThrowIfNull(config);
+        _config = config;
+        WorkerCount = ResolveWorkerCount(config.WorkerThreadCount);
+        _channel = Channel.CreateUnbounded<JobItem>(
+            new()
+            {
+                SingleReader = false,
+                SingleWriter = false
+            }
+        );
+        _workers = new Thread[WorkerCount];
+    }
 
     /// <inheritdoc />
-    public Task Schedule(Action work, CancellationToken cancellationToken = default)
+    public Task ScheduleAsync(Action work, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(work);
         ThrowIfDisposed();
@@ -106,7 +100,7 @@ public sealed class JobSystemService : IJobSystem, ISquidStdService
     }
 
     /// <inheritdoc />
-    public Task<T> Schedule<T>(Func<T> work, CancellationToken cancellationToken = default)
+    public Task<T> ScheduleAsync<T>(Func<T> work, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(work);
         ThrowIfDisposed();
@@ -187,6 +181,27 @@ public sealed class JobSystemService : IJobSystem, ISquidStdService
         return ValueTask.CompletedTask;
     }
 
+    private void Enqueue(JobItem item)
+    {
+        Interlocked.Increment(ref _pendingCount);
+
+        if (!_channel.Writer.TryWrite(item))
+        {
+            Interlocked.Decrement(ref _pendingCount);
+
+            throw new ObjectDisposedException(nameof(JobSystemService));
+        }
+    }
+
+    private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs args)
+    {
+        _logger.Error(args.Exception, "Unobserved task exception");
+        args.SetObserved();
+    }
+
+    private static int ResolveWorkerCount(int configured)
+        => configured > 0 ? configured : Math.Max(1, Environment.ProcessorCount - 1);
+
     private void Stop(CancellationToken cancellationToken)
     {
         if (Interlocked.CompareExchange(ref _disposed, 1, 0) != 0)
@@ -233,27 +248,6 @@ public sealed class JobSystemService : IJobSystem, ISquidStdService
 
         _shutdownCts.Dispose();
     }
-
-    private void Enqueue(JobItem item)
-    {
-        Interlocked.Increment(ref _pendingCount);
-
-        if (!_channel.Writer.TryWrite(item))
-        {
-            Interlocked.Decrement(ref _pendingCount);
-
-            throw new ObjectDisposedException(nameof(JobSystemService));
-        }
-    }
-
-    private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs args)
-    {
-        _logger.Error(args.Exception, "Unobserved task exception");
-        args.SetObserved();
-    }
-
-    private static int ResolveWorkerCount(int configured)
-        => configured > 0 ? configured : Math.Max(1, Environment.ProcessorCount - 1);
 
     private void ThrowIfDisposed()
     {
@@ -317,4 +311,10 @@ public sealed class JobSystemService : IJobSystem, ISquidStdService
             _logger.Error(ex, "JobSystemService worker loop terminated unexpectedly");
         }
     }
+
+    /// <summary>
+    /// Releases worker resources.
+    /// </summary>
+    public void Dispose()
+        => Stop(CancellationToken.None);
 }

@@ -10,7 +10,7 @@ namespace SquidStd.Network.Client;
 /// Connectionless UDP client that binds a local socket and surfaces inbound datagrams through an
 /// async receive loop. Datagrams can be sent to any endpoint with <see cref="SendToAsync" />, or to
 /// an optional default remote endpoint via <see cref="SendAsync" />. Mirrors the lifecycle surface of
-/// <see cref="OrionTcpClient" /> (session id, connect/disconnect/data/exception events, and
+/// <see cref="SquidStdTcpClient" /> (session id, connect/disconnect/data/exception events, and
 /// <see cref="INetworkConnection" />). Supports Start once; recreate the instance to listen again.
 /// </summary>
 public sealed class SquidStdUdpClient : INetworkConnection, IAsyncDisposable, IDisposable
@@ -91,31 +91,33 @@ public sealed class SquidStdUdpClient : INetworkConnection, IAsyncDisposable, ID
     /// </param>
     public SquidStdUdpClient(IPEndPoint? localEndPoint = null, IPEndPoint? defaultRemoteEndPoint = null)
     {
-        _udpClient = new UdpClient(localEndPoint ?? new IPEndPoint(IPAddress.Any, 0));
+        _udpClient = new(localEndPoint ?? new IPEndPoint(IPAddress.Any, 0));
         _defaultRemoteEndPoint = defaultRemoteEndPoint;
         SessionId = Interlocked.Increment(ref _sessionIdSequence);
     }
 
     /// <summary>
-    /// Starts the receive loop and raises <see cref="OnConnected" />.
+    /// Closes the client and raises <see cref="OnDisconnected" /> once.
     /// </summary>
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task CloseAsync(CancellationToken cancellationToken = default)
     {
-        if (Interlocked.Exchange(ref _started, 1) != 0)
+        if (Interlocked.Exchange(ref _closed, 1) != 0)
         {
-            return Task.CompletedTask;
+            return;
         }
 
-        if (cancellationToken.CanBeCanceled)
+        try
         {
-            _externalCancellationTokenRegistration =
-                cancellationToken.Register(() => _ = CloseAsync(CancellationToken.None));
+            await _internalCancellationTokenSource.CancelAsync().WaitAsync(cancellationToken);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // Once close has started, still tear down the socket below.
         }
 
-        RaiseConnected();
-        _receiveLoopTask = Task.Run(ReceiveLoopAsync, CancellationToken.None);
-
-        return Task.CompletedTask;
+        _udpClient.Close();
+        _externalCancellationTokenRegistration.Dispose();
+        RaiseDisconnected();
     }
 
     /// <summary>
@@ -157,27 +159,51 @@ public sealed class SquidStdUdpClient : INetworkConnection, IAsyncDisposable, ID
     }
 
     /// <summary>
-    /// Closes the client and raises <see cref="OnDisconnected" /> once.
+    /// Starts the receive loop and raises <see cref="OnConnected" />.
     /// </summary>
-    public async Task CloseAsync(CancellationToken cancellationToken = default)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-        if (Interlocked.Exchange(ref _closed, 1) != 0)
+        if (Interlocked.Exchange(ref _started, 1) != 0)
         {
-            return;
+            return Task.CompletedTask;
         }
 
-        try
+        if (cancellationToken.CanBeCanceled)
         {
-            await _internalCancellationTokenSource.CancelAsync().WaitAsync(cancellationToken);
-        }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-            // Once close has started, still tear down the socket below.
+            _externalCancellationTokenRegistration =
+                cancellationToken.Register(() => _ = CloseAsync(CancellationToken.None));
         }
 
-        _udpClient.Close();
-        _externalCancellationTokenRegistration.Dispose();
-        RaiseDisconnected();
+        RaiseConnected();
+        _receiveLoopTask = Task.Run(ReceiveLoopAsync, CancellationToken.None);
+
+        return Task.CompletedTask;
+    }
+
+    private void RaiseConnected()
+    {
+        _logger.Information(
+            "UDP client started. SessionId={SessionId}, LocalEndPoint={LocalEndPoint}",
+            SessionId,
+            LocalEndPoint
+        );
+        OnConnected?.Invoke(this, new(this));
+    }
+
+    private void RaiseDisconnected()
+    {
+        _logger.Information(
+            "UDP client closed. SessionId={SessionId}, LocalEndPoint={LocalEndPoint}",
+            SessionId,
+            LocalEndPoint
+        );
+        OnDisconnected?.Invoke(this, new(this));
+    }
+
+    private void RaiseException(Exception exception)
+    {
+        _logger.Error(exception, "UDP client exception. SessionId={SessionId}", SessionId);
+        OnException?.Invoke(this, new(exception, this));
     }
 
     private async Task ReceiveLoopAsync()
@@ -213,32 +239,6 @@ public sealed class SquidStdUdpClient : INetworkConnection, IAsyncDisposable, ID
         {
             await CloseAsync(CancellationToken.None);
         }
-    }
-
-    private void RaiseConnected()
-    {
-        _logger.Information(
-            "UDP client started. SessionId={SessionId}, LocalEndPoint={LocalEndPoint}",
-            SessionId,
-            LocalEndPoint
-        );
-        OnConnected?.Invoke(this, new(this));
-    }
-
-    private void RaiseDisconnected()
-    {
-        _logger.Information(
-            "UDP client closed. SessionId={SessionId}, LocalEndPoint={LocalEndPoint}",
-            SessionId,
-            LocalEndPoint
-        );
-        OnDisconnected?.Invoke(this, new(this));
-    }
-
-    private void RaiseException(Exception exception)
-    {
-        _logger.Error(exception, "UDP client exception. SessionId={SessionId}", SessionId);
-        OnException?.Invoke(this, new(exception, this));
     }
 
     /// <inheritdoc />

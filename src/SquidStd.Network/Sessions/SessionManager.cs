@@ -49,16 +49,6 @@ public sealed class SessionManager<TState> : ISessionManager<TState>, IDisposabl
     }
 
     /// <inheritdoc />
-    public bool TryGetSession(long sessionId, out Session<TState>? session)
-        => _sessions.TryGetValue(sessionId, out session);
-
-    /// <inheritdoc />
-    public Task SendAsync(long sessionId, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken = default)
-        => _sessions.TryGetValue(sessionId, out var session)
-               ? session.SendAsync(payload, cancellationToken)
-               : Task.CompletedTask;
-
-    /// <inheritdoc />
     public async Task BroadcastAsync(ReadOnlyMemory<byte> payload, CancellationToken cancellationToken = default)
     {
         var snapshot = _sessions.Values.ToArray();
@@ -77,6 +67,16 @@ public sealed class SessionManager<TState> : ISessionManager<TState>, IDisposabl
         => _sessions.TryGetValue(sessionId, out var session)
                ? session.CloseAsync(cancellationToken)
                : Task.CompletedTask;
+
+    /// <inheritdoc />
+    public Task SendAsync(long sessionId, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken = default)
+        => _sessions.TryGetValue(sessionId, out var session)
+               ? session.SendAsync(payload, cancellationToken)
+               : Task.CompletedTask;
+
+    /// <inheritdoc />
+    public bool TryGetSession(long sessionId, out Session<TState>? session)
+        => _sessions.TryGetValue(sessionId, out session);
 
     internal void HandleConnected(INetworkConnection connection)
     {
@@ -113,18 +113,6 @@ public sealed class SessionManager<TState> : ISessionManager<TState>, IDisposabl
         }
     }
 
-    private async Task SendSafelyAsync(Session<TState> session, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken)
-    {
-        try
-        {
-            await session.SendAsync(payload, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.Warning(ex, "Broadcast send failed for session {SessionId}", session.SessionId);
-        }
-    }
-
     private void HandleServerClientConnect(object? sender, SquidStdTcpClientEventArgs e)
         => HandleConnected(e.Client);
 
@@ -146,6 +134,18 @@ public sealed class SessionManager<TState> : ISessionManager<TState>, IDisposabl
         }
     }
 
+    private void RaiseSessionData(Session<TState> session, ReadOnlyMemory<byte> data)
+    {
+        try
+        {
+            OnSessionData?.Invoke(this, new(session, data));
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "OnSessionData handler failed for session {SessionId}", session.SessionId);
+        }
+    }
+
     private void RaiseSessionRemoved(Session<TState> session)
     {
         try
@@ -158,15 +158,19 @@ public sealed class SessionManager<TState> : ISessionManager<TState>, IDisposabl
         }
     }
 
-    private void RaiseSessionData(Session<TState> session, ReadOnlyMemory<byte> data)
+    private async Task SendSafelyAsync(
+        Session<TState> session,
+        ReadOnlyMemory<byte> payload,
+        CancellationToken cancellationToken
+    )
     {
         try
         {
-            OnSessionData?.Invoke(this, new(session, data));
+            await session.SendAsync(payload, cancellationToken);
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, "OnSessionData handler failed for session {SessionId}", session.SessionId);
+            _logger.Warning(ex, "Broadcast send failed for session {SessionId}", session.SessionId);
         }
     }
 

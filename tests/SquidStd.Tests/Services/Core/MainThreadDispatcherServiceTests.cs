@@ -9,32 +9,6 @@ namespace SquidStd.Tests.Services.Core;
 public class MainThreadDispatcherServiceTests
 {
     [Fact]
-    public void DrainPending_EmptyQueue_ReturnsZero()
-    {
-        IMainThreadDispatcher dispatcher = new MainThreadDispatcherService();
-
-        var executed = dispatcher.DrainPending();
-
-        Assert.Equal(0, executed);
-        Assert.Equal(0, dispatcher.PendingCount);
-    }
-
-    [Fact]
-    public void DrainPending_NoBudget_DrainsAll()
-    {
-        IMainThreadDispatcher dispatcher = new MainThreadDispatcherService();
-        var calls = new List<int>();
-        dispatcher.Post(() => calls.Add(1));
-        dispatcher.Post(() => calls.Add(2));
-
-        var executed = dispatcher.DrainPending();
-
-        Assert.Equal(2, executed);
-        Assert.Equal([1, 2], calls);
-        Assert.Equal(0, dispatcher.PendingCount);
-    }
-
-    [Fact]
     public void DrainPending_BudgetExceededAfterFirstCallback_DefersRest()
     {
         IMainThreadDispatcher dispatcher = new MainThreadDispatcherService();
@@ -92,11 +66,47 @@ public class MainThreadDispatcherServiceTests
     }
 
     [Fact]
+    public void DrainPending_EmptyQueue_ReturnsZero()
+    {
+        IMainThreadDispatcher dispatcher = new MainThreadDispatcherService();
+
+        var executed = dispatcher.DrainPending();
+
+        Assert.Equal(0, executed);
+        Assert.Equal(0, dispatcher.PendingCount);
+    }
+
+    [Fact]
+    public void DrainPending_NoBudget_DrainsAll()
+    {
+        IMainThreadDispatcher dispatcher = new MainThreadDispatcherService();
+        var calls = new List<int>();
+        dispatcher.Post(() => calls.Add(1));
+        dispatcher.Post(() => calls.Add(2));
+
+        var executed = dispatcher.DrainPending();
+
+        Assert.Equal(2, executed);
+        Assert.Equal([1, 2], calls);
+        Assert.Equal(0, dispatcher.PendingCount);
+    }
+
+    [Fact]
     public void Post_NullAction_ThrowsArgumentNullException()
     {
         IMainThreadDispatcher dispatcher = new MainThreadDispatcherService();
 
         Assert.Throws<ArgumentNullException>(() => dispatcher.Post(null!));
+    }
+
+    [Fact]
+    public void RegisterCoreServices_RegistersMainThreadDispatcher()
+    {
+        using var container = new Container();
+
+        container.RegisterCoreServices();
+
+        Assert.IsType<MainThreadDispatcherService>(container.Resolve<IMainThreadDispatcher>());
     }
 
     [Fact]
@@ -124,15 +134,5 @@ public class MainThreadDispatcherServiceTests
 
         Assert.Equal("sent", stateValue);
         Assert.Equal(0, dispatcher.PendingCount);
-    }
-
-    [Fact]
-    public void RegisterCoreServices_RegistersMainThreadDispatcher()
-    {
-        using var container = new Container();
-
-        container.RegisterCoreServices();
-
-        Assert.IsType<MainThreadDispatcherService>(container.Resolve<IMainThreadDispatcher>());
     }
 }

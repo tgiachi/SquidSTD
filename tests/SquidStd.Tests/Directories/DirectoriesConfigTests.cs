@@ -19,12 +19,12 @@ public class DirectoriesConfigTests
     }
 
     [Fact]
-    public void GetPath_String_ReturnsSnakeCasedPath()
+    public void EnumIndexer_ResolvesPathFromEnumName()
     {
         using var temp = new TempDirectory();
-        var config = new DirectoriesConfig(temp.Combine("app"), ["Logs"]);
+        var config = new DirectoriesConfig(temp.Combine("app"), []);
 
-        Assert.Equal(Path.Combine(config.Root, "logs"), config.GetPath("Logs"));
+        Assert.Equal(Path.Combine(config.Root, "plugins"), config[TestDirectoryType.Plugins]);
     }
 
     [Fact]
@@ -40,21 +40,12 @@ public class DirectoriesConfigTests
     }
 
     [Fact]
-    public void StringIndexer_ReturnsSamePathAsGetPath()
+    public void GetPath_String_ReturnsSnakeCasedPath()
     {
         using var temp = new TempDirectory();
         var config = new DirectoriesConfig(temp.Combine("app"), ["Logs"]);
 
-        Assert.Equal(config.GetPath("Logs"), config["Logs"]);
-    }
-
-    [Fact]
-    public void EnumIndexer_ResolvesPathFromEnumName()
-    {
-        using var temp = new TempDirectory();
-        var config = new DirectoriesConfig(temp.Combine("app"), []);
-
-        Assert.Equal(Path.Combine(config.Root, "plugins"), config[TestDirectoryType.Plugins]);
+        Assert.Equal(Path.Combine(config.Root, "logs"), config.GetPath("Logs"));
     }
 
     [Fact]
@@ -64,6 +55,15 @@ public class DirectoriesConfigTests
         var config = new DirectoriesConfig(temp.Combine("app"), []);
 
         Assert.Equal(Path.Combine(config.Root, "config_files"), config.GetPath(TestDirectoryType.ConfigFiles));
+    }
+
+    [Fact]
+    public void StringIndexer_ReturnsSamePathAsGetPath()
+    {
+        using var temp = new TempDirectory();
+        var config = new DirectoriesConfig(temp.Combine("app"), ["Logs"]);
+
+        Assert.Equal(config.GetPath("Logs"), config["Logs"]);
     }
 
     [Fact]

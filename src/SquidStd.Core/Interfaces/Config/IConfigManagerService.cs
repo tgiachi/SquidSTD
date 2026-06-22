@@ -26,17 +26,17 @@ public interface IConfigManagerService
     IReadOnlyCollection<IConfigEntry> Entries { get; }
 
     /// <summary>
+    /// Composes the currently loaded sections into YAML.
+    /// </summary>
+    /// <returns>The composed YAML document.</returns>
+    string Compose();
+
+    /// <summary>
     /// Gets a loaded configuration section from DI.
     /// </summary>
     /// <typeparam name="TConfig">The configuration type.</typeparam>
     /// <returns>The loaded configuration section.</returns>
     TConfig GetConfig<TConfig>() where TConfig : class;
-
-    /// <summary>
-    /// Composes the currently loaded sections into YAML.
-    /// </summary>
-    /// <returns>The composed YAML document.</returns>
-    string Compose();
 
     /// <summary>
     /// Loads or creates the configured YAML file and registers every section into DI.
