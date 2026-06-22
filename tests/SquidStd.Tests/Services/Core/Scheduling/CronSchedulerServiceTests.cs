@@ -54,4 +54,70 @@ public class CronSchedulerServiceTests
 
         Assert.Throws<CronFormatException>(() => { scheduler.Schedule("bad", "not a cron", _ => Task.CompletedTask); });
     }
+
+    [Fact]
+    public void Fire_WhileRunning_SkipsOverlappingOccurrence()
+    {
+        var timer = new FakeTimerService();
+        var jobs = new ManualJobSystem();
+        using var scheduler = new CronSchedulerService(timer, jobs);
+        var count = 0;
+        scheduler.Schedule("tick", "* * * * *", _ => { count++; return Task.CompletedTask; });
+
+        timer.FireDue(); // running flag set, job queued (not yet run)
+        timer.FireDue(); // still running -> occurrence skipped, no second job queued
+
+        Assert.Equal(1, jobs.PendingCount);
+        jobs.RunAll();
+        Assert.Equal(1, count);
+    }
+
+    [Fact]
+    public void Unschedule_StopsFutureFirings()
+    {
+        var timer = new FakeTimerService();
+        var jobs = new ManualJobSystem();
+        using var scheduler = new CronSchedulerService(timer, jobs);
+        var count = 0;
+        var id = scheduler.Schedule("tick", "* * * * *", _ => { count++; return Task.CompletedTask; });
+
+        Assert.True(scheduler.Unschedule(id));
+        Assert.Equal(0, timer.Count);
+        Assert.Equal(0, timer.FireDue());
+        jobs.RunAll();
+        Assert.Equal(0, count);
+        Assert.Empty(scheduler.Jobs);
+    }
+
+    [Fact]
+    public void UnscheduleByName_RemovesAllMatching()
+    {
+        var timer = new FakeTimerService();
+        var jobs = new ManualJobSystem();
+        using var scheduler = new CronSchedulerService(timer, jobs);
+        scheduler.Schedule("dup", "* * * * *", _ => Task.CompletedTask);
+        scheduler.Schedule("dup", "* * * * *", _ => Task.CompletedTask);
+        scheduler.Schedule("other", "* * * * *", _ => Task.CompletedTask);
+
+        Assert.Equal(2, scheduler.UnscheduleByName("dup"));
+        Assert.Single(scheduler.Jobs);
+    }
+
+    [Fact]
+    public void Fire_HandlerThrows_IsLogged_AndKeepsRescheduling()
+    {
+        var timer = new FakeTimerService();
+        var jobs = new ManualJobSystem();
+        using var scheduler = new CronSchedulerService(timer, jobs);
+        scheduler.Schedule("boom", "* * * * *", _ => throw new InvalidOperationException("boom"));
+
+        timer.FireDue();
+        jobs.RunAll(); // handler throws, swallowed
+        Assert.Equal(1, timer.Count); // still rescheduled
+
+        timer.FireDue();
+        jobs.RunAll();
+        Assert.Equal(1, timer.Count); // still alive
+        Assert.Equal(0, Assert.Single(scheduler.Jobs).RunCount); // failures do not count as runs
+    }
 }
