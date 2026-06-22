@@ -1,6 +1,8 @@
 using System.Text;
 using SquidStd.Messaging.Abstractions;
+using SquidStd.Messaging.Abstractions.Data.Config;
 using SquidStd.Messaging.RabbitMq;
+using SquidStd.Messaging.RabbitMq.Data.Config;
 
 namespace SquidStd.Tests.Messaging.RabbitMq;
 
