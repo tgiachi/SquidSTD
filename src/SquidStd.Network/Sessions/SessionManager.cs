@@ -68,19 +68,6 @@ public sealed class SessionManager<TState> : ISessionManager<TState>, IDisposabl
                ? session.CloseAsync(cancellationToken)
                : Task.CompletedTask;
 
-    public void Dispose()
-    {
-        if (Interlocked.Exchange(ref _disposed, 1) != 0)
-        {
-            return;
-        }
-
-        _server.OnClientConnect -= HandleServerClientConnect;
-        _server.OnClientDisconnect -= HandleServerClientDisconnect;
-        _server.OnDataReceived -= HandleServerDataReceived;
-        _sessions.Clear();
-    }
-
     /// <inheritdoc />
     public Task SendAsync(long sessionId, ReadOnlyMemory<byte> payload, CancellationToken cancellationToken = default)
         => _sessions.TryGetValue(sessionId, out var session)
@@ -185,5 +172,18 @@ public sealed class SessionManager<TState> : ISessionManager<TState>, IDisposabl
         {
             _logger.Warning(ex, "Broadcast send failed for session {SessionId}", session.SessionId);
         }
+    }
+
+    public void Dispose()
+    {
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
+        {
+            return;
+        }
+
+        _server.OnClientConnect -= HandleServerClientConnect;
+        _server.OnClientDisconnect -= HandleServerClientDisconnect;
+        _server.OnDataReceived -= HandleServerDataReceived;
+        _sessions.Clear();
     }
 }

@@ -107,14 +107,6 @@ public sealed class SquidStdUdpServer : INetworkServer, IAsyncDisposable, IDispo
         _bindAllInterfaces = bindAllInterfaces;
     }
 
-    /// <inheritdoc />
-    public void Dispose()
-        => DisposeAsync().AsTask().GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public async ValueTask DisposeAsync()
-        => await StopAsync(CancellationToken.None);
-
     /// <summary>
     /// Starts listening, binding sockets and launching a receive loop per socket. Recreates the
     /// sockets on every call, so Stop/Start cycles are supported.
@@ -321,4 +313,12 @@ public sealed class SquidStdUdpServer : INetworkServer, IAsyncDisposable, IDispo
                            .Select(address => new IPEndPoint(address.Address, _endPoint.Port))
         ];
     }
+
+    /// <inheritdoc />
+    public void Dispose()
+        => DisposeAsync().AsTask().GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+        => await StopAsync(CancellationToken.None);
 }

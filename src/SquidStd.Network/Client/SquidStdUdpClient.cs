@@ -120,32 +120,6 @@ public sealed class SquidStdUdpClient : INetworkConnection, IAsyncDisposable, ID
         RaiseDisconnected();
     }
 
-    /// <inheritdoc />
-    public void Dispose() // Sync-over-async: best effort. Prefer DisposeAsync.
-        => DisposeAsync().AsTask().GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public async ValueTask DisposeAsync()
-    {
-        await CloseAsync(CancellationToken.None);
-
-        // Drain the receive loop before disposing the resources it relies on.
-        if (_receiveLoopTask is not null)
-        {
-            try
-            {
-                await _receiveLoopTask;
-            }
-            catch
-            {
-                // Loop failures are already surfaced via OnException.
-            }
-        }
-
-        _internalCancellationTokenSource.Dispose();
-        _udpClient.Dispose();
-    }
-
     /// <summary>
     /// Sends a datagram to the configured default remote endpoint.
     /// </summary>
@@ -265,5 +239,31 @@ public sealed class SquidStdUdpClient : INetworkConnection, IAsyncDisposable, ID
         {
             await CloseAsync(CancellationToken.None);
         }
+    }
+
+    /// <inheritdoc />
+    public void Dispose() // Sync-over-async: best effort. Prefer DisposeAsync.
+        => DisposeAsync().AsTask().GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        await CloseAsync(CancellationToken.None);
+
+        // Drain the receive loop before disposing the resources it relies on.
+        if (_receiveLoopTask is not null)
+        {
+            try
+            {
+                await _receiveLoopTask;
+            }
+            catch
+            {
+                // Loop failures are already surfaced via OnException.
+            }
+        }
+
+        _internalCancellationTokenSource.Dispose();
+        _udpClient.Dispose();
     }
 }
