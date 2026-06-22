@@ -6,9 +6,9 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/.NET-10.0-512BD4.svg" alt=".NET 10" />
-  <a href="https://github.com/tgiachi/SquidStd/actions/workflows/ci.yml"><img src="https://github.com/tgiachi/SquidStd/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
-  <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/tgiachi/SquidStd/gh-pages/badges/tests.json" alt="tests" />
-  <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/tgiachi/SquidStd/gh-pages/badges/coverage.json" alt="coverage" />
+  <a href="https://github.com/tgiachi/squid-std/actions/workflows/ci.yml"><img src="https://github.com/tgiachi/squid-std/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/tgiachi/squid-std/gh-pages/badges/tests.json" alt="tests" />
+  <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/tgiachi/squid-std/gh-pages/badges/coverage.json" alt="coverage" />
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="license" />
 </p>
 

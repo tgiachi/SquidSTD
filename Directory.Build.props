@@ -33,7 +33,7 @@
         <Copyright>© $(Company) $([System.DateTime]::Now.Year)</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryType>git</RepositoryType>
-        <PackageProjectUrl>https://github.com/tgiachi/SquidStd</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/tgiachi/squid-std</PackageProjectUrl>
         <PackageIcon>icon.png</PackageIcon>
         <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>

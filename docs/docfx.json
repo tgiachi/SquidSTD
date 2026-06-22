@@ -28,7 +28,7 @@
       "_appLogoPath": "images/logo.png",
       "_appFaviconPath": "images/favicon.png",
       "_enableSearch": true,
-      "_gitContribute": { "repo": "https://github.com/tgiachi/SquidStd", "branch": "main" }
+      "_gitContribute": { "repo": "https://github.com/tgiachi/squid-std", "branch": "main" }
     }
   }
 }
