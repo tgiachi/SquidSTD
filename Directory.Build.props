@@ -34,6 +34,7 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryType>git</RepositoryType>
         <PackageProjectUrl>https://github.com/tgiachi/SquidStd</PackageProjectUrl>
+        <PackageIcon>icon.png</PackageIcon>
         <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -65,5 +66,10 @@
     <PropertyGroup>
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     </PropertyGroup>
+
+    <!-- Package Icon -->
+    <ItemGroup Condition="Exists('$(MSBuildThisFileDirectory)assets/icon.png')">
+        <None Include="$(MSBuildThisFileDirectory)assets/icon.png" Pack="true" PackagePath="" Visible="false" />
+    </ItemGroup>
 
 </Project>
