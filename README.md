@@ -39,6 +39,7 @@ in-memory implementation for tests and an external backend for production.
 
 ```bash
 dotnet add package SquidStd.Services.Core
+dotnet add package SquidStd.Caching
 ```
 
 ```csharp
