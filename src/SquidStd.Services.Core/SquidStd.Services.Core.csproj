@@ -8,15 +8,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SquidStd.Abstractions\SquidStd.Abstractions.csproj"/>
-        <ProjectReference Include="..\SquidStd.Core\SquidStd.Core.csproj"/>
+        <ProjectReference Include="..\SquidStd.Abstractions\SquidStd.Abstractions.csproj" />
+        <ProjectReference Include="..\SquidStd.Core\SquidStd.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="DryIoc.dll" Version="5.4.3"/>
-        <PackageReference Include="Serilog" Version="4.3.1"/>
-        <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1"/>
-        <PackageReference Include="Serilog.Sinks.File" Version="7.0.0"/>
+        <PackageReference Include="Cronos" Version="0.13.0" />
+        <PackageReference Include="DryIoc.dll" Version="5.4.3" />
+        <PackageReference Include="Serilog" Version="4.3.1" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+        <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     </ItemGroup>
 
 </Project>
