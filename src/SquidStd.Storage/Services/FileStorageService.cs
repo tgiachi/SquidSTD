@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using SquidStd.Storage.Abstractions.Data.Config;
 using SquidStd.Storage.Abstractions.Interfaces;
 using SquidStd.Storage.Internal;
@@ -86,6 +87,41 @@ public sealed class FileStorageService : IStorageService
             {
                 File.Delete(tempPath);
             }
+        }
+    }
+
+    /// <inheritdoc />
+    public async IAsyncEnumerable<string> ListKeysAsync(
+        string? prefix = null,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default
+    )
+    {
+        await Task.CompletedTask;
+
+        if (!Directory.Exists(_rootDirectory))
+        {
+            yield break;
+        }
+
+        foreach (var file in Directory.EnumerateFiles(_rootDirectory, "*", SearchOption.AllDirectories))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var name = Path.GetFileName(file);
+
+            if (name.StartsWith('.') && name.EndsWith(".tmp", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            var key = Path.GetRelativePath(_rootDirectory, file).Replace('\\', '/');
+
+            if (!string.IsNullOrEmpty(prefix) && !key.StartsWith(prefix, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            yield return key;
         }
     }
 

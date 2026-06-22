@@ -51,4 +51,8 @@ public sealed class YamlObjectStorageService : IObjectStorageService
         var yaml = YamlUtils.Serialize(value);
         await _storageService.SaveAsync(key, Encoding.UTF8.GetBytes(yaml), cancellationToken);
     }
+
+    /// <inheritdoc />
+    public IAsyncEnumerable<string> ListKeysAsync(string? prefix = null, CancellationToken cancellationToken = default)
+        => _storageService.ListKeysAsync(prefix, cancellationToken);
 }

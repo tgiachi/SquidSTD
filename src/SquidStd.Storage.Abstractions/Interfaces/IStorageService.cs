@@ -36,4 +36,12 @@ public interface IStorageService
     /// <param name="data">The payload to store.</param>
     /// <param name="cancellationToken">Token used to cancel the operation.</param>
     ValueTask SaveAsync(string key, ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Enumerates stored keys, optionally filtered by prefix.
+    /// </summary>
+    /// <param name="prefix">Optional key prefix; <c>null</c> or empty returns all keys.</param>
+    /// <param name="cancellationToken">Token used to cancel the enumeration.</param>
+    /// <returns>An async sequence of storage keys.</returns>
+    IAsyncEnumerable<string> ListKeysAsync(string? prefix = null, CancellationToken cancellationToken = default);
 }

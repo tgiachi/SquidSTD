@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Minio;
 using Minio.DataModel.Args;
 using Minio.Exceptions;
@@ -116,6 +117,30 @@ public sealed class S3StorageService : IStorageService, IDisposable
         );
 
         return true;
+    }
+
+    /// <inheritdoc />
+    public async IAsyncEnumerable<string> ListKeysAsync(
+        string? prefix = null,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default
+    )
+    {
+        await EnsureBucketAsync(cancellationToken);
+
+        var args = new ListObjectsArgs().WithBucket(_bucket).WithRecursive(true);
+
+        if (!string.IsNullOrEmpty(prefix))
+        {
+            args = args.WithPrefix(prefix);
+        }
+
+        await foreach (var item in _client.ListObjectsEnumAsync(args, cancellationToken))
+        {
+            if (!item.IsDir)
+            {
+                yield return item.Key;
+            }
+        }
     }
 
     private async ValueTask EnsureBucketAsync(CancellationToken cancellationToken)
