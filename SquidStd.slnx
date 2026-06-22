@@ -7,6 +7,7 @@
     <Project Path="src/SquidStd.Abstractions/SquidStd.Abstractions.csproj" />
     <Project Path="src/SquidStd.Core/SquidStd.Core.csproj" />
     <Project Path="src/SquidStd.Database.Abstractions/SquidStd.Database.Abstractions.csproj" />
+    <Project Path="src/SquidStd.Database/SquidStd.Database.csproj" />
     <Project Path="src/SquidStd.Network/SquidStd.Network.csproj" />
     <Project Path="src/SquidStd.Plugin.Abstractions/SquidStd.Plugin.Abstractions.csproj" />
     <Project Path="src/SquidStd.Scripting.Lua/SquidStd.Scripting.Lua.csproj" />
