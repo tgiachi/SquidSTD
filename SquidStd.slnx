@@ -1,5 +1,6 @@
 <Solution>
     <Folder Name="/src/">
+        <Project Path="src/SquidStd.AspNetCore/SquidStd.AspNetCore.csproj" />
         <Project Path="src/SquidStd.Messaging.Abstractions/SquidStd.Messaging.Abstractions.csproj" />
         <Project Path="src/SquidStd.Messaging/SquidStd.Messaging.csproj" />
     </Folder>

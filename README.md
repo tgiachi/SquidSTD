@@ -20,6 +20,7 @@ Short description goes here.
 | Package | Version | Downloads |
 |---------|---------|-----------|
 | `SquidStd.Abstractions` | [![NuGet](https://img.shields.io/nuget/v/SquidStd.Abstractions.svg)](https://www.nuget.org/packages/SquidStd.Abstractions/) | ![Downloads](https://img.shields.io/nuget/dt/SquidStd.Abstractions.svg) |
+| `SquidStd.AspNetCore` | [![NuGet](https://img.shields.io/nuget/v/SquidStd.AspNetCore.svg)](https://www.nuget.org/packages/SquidStd.AspNetCore/) | ![Downloads](https://img.shields.io/nuget/dt/SquidStd.AspNetCore.svg) |
 | `SquidStd.Core` | [![NuGet](https://img.shields.io/nuget/v/SquidStd.Core.svg)](https://www.nuget.org/packages/SquidStd.Core/) | ![Downloads](https://img.shields.io/nuget/dt/SquidStd.Core.svg) |
 | `SquidStd.Network` | [![NuGet](https://img.shields.io/nuget/v/SquidStd.Network.svg)](https://www.nuget.org/packages/SquidStd.Network/) | ![Downloads](https://img.shields.io/nuget/dt/SquidStd.Network.svg) |
 | `SquidStd.Plugin.Abstractions` | [![NuGet](https://img.shields.io/nuget/v/SquidStd.Plugin.Abstractions.svg)](https://www.nuget.org/packages/SquidStd.Plugin.Abstractions/) | ![Downloads](https://img.shields.io/nuget/dt/SquidStd.Plugin.Abstractions.svg) |

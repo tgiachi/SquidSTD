@@ -9,9 +9,14 @@
 
     <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="10.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="10.0.9" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
         <PackageReference Include="xunit" Version="2.9.3" />
         <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
     <ItemGroup>
@@ -25,6 +30,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\SquidStd.Core\SquidStd.Core.csproj" />
         <ProjectReference Include="..\..\src\SquidStd.Abstractions\SquidStd.Abstractions.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.AspNetCore\SquidStd.AspNetCore.csproj" />
         <ProjectReference Include="..\..\src\SquidStd.Plugin.Abstractions\SquidStd.Plugin.Abstractions.csproj" />
         <ProjectReference Include="..\..\src\SquidStd.Network\SquidStd.Network.csproj" />
         <ProjectReference Include="..\..\src\SquidStd.Services.Core\SquidStd.Services.Core.csproj" />

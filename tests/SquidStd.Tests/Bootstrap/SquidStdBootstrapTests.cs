@@ -33,6 +33,52 @@ public class SquidStdBootstrapTests
     }
 
     [Fact]
+    public async Task Create_WithContainer_UsesProvidedContainer()
+    {
+        using var temp = new TempDirectory();
+        var container = new Container();
+
+        await using var bootstrap = SquidStdBootstrap.Create(
+            new()
+            {
+                ConfigName = "app",
+                RootDirectory = temp.Path
+            },
+            container
+        );
+
+        Assert.Same(container, bootstrap.Container);
+        Assert.Same(bootstrap, container.Resolve<ISquidStdBootstrap>());
+        Assert.Same(bootstrap.Options, container.Resolve<SquidStdOptions>());
+
+        container.Dispose();
+    }
+
+    [Fact]
+    public async Task DisposeAsync_WithProvidedContainer_DoesNotDisposeContainer()
+    {
+        using var temp = new TempDirectory();
+        var container = new Container();
+
+        await using (SquidStdBootstrap.Create(
+                         new()
+                         {
+                             ConfigName = "app",
+                             RootDirectory = temp.Path
+                         },
+                         container
+                     ))
+        {
+        }
+
+        container.RegisterInstance("still-open");
+
+        Assert.Equal("still-open", container.Resolve<string>());
+
+        container.Dispose();
+    }
+
+    [Fact]
     public async Task StartAsync_LoadsConfigBeforeResolvingRegisteredServices()
     {
         using var temp = new TempDirectory();

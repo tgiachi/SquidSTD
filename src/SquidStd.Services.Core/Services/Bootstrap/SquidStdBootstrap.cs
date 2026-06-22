@@ -20,6 +20,7 @@ public sealed class SquidStdBootstrap : ISquidStdBootstrap
 {
     private readonly Lock _syncRoot = new();
     private readonly List<ISquidStdService> _startedServices = [];
+    private readonly bool _ownsContainer;
     private int _disposed;
     private bool _loggerConfigured;
     private BootstrapStateType _state;
@@ -34,16 +35,20 @@ public sealed class SquidStdBootstrap : ISquidStdBootstrap
     /// Initializes a bootstrapper with default options.
     /// </summary>
     public SquidStdBootstrap()
-        : this(new SquidStdOptions()) { }
+        : this(new SquidStdOptions())
+    {
+    }
 
     /// <summary>
     /// Initializes a bootstrapper with the specified options.
     /// </summary>
     /// <param name="options">Bootstrap options used to register core services.</param>
     public SquidStdBootstrap(SquidStdOptions options)
-        : this(options, new Container()) { }
+        : this(options, new Container(), true)
+    {
+    }
 
-    private SquidStdBootstrap(SquidStdOptions options, IContainer container)
+    private SquidStdBootstrap(SquidStdOptions options, IContainer container, bool ownsContainer)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(container);
@@ -52,6 +57,7 @@ public sealed class SquidStdBootstrap : ISquidStdBootstrap
 
         Options = options;
         Container = container;
+        _ownsContainer = ownsContainer;
 
         Container.RegisterInstance<ISquidStdBootstrap>(this, IfAlreadyRegistered.Replace);
         Container.RegisterInstance(this, IfAlreadyRegistered.Replace);
@@ -73,6 +79,15 @@ public sealed class SquidStdBootstrap : ISquidStdBootstrap
     /// <returns>The created bootstrapper.</returns>
     public static SquidStdBootstrap Create(SquidStdOptions options)
         => new(options);
+
+    /// <summary>
+    /// Creates a bootstrapper using an externally owned DryIoc container.
+    /// </summary>
+    /// <param name="options">Bootstrap options used to register core services.</param>
+    /// <param name="container">Externally owned container that receives SquidStd services.</param>
+    /// <returns>The created bootstrapper.</returns>
+    public static SquidStdBootstrap Create(SquidStdOptions options, IContainer container)
+        => new(options, container, false);
 
     /// <inheritdoc />
     public ISquidStdBootstrap ConfigureService(Func<IContainer, IContainer> configure)
@@ -323,7 +338,10 @@ public sealed class SquidStdBootstrap : ISquidStdBootstrap
                 await Log.CloseAndFlushAsync();
             }
 
-            Container.Dispose();
+            if (_ownsContainer)
+            {
+                Container.Dispose();
+            }
         }
     }
 }
