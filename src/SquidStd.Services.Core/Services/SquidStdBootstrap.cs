@@ -1,8 +1,12 @@
 using DryIoc;
+using Serilog;
+using Serilog.Events;
 using SquidStd.Abstractions.Data.Internal.Services;
 using SquidStd.Abstractions.Interfaces.Services;
 using SquidStd.Core.Data.Bootstrap;
 using SquidStd.Core.Interfaces.Bootstrap;
+using SquidStd.Core.Interfaces.Config;
+using SquidStd.Core.Types;
 using SquidStd.Services.Core.Extensions;
 
 namespace SquidStd.Services.Core.Services;
@@ -15,6 +19,7 @@ public sealed class SquidStdBootstrap : ISquidStdBootstrap
     private readonly Lock _syncRoot = new();
     private readonly List<ISquidStdService> _startedServices = [];
     private int _disposed;
+    private bool _loggerConfigured;
     private BootstrapState _state;
 
     /// <summary>
@@ -132,6 +137,11 @@ public sealed class SquidStdBootstrap : ISquidStdBootstrap
 
                 await service.StartAsync(cancellationToken);
                 _startedServices.Add(service);
+
+                if (service is IConfigManagerService)
+                {
+                    ConfigureLogger();
+                }
             }
         }
         catch
@@ -196,8 +206,49 @@ public sealed class SquidStdBootstrap : ISquidStdBootstrap
         }
         finally
         {
+            if (_loggerConfigured)
+            {
+                Log.CloseAndFlush();
+            }
+
             Container.Dispose();
         }
+    }
+
+    private void ConfigureLogger()
+    {
+        if (!Container.IsRegistered<SquidStdLoggerOptions>())
+        {
+            return;
+        }
+
+        var options = Container.Resolve<SquidStdLoggerOptions>();
+        var loggerConfiguration = new LoggerConfiguration();
+
+        if (options.MinimumLevel != LogLevelType.None)
+        {
+            var minimumLevel = MapLogLevel(options.MinimumLevel);
+            loggerConfiguration.MinimumLevel.Is(minimumLevel);
+
+            if (options.EnableConsole)
+            {
+                loggerConfiguration.WriteTo.Console(restrictedToMinimumLevel: minimumLevel);
+            }
+
+            if (options.EnableFile)
+            {
+                loggerConfiguration.WriteTo.File(
+                    ResolveLogPath(options),
+                    rollingInterval: MapRollingInterval(options.RollingInterval),
+                    restrictedToMinimumLevel: minimumLevel
+                );
+            }
+        }
+
+        var logger = loggerConfiguration.CreateLogger();
+        Log.Logger = logger;
+        Container.RegisterInstance<Serilog.ILogger>(logger, IfAlreadyRegistered.Replace);
+        _loggerConfigured = true;
     }
 
     private ServiceRegistrationData[] GetServiceRegistrations()
@@ -214,6 +265,41 @@ public sealed class SquidStdBootstrap : ISquidStdBootstrap
                         .ThenBy(registration => registration.ServiceType.FullName, StringComparer.Ordinal)
                         .ThenBy(registration => registration.ImplementationType.FullName, StringComparer.Ordinal)
         ];
+    }
+
+    private LogEventLevel MapLogLevel(LogLevelType level)
+        => level switch
+        {
+            LogLevelType.Trace       => LogEventLevel.Verbose,
+            LogLevelType.Debug       => LogEventLevel.Debug,
+            LogLevelType.Information => LogEventLevel.Information,
+            LogLevelType.Warning     => LogEventLevel.Warning,
+            LogLevelType.Error       => LogEventLevel.Error,
+            LogLevelType.Critical    => LogEventLevel.Fatal,
+            _                        => LogEventLevel.Fatal
+        };
+
+    private RollingInterval MapRollingInterval(SquidStdLogRollingIntervalType interval)
+        => interval switch
+        {
+            SquidStdLogRollingIntervalType.Year     => RollingInterval.Year,
+            SquidStdLogRollingIntervalType.Month    => RollingInterval.Month,
+            SquidStdLogRollingIntervalType.Day      => RollingInterval.Day,
+            SquidStdLogRollingIntervalType.Hour     => RollingInterval.Hour,
+            SquidStdLogRollingIntervalType.Minute   => RollingInterval.Minute,
+            SquidStdLogRollingIntervalType.Infinite => RollingInterval.Infinite,
+            _                                       => RollingInterval.Day
+        };
+
+    private string ResolveLogPath(SquidStdLoggerOptions options)
+    {
+        var logDirectory = string.IsNullOrWhiteSpace(options.LogDirectory) ? "logs" : options.LogDirectory;
+        var fileName = string.IsNullOrWhiteSpace(options.FileName) ? "squidstd-.log" : options.FileName;
+        var directory = Path.IsPathRooted(logDirectory)
+                            ? logDirectory
+                            : Path.Combine(Options.RootDirectory, logDirectory);
+
+        return Path.Combine(directory, fileName);
     }
 
     private void MarkStarting()

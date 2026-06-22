@@ -1,4 +1,5 @@
 using DryIoc;
+using Serilog;
 using SquidStd.Abstractions.Data.Internal.Services;
 using SquidStd.Abstractions.Extensions.Container;
 using SquidStd.Abstractions.Interfaces.Services;
@@ -11,6 +12,7 @@ using SquidStd.Tests.Support;
 
 namespace SquidStd.Tests.Bootstrap;
 
+[Collection(SerilogEventSinkCollection.Name)]
 public class SquidStdBootstrapTests
 {
     [Fact]
@@ -141,6 +143,36 @@ public class SquidStdBootstrapTests
         await state.Stopped.Task.WaitAsync(TimeSpan.FromSeconds(3));
 
         Assert.True(state.Stopped.Task.IsCompletedSuccessfully);
+    }
+
+    [Fact]
+    public async Task StartAsync_ConfiguresFileSinkFromLoggerOptions()
+    {
+        using var temp = new TempDirectory();
+        File.WriteAllText(
+            temp.Combine("app.yaml"),
+            """
+            logger:
+              MinimumLevel: Information
+              EnableConsole: false
+              EnableFile: true
+              LogDirectory: logs
+              FileName: app.log
+              RollingInterval: Infinite
+            """
+        );
+        await using var bootstrap = SquidStdBootstrap.Create(
+            new SquidStdOptions { ConfigName = "app", RootDirectory = temp.Path }
+        );
+
+        await bootstrap.StartAsync(CancellationToken.None);
+        await bootstrap.StopAsync(CancellationToken.None);
+        Log.CloseAndFlush();
+
+        var logPath = temp.Combine(Path.Combine("logs", "app.log"));
+        var content = File.ReadAllText(logPath);
+
+        Assert.Contains("JobSystemService started", content);
     }
 
     private sealed class ConfigConsumerService(SquidStdLoggerOptions options, List<string> events) : ISquidStdService
