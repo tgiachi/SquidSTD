@@ -22,5 +22,11 @@
   href: messaging.md
 - name: SquidStd.Messaging.RabbitMq
   href: messaging-rabbitmq.md
+- name: SquidStd.Caching.Abstractions
+  href: caching-abstractions.md
+- name: SquidStd.Caching
+  href: caching.md
+- name: SquidStd.Caching.Redis
+  href: caching-redis.md
 - name: SquidStd.Scripting.Lua
   href: scripting-lua.md
