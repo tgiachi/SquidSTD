@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Text.RegularExpressions;
 
 namespace SquidStd.Core.Extensions.Env;
 
@@ -28,4 +29,32 @@ public static class EnvExtensions
 
         return input;
     }
+
+    /// <summary>
+    /// Replaces "$VAR" tokens with the matching environment variable value. Unknown variables are
+    /// left unchanged.
+    /// </summary>
+    /// <param name="input">The input string.</param>
+    /// <returns>The string with known $VAR tokens substituted.</returns>
+    public static string ReplaceEnv(this string input)
+    {
+        if (string.IsNullOrEmpty(input))
+        {
+            return input;
+        }
+
+        return EnvTokenRegex.Replace(
+            input,
+            match =>
+            {
+                var name = match.Groups[1].Value;
+                var value = Environment.GetEnvironmentVariable(name);
+
+                return value ?? match.Value;
+            });
+    }
+
+    private static readonly Regex EnvTokenRegex = new(
+        @"\$([A-Za-z_][A-Za-z0-9_]*)",
+        RegexOptions.Compiled);
 }
