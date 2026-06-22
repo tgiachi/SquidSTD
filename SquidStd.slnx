@@ -3,6 +3,7 @@
         <Project Path="src/SquidStd.Abstractions/SquidStd.Abstractions.csproj" />
         <Project Path="src/SquidStd.AspNetCore/SquidStd.AspNetCore.csproj" />
         <Project Path="src/SquidStd.Caching.Abstractions/SquidStd.Caching.Abstractions.csproj" />
+        <Project Path="src/SquidStd.Caching/SquidStd.Caching.csproj" />
         <Project Path="src/SquidStd.Core/SquidStd.Core.csproj" />
         <Project Path="src/SquidStd.Database.Abstractions/SquidStd.Database.Abstractions.csproj" />
         <Project Path="src/SquidStd.Database/SquidStd.Database.csproj" />

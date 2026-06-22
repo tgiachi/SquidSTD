@@ -42,6 +42,7 @@
         <ProjectReference Include="..\..\src\SquidStd.Database\SquidStd.Database.csproj" />
         <ProjectReference Include="..\..\src\SquidStd.Messaging.RabbitMq\SquidStd.Messaging.RabbitMq.csproj" />
         <ProjectReference Include="..\..\src\SquidStd.Caching.Abstractions\SquidStd.Caching.Abstractions.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Caching\SquidStd.Caching.csproj" />
     </ItemGroup>
 
 </Project>
