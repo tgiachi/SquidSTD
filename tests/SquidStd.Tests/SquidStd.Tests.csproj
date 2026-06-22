@@ -28,6 +28,7 @@
         <ProjectReference Include="..\..\src\SquidStd.Plugin.Abstractions\SquidStd.Plugin.Abstractions.csproj"/>
         <ProjectReference Include="..\..\src\SquidStd.Network\SquidStd.Network.csproj"/>
         <ProjectReference Include="..\..\src\SquidStd.Services.Core\SquidStd.Services.Core.csproj"/>
+        <ProjectReference Include="..\..\src\SquidStd.Scripting.Lua\SquidStd.Scripting.Lua.csproj"/>
     </ItemGroup>
 
 </Project>

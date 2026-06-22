@@ -748,14 +748,12 @@ public class LuaScriptEngineService : IScriptEngineService, IDisposable
         => value == null ? DynValue.Nil : DynValue.FromObject(LuaScript, value);
 
     /// <summary>
-    /// Creates a factory function that dynamically invokes the correct constructor.
-    /// Uses reflection to find the constructor matching the number of arguments passed from Lua.
+    /// Creates a Lua callback that invokes the constructor matching the number of arguments passed from Lua.
     /// </summary>
-    private Func<dynamic, dynamic, dynamic, dynamic, dynamic> CreateConstructorWrapper(
+    private DynValue CreateConstructorCallback(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type
     )
     {
-        // Cache constructors by parameter count for performance
         var constructorsByParamCount = new Dictionary<int, ConstructorInfo>();
         var constructors = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
 
@@ -765,94 +763,41 @@ public class LuaScriptEngineService : IScriptEngineService, IDisposable
             constructorsByParamCount.TryAdd(paramCount, ctor);
         }
 
-        return (arg1, arg2, arg3, arg4) =>
-               {
-                   // Collect arguments
-                   var rawArgs = new List<object>();
+        return DynValue.NewCallback(
+            (_, args) =>
+            {
+                var argCount = args.Count;
 
-                   if (arg1 != null)
-                   {
-                       rawArgs.Add(arg1);
-                   }
+                if (!constructorsByParamCount.TryGetValue(argCount, out var ctor))
+                {
+                    var availableCtors = string.Join(", ", constructorsByParamCount.Keys.OrderBy(k => k));
 
-                   if (arg2 != null)
-                   {
-                       rawArgs.Add(arg2);
-                   }
+                    throw new ScriptRuntimeException(
+                        $"No constructor found for {type.Name} with {argCount} arguments. Available: {availableCtors}"
+                    );
+                }
 
-                   if (arg3 != null)
-                   {
-                       rawArgs.Add(arg3);
-                   }
+                try
+                {
+                    var parameters = ctor.GetParameters();
+                    var convertedArgs = new object?[argCount];
 
-                   if (arg4 != null)
-                   {
-                       rawArgs.Add(arg4);
-                   }
+                    for (var i = 0; i < argCount; i++)
+                    {
+                        convertedArgs[i] = ConvertFromLua(args[i], parameters[i].ParameterType);
+                    }
 
-                   var argCount = rawArgs.Count;
-
-                   // Find constructor with matching parameter count
-                   if (constructorsByParamCount.TryGetValue(argCount, out var ctor))
-                   {
-                       try
-                       {
-                           // Convert arguments to match constructor parameter types
-                           var parameters = ctor.GetParameters();
-                           var convertedArgs = new object[argCount];
-
-                           for (var i = 0; i < argCount; i++)
-                           {
-                               var paramType = parameters[i].ParameterType;
-                               var argValue = rawArgs[i];
-
-                               // Convert argument to the expected parameter type
-                               if (argValue == null)
-                               {
-                                   convertedArgs[i] = null;
-                               }
-                               else if (paramType.IsInstanceOfType(argValue))
-                               {
-                                   // No conversion needed
-                                   convertedArgs[i] = argValue;
-                               }
-                               else
-                               {
-                                   // Convert using Convert.ChangeType (handles double -> float, etc.)
-                                   try
-                                   {
-                                       convertedArgs[i] = Convert.ChangeType(
-                                           argValue,
-                                           paramType,
-                                           CultureInfo.InvariantCulture
-                                       );
-                                   }
-                                   catch
-                                   {
-                                       convertedArgs[i] = argValue; // Fallback to original value
-                                   }
-                               }
-                           }
-
-                           // Create instance with converted arguments
-                           return Activator.CreateInstance(type, convertedArgs);
-                       }
-                       catch (Exception ex)
-                       {
-                           throw new ScriptRuntimeException(
-                               $"Constructor of {type.Name} with {argCount} arguments failed: {ex.Message}",
-                               ex
-                           );
-                       }
-                   }
-
-                   // No matching constructor found
-                   var availableCtors = string.Join(", ", constructorsByParamCount.Keys.OrderBy(k => k));
-
-                   throw new ScriptRuntimeException(
-                       $"No constructor found for {type.Name} with {argCount} arguments. Available: {availableCtors}"
-                   );
-               };
+                    return ConvertToLua(Activator.CreateInstance(type, convertedArgs));
+                }
+                catch (Exception ex)
+                {
+                    throw new ScriptRuntimeException(
+                        $"Constructor of {type.Name} with {argCount} arguments failed: {ex.Message}",
+                        ex
+                    );
+                }
+            }
+        );
     }
 
     /// <summary>
@@ -1260,7 +1205,7 @@ public class LuaScriptEngineService : IScriptEngineService, IDisposable
             if (publicConstructors.Length > 0)
             {
                 // Instantiable type - use constructor wrapper for easier instance creation
-                var constructorWrapper = CreateConstructorWrapper(scriptUserData.UserType);
+                var constructorWrapper = CreateConstructorCallback(scriptUserData.UserType);
                 LuaScript.Globals[scriptUserData.UserType.Name] = constructorWrapper;
             }
             else
