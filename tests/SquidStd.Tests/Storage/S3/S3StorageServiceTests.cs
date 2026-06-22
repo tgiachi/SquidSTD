@@ -65,4 +65,24 @@ public class S3StorageServiceTests
             () => new S3StorageService(new S3StorageOptions { AccessKey = "a", SecretKey = "b", Bucket = "c" })
         );
     }
+
+    [Fact]
+    public async Task ListKeysAsync_ReturnsObjectsUnderPrefix()
+    {
+        var storage = NewService();
+        var prefix = "list-" + Guid.NewGuid().ToString("N") + "/";
+        await storage.SaveAsync(prefix + "a", Encoding.UTF8.GetBytes("1"));
+        await storage.SaveAsync(prefix + "b", Encoding.UTF8.GetBytes("2"));
+
+        var keys = new List<string>();
+
+        await foreach (var key in storage.ListKeysAsync(prefix))
+        {
+            keys.Add(key);
+        }
+
+        Assert.Equal(2, keys.Count);
+        Assert.Contains(prefix + "a", keys);
+        Assert.Contains(prefix + "b", keys);
+    }
 }
