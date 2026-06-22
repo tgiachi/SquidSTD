@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="RabbitMQ.Client" Version="7.1.2" />
+        <PackageReference Include="RabbitMQ.Client" Version="7.2.1" />
         <PackageReference Include="DryIoc.dll" Version="5.4.3" />
     </ItemGroup>
 
