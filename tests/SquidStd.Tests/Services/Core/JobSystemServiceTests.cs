@@ -16,6 +16,7 @@ public class JobSystemServiceTests
         await system.ScheduleAsync(() => called = true);
 
         Assert.True(called);
+        await WaitForCompletedAsync(system, 1);
         Assert.Equal(1, system.CompletedCount);
     }
 
@@ -60,6 +61,7 @@ public class JobSystemServiceTests
         await Task.WhenAll(tasks);
 
         Assert.Equal(5050, sum);
+        await WaitForCompletedAsync(system, 100);
         Assert.Equal(100, system.CompletedCount);
     }
 
@@ -173,4 +175,14 @@ public class JobSystemServiceTests
                 ShutdownTimeoutSeconds = 1.0
             }
         );
+
+    // CompletedCount is incremented by the worker after the scheduled task's completion fires, so
+    // awaiting ScheduleAsync does not guarantee the counter is updated yet. Wait for it (bounded).
+    private static async Task WaitForCompletedAsync(IJobSystem system, long expected)
+    {
+        for (var i = 0; i < 200 && system.CompletedCount < expected; i++)
+        {
+            await Task.Delay(10);
+        }
+    }
 }
