@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/icon.png" alt="SquidStd" width="128" height="128" />
+  <img src="assets/icon.png" alt="squid-std" width="128" height="128" />
 </p>
 
-<h1 align="center">SquidStd</h1>
+<h1 align="center">squid-std</h1>
 
 <p align="center">
   <a href="https://github.com/tgiachi/SquidStd/actions/workflows/ci.yml"><img src="https://github.com/tgiachi/SquidStd/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
@@ -30,6 +30,9 @@ Short description goes here.
 | `SquidStd.Messaging.Abstractions` | Messaging contracts (`IMessageQueue`, `IQueueProvider`, serializer/metrics, listeners). | [readme](src/SquidStd.Messaging.Abstractions/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Messaging.Abstractions.svg)](https://www.nuget.org/packages/SquidStd.Messaging.Abstractions/) |
 | `SquidStd.Messaging` | In-memory messaging transport (`AddInMemoryMessaging`). | [readme](src/SquidStd.Messaging/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Messaging.svg)](https://www.nuget.org/packages/SquidStd.Messaging/) |
 | `SquidStd.Messaging.RabbitMq` | RabbitMQ messaging transport (`AddRabbitMqMessaging`). | [readme](src/SquidStd.Messaging.RabbitMq/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Messaging.RabbitMq.svg)](https://www.nuget.org/packages/SquidStd.Messaging.RabbitMq/) |
+| `SquidStd.Caching.Abstractions` | Caching contracts (`ICacheService`, `ICacheProvider`, `CacheService` facade, metrics, connection string). | [readme](src/SquidStd.Caching.Abstractions/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Caching.Abstractions.svg)](https://www.nuget.org/packages/SquidStd.Caching.Abstractions/) |
+| `SquidStd.Caching` | In-memory cache backend (`AddInMemoryCache`). | [readme](src/SquidStd.Caching/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Caching.svg)](https://www.nuget.org/packages/SquidStd.Caching/) |
+| `SquidStd.Caching.Redis` | Redis cache backend (`AddRedisCache`). | [readme](src/SquidStd.Caching.Redis/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Caching.Redis.svg)](https://www.nuget.org/packages/SquidStd.Caching.Redis/) |
 | `SquidStd.Scripting.Lua` | Lua scripting engine with attribute-based modules and event bridging. | [readme](src/SquidStd.Scripting.Lua/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Scripting.Lua.svg)](https://www.nuget.org/packages/SquidStd.Scripting.Lua/) |
 
 ## Build
