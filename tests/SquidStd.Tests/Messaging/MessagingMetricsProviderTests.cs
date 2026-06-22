@@ -1,4 +1,4 @@
-using SquidStd.Messaging;
+using SquidStd.Messaging.Abstractions;
 
 namespace SquidStd.Tests.Messaging;
 

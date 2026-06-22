@@ -1,6 +1,6 @@
 using SquidStd.Messaging.Abstractions.Interfaces;
 
-namespace SquidStd.Messaging;
+namespace SquidStd.Messaging.Abstractions;
 
 /// <summary>
 /// Typed facade over an <see cref="IQueueProvider" />: serializes outgoing messages and

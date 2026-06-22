@@ -4,7 +4,7 @@ using SquidStd.Core.Interfaces.Metrics;
 using SquidStd.Core.Types.Metrics;
 using SquidStd.Messaging.Abstractions.Interfaces;
 
-namespace SquidStd.Messaging;
+namespace SquidStd.Messaging.Abstractions;
 
 /// <summary>
 /// Accumulates messaging metrics and exposes them to the metrics collection system.

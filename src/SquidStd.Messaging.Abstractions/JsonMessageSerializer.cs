@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using SquidStd.Messaging.Abstractions.Interfaces;
 
-namespace SquidStd.Messaging;
+namespace SquidStd.Messaging.Abstractions;
 
 /// <summary>
 /// Default JSON message serializer based on System.Text.Json.
