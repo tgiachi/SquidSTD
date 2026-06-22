@@ -29,9 +29,6 @@ public sealed class RabbitMqQueueProvider : IQueueProvider
 
     public RabbitMqQueueProvider(RabbitMqOptions options, MessagingOptions messagingOptions, IMessagingMetrics? metrics = null)
     {
-        ArgumentNullException.ThrowIfNull(options);
-        ArgumentNullException.ThrowIfNull(messagingOptions);
-
         _options = options;
         _messagingOptions = messagingOptions;
         _metrics = metrics ?? NoOpMessagingMetrics.Instance;

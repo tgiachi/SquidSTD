@@ -22,8 +22,6 @@ public sealed class TimerWheelPumpService : ISquidStdService, IDisposable
 
     public TimerWheelPumpService(ITimerService timer, TimerWheelPumpConfig config)
     {
-        ArgumentNullException.ThrowIfNull(config);
-
         if (config.PumpInterval <= TimeSpan.Zero)
         {
             throw new ArgumentOutOfRangeException(nameof(config), "PumpInterval must be positive.");

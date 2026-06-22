@@ -25,8 +25,6 @@ public sealed class CacheService : ICacheService
         ICacheMetrics? metrics = null
     )
     {
-        ArgumentNullException.ThrowIfNull(options);
-
         _provider = provider;
         _serializer = serializer;
         _deserializer = deserializer;
