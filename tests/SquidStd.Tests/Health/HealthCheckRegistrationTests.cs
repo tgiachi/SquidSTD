@@ -11,7 +11,7 @@ public class HealthCheckRegistrationTests
     [Fact]
     public async Task RegisterHealthChecksService_ResolvesAndAggregatesRegisteredChecks()
     {
-        var container = new Container();
+        using var container = new Container();
         container.RegisterInstance(new HealthCheckOptions());
         container.RegisterInstance<IHealthCheck>(new FakeHealthCheck("a"), IfAlreadyRegistered.AppendNotKeyed);
         container.RegisterInstance<IHealthCheck>(new FakeHealthCheck("b"), IfAlreadyRegistered.AppendNotKeyed);
