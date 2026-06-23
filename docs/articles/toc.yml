@@ -44,6 +44,8 @@
   href: workers.md
 - name: SquidStd.Workers.Manager
   href: workers-manager.md
+- name: SquidStd.Templates
+  href: templates.md
 - name: Serialization
   href: serialization.md
 - name: Scheduler
