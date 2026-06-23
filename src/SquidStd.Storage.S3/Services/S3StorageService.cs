@@ -26,17 +26,7 @@ public sealed class S3StorageService : IStorageService, IDisposable
         ArgumentException.ThrowIfNullOrWhiteSpace(options.SecretKey);
         ArgumentException.ThrowIfNullOrWhiteSpace(options.Bucket);
 
-        using var builder = new MinioClient()
-            .WithEndpoint(options.Endpoint)
-            .WithCredentials(options.AccessKey, options.SecretKey)
-            .WithSSL(options.UseSsl);
-
-        if (!string.IsNullOrWhiteSpace(options.Region))
-        {
-            builder = builder.WithRegion(options.Region);
-        }
-
-        _client = builder.Build();
+        _client = CreateClient(options);
         _bucket = options.Bucket;
     }
 
@@ -141,6 +131,21 @@ public sealed class S3StorageService : IStorageService, IDisposable
                 yield return item.Key;
             }
         }
+    }
+
+    private static IMinioClient CreateClient(S3StorageOptions options)
+    {
+        var minio = new MinioClient()
+            .WithEndpoint(options.Endpoint)
+            .WithCredentials(options.AccessKey, options.SecretKey)
+            .WithSSL(options.UseSsl);
+
+        if (!string.IsNullOrWhiteSpace(options.Region))
+        {
+            minio = minio.WithRegion(options.Region);
+        }
+
+        return minio.Build();
     }
 
     private async ValueTask EnsureBucketAsync(CancellationToken cancellationToken)
