@@ -48,6 +48,7 @@ public static class SquidStdAspNetCoreBuilderExtensions
             var container = new Container();
             builder.Host.UseServiceProviderFactory(new DryIocServiceProviderFactory(container));
             SquidStdBootstrap.Create(options, container);
+            builder.Host.Properties[ContainerPropertyKey] = container;
 
             var configuredContainer = configureContainer?.Invoke(container) ?? container;
 
@@ -61,6 +62,8 @@ public static class SquidStdAspNetCoreBuilderExtensions
             return builder;
         }
     }
+
+    internal const string ContainerPropertyKey = "SquidStd:Container";
 
     private static void ValidateOptions(SquidStdOptions options)
     {

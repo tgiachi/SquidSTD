@@ -27,8 +27,9 @@ dotnet add package SquidStd.Core
 - Configuration contracts: `IConfigEntry` (a YAML section) and `IConfigManagerService`.
 - In-process messaging: `IEventBus` with `ISyncEventListener<T>` / `IAsyncEventListener<T>` over `IEvent`.
 - Background work & timing: `IJobSystem`, `ITimerService`, `IMainThreadDispatcher`.
-- Metrics & storage: `IMetricProvider`, `IStorageService`, `IObjectStorageService`, secrets contracts.
-- Utilities: `YamlUtils`, `JsonUtils`, a Serilog `EventSink`, and string/env/directory extensions.
+- Metrics & secrets: `IMetricProvider` and secret-protection contracts.
+- Serialization: `IDataSerializer` / `IDataDeserializer` (default `JsonDataSerializer`), plus `YamlUtils` / `JsonUtils`.
+- Utilities: a Serilog `EventSink`, and string/env/directory extensions.
 - Shared domain enums under `Types` (e.g. `LogLevelType`, `PlatformType`).
 
 ## Usage

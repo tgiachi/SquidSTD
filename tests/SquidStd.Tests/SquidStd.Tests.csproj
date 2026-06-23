@@ -11,6 +11,7 @@
         <PackageReference Include="coverlet.collector" Version="10.0.1" />
         <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="10.0.9" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
+        <PackageReference Include="Testcontainers.Minio" Version="4.12.0" />
         <PackageReference Include="Testcontainers.RabbitMq" Version="4.12.0" />
         <PackageReference Include="Testcontainers.Redis" Version="4.12.0" />
         <PackageReference Include="xunit" Version="2.9.3" />
@@ -45,6 +46,8 @@
         <ProjectReference Include="..\..\src\SquidStd.Caching.Abstractions\SquidStd.Caching.Abstractions.csproj" />
         <ProjectReference Include="..\..\src\SquidStd.Caching\SquidStd.Caching.csproj" />
         <ProjectReference Include="..\..\src\SquidStd.Caching.Redis\SquidStd.Caching.Redis.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Storage\SquidStd.Storage.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Storage.S3\SquidStd.Storage.S3.csproj" />
     </ItemGroup>
 
 </Project>

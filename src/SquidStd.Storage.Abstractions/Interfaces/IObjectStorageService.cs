@@ -1,4 +1,4 @@
-namespace SquidStd.Core.Interfaces.Storage;
+namespace SquidStd.Storage.Abstractions.Interfaces;
 
 /// <summary>
 /// Stores typed objects by logical key.
@@ -38,4 +38,12 @@ public interface IObjectStorageService
     /// <param name="cancellationToken">Token used to cancel the operation.</param>
     /// <typeparam name="T">The object type.</typeparam>
     ValueTask SaveAsync<T>(string key, T value, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Enumerates stored keys, optionally filtered by prefix.
+    /// </summary>
+    /// <param name="prefix">Optional key prefix; <c>null</c> or empty returns all keys.</param>
+    /// <param name="cancellationToken">Token used to cancel the enumeration.</param>
+    /// <returns>An async sequence of storage keys.</returns>
+    IAsyncEnumerable<string> ListKeysAsync(string? prefix = null, CancellationToken cancellationToken = default);
 }

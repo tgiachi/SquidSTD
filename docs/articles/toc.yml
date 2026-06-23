@@ -28,5 +28,17 @@
   href: caching.md
 - name: SquidStd.Caching.Redis
   href: caching-redis.md
+- name: SquidStd.Storage.Abstractions
+  href: storage-abstractions.md
+- name: SquidStd.Storage
+  href: storage.md
+- name: SquidStd.Storage.S3
+  href: storage-s3.md
 - name: SquidStd.Scripting.Lua
   href: scripting-lua.md
+- name: Serialization
+  href: serialization.md
+- name: Scheduler
+  href: scheduler.md
+- name: Health Checks
+  href: health-checks.md

@@ -15,6 +15,9 @@
         <Project Path="src/SquidStd.Plugin.Abstractions/SquidStd.Plugin.Abstractions.csproj" />
         <Project Path="src/SquidStd.Scripting.Lua/SquidStd.Scripting.Lua.csproj" />
         <Project Path="src/SquidStd.Services.Core/SquidStd.Services.Core.csproj" />
+        <Project Path="src/SquidStd.Storage.Abstractions/SquidStd.Storage.Abstractions.csproj" />
+        <Project Path="src/SquidStd.Storage.S3/SquidStd.Storage.S3.csproj" />
+        <Project Path="src/SquidStd.Storage/SquidStd.Storage.csproj" />
     </Folder>
     <Folder Name="/tests/">
         <Project Path="tests/SquidStd.Tests/SquidStd.Tests.csproj" />

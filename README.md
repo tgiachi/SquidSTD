@@ -68,9 +68,9 @@ block until cancellation for long-running hosts.
 
 | Package | Description | Links |
 |---------|-------------|-------|
-| `SquidStd.Core` | Foundational contracts & utilities (config, event bus, jobs, metrics, storage, YAML/JSON, Serilog sink). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Core/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Core.svg)](https://www.nuget.org/packages/SquidStd.Core/) |
+| `SquidStd.Core` | Foundational contracts & utilities (config, event bus, jobs, metrics, serialization, YAML/JSON, Serilog sink). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Core/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Core.svg)](https://www.nuget.org/packages/SquidStd.Core/) |
 | `SquidStd.Abstractions` | DI registration plumbing (`ISquidStdService`, `RegisterStdService`, `RegisterConfigSection`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Abstractions/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Abstractions.svg)](https://www.nuget.org/packages/SquidStd.Abstractions/) |
-| `SquidStd.Services.Core` | Concrete services: config, event bus, jobs, timer/cron scheduler, dispatcher, metrics, storage. | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Services.Core/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Services.Core.svg)](https://www.nuget.org/packages/SquidStd.Services.Core/) |
+| `SquidStd.Services.Core` | Concrete services: config, event bus, jobs, timer/cron scheduler, dispatcher, metrics, health checks, secrets. | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Services.Core/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Services.Core.svg)](https://www.nuget.org/packages/SquidStd.Services.Core/) |
 | `SquidStd.AspNetCore` | ASP.NET Core host integration for the SquidStd service stack. | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.AspNetCore/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.AspNetCore.svg)](https://www.nuget.org/packages/SquidStd.AspNetCore/) |
 | `SquidStd.Network` | TCP/UDP servers & clients, sessions, framing/middleware pipeline, span readers/writers. | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Network/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Network.svg)](https://www.nuget.org/packages/SquidStd.Network/) |
 | `SquidStd.Plugin.Abstractions` | Plugin contracts (`ISquidStdPlugin`, metadata, context). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Plugin.Abstractions/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Plugin.Abstractions.svg)](https://www.nuget.org/packages/SquidStd.Plugin.Abstractions/) |
@@ -82,6 +82,9 @@ block until cancellation for long-running hosts.
 | `SquidStd.Caching.Abstractions` | Caching contracts (`ICacheService`, `ICacheProvider`, `CacheService` facade, metrics, connection string). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Caching.Abstractions/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Caching.Abstractions.svg)](https://www.nuget.org/packages/SquidStd.Caching.Abstractions/) |
 | `SquidStd.Caching` | In-memory cache backend (`AddInMemoryCache`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Caching/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Caching.svg)](https://www.nuget.org/packages/SquidStd.Caching/) |
 | `SquidStd.Caching.Redis` | Redis cache backend (`AddRedisCache`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Caching.Redis/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Caching.Redis.svg)](https://www.nuget.org/packages/SquidStd.Caching.Redis/) |
+| `SquidStd.Storage.Abstractions` | Storage contracts (`IStorageService`, `IObjectStorageService`, `StorageConfig`, `ListKeysAsync`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Storage.Abstractions/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Storage.Abstractions.svg)](https://www.nuget.org/packages/SquidStd.Storage.Abstractions/) |
+| `SquidStd.Storage` | Local file storage backend (`AddFileStorage`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Storage/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Storage.svg)](https://www.nuget.org/packages/SquidStd.Storage/) |
+| `SquidStd.Storage.S3` | S3/MinIO storage backend (`AddS3Storage`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Storage.S3/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Storage.S3.svg)](https://www.nuget.org/packages/SquidStd.Storage.S3/) |
 | `SquidStd.Scripting.Lua` | Lua scripting engine with attribute-based modules and event bridging. | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Scripting.Lua/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Scripting.Lua.svg)](https://www.nuget.org/packages/SquidStd.Scripting.Lua/) |
 
 ## Architecture
@@ -102,7 +105,7 @@ squid-std follows a few consistent principles across every module:
 ## Documentation
 
 Full API documentation is published with DocFX to GitHub Pages:
-**[tgiachi.github.io/SquidStd](https://tgiachi.github.io/SquidStd/)**. Each package also ships its
+**[tgiachi.github.io/squid-std](https://tgiachi.github.io/squid-std/)**. Each package also ships its
 own README (linked in the table above).
 
 ## Build

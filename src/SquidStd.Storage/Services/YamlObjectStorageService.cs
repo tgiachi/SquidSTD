@@ -1,8 +1,8 @@
 using System.Text;
-using SquidStd.Core.Interfaces.Storage;
+using SquidStd.Storage.Abstractions.Interfaces;
 using SquidStd.Core.Yaml;
 
-namespace SquidStd.Services.Core.Services.Storage;
+namespace SquidStd.Storage.Services;
 
 /// <summary>
 /// YAML object storage built on top of binary storage.
@@ -51,4 +51,8 @@ public sealed class YamlObjectStorageService : IObjectStorageService
         var yaml = YamlUtils.Serialize(value);
         await _storageService.SaveAsync(key, Encoding.UTF8.GetBytes(yaml), cancellationToken);
     }
+
+    /// <inheritdoc />
+    public IAsyncEnumerable<string> ListKeysAsync(string? prefix = null, CancellationToken cancellationToken = default)
+        => _storageService.ListKeysAsync(prefix, cancellationToken);
 }

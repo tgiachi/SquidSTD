@@ -5,11 +5,12 @@ using SquidStd.Core.Data.Bootstrap;
 using SquidStd.Core.Data.Jobs;
 using SquidStd.Core.Data.Metrics;
 using SquidStd.Core.Data.Storage;
+using SquidStd.Storage.Abstractions.Data.Config;
 using SquidStd.Core.Data.Timing;
 using SquidStd.Core.Interfaces.Config;
 using SquidStd.Core.Interfaces.Metrics;
 using SquidStd.Core.Interfaces.Secrets;
-using SquidStd.Core.Interfaces.Storage;
+using SquidStd.Storage.Abstractions.Interfaces;
 using SquidStd.Services.Core.Extensions;
 using SquidStd.Services.Core.Services;
 using SquidStd.Services.Core.Services.Storage;
@@ -165,33 +166,18 @@ public class RegisterDefaultServicesExtensionsTests
     }
 
     [Fact]
-    public void RegisterCoreServices_RegistersStorageAndSecretServices()
+    public void RegisterCoreServices_RegistersSecretServices()
     {
         using var temp = new TempDirectory();
         using var container = new Container();
 
         container.RegisterCoreServices("app", temp.Path);
 
-        Assert.True(container.IsRegistered<IStorageService>());
-        Assert.True(container.IsRegistered<IObjectStorageService>());
+        // Storage is opt-in (AddFileStorage); core no longer registers it.
+        Assert.False(container.IsRegistered<IStorageService>());
+        Assert.False(container.IsRegistered<IObjectStorageService>());
         Assert.True(container.IsRegistered<ISecretProtector>());
         Assert.True(container.IsRegistered<ISecretStore>());
-    }
-
-    [Fact]
-    public async Task RegisterStorageServices_RegistersFileAndYamlStorage()
-    {
-        using var temp = new TempDirectory();
-        using var container = new Container();
-
-        container.RegisterStorageServices();
-        container.RegisterConfigManagerService("app", temp.Path);
-        await ((ConfigManagerService)container.Resolve<IConfigManagerService>()).StartAsync(CancellationToken.None);
-
-        Assert.True(container.IsRegistered<IStorageService>());
-        Assert.True(container.IsRegistered<IObjectStorageService>());
-        Assert.IsType<FileStorageService>(container.Resolve<IStorageService>());
-        Assert.IsType<YamlObjectStorageService>(container.Resolve<IObjectStorageService>());
     }
 
     [Fact]

@@ -1,4 +1,4 @@
-namespace SquidStd.Services.Core.Services.Internal;
+namespace SquidStd.Storage.Internal;
 
 /// <summary>
 /// Resolves logical storage keys into paths constrained to one root directory.

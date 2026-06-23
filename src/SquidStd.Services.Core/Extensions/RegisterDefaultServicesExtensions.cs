@@ -7,6 +7,7 @@ using SquidStd.Core.Data.Bootstrap;
 using SquidStd.Core.Data.Jobs;
 using SquidStd.Core.Data.Metrics;
 using SquidStd.Core.Data.Storage;
+using SquidStd.Storage.Abstractions.Data.Config;
 using SquidStd.Core.Data.Timing;
 using SquidStd.Core.Interfaces.Config;
 using SquidStd.Core.Interfaces.Events;
@@ -14,7 +15,7 @@ using SquidStd.Core.Interfaces.Jobs;
 using SquidStd.Core.Interfaces.Metrics;
 using SquidStd.Core.Interfaces.Secrets;
 using SquidStd.Core.Interfaces.Serialization;
-using SquidStd.Core.Interfaces.Storage;
+using SquidStd.Storage.Abstractions.Interfaces;
 using SquidStd.Core.Interfaces.Threading;
 using SquidStd.Core.Interfaces.Timing;
 using SquidStd.Core.Json;
@@ -86,7 +87,6 @@ public static class RegisterDefaultServicesExtensions
             container.RegisterMainThreadDispatcherService();
             container.RegisterTimerWheelService();
             container.RegisterMetricsCollectionService();
-            container.RegisterStorageServices();
             container.RegisterSecretServices();
 
             return container;
@@ -135,19 +135,6 @@ public static class RegisterDefaultServicesExtensions
             container.RegisterConfigSection("metrics", static () => new MetricsConfig(), -80);
 
             return container.RegisterStdService<IMetricsCollectionService, MetricsCollectionService>(1000);
-        }
-
-        /// <summary>
-        /// Registers default local storage services in the container.
-        /// </summary>
-        /// <returns>The same container for chaining.</returns>
-        public IContainer RegisterStorageServices()
-        {
-            container.RegisterConfigSection("storage", static () => new StorageConfig(), -70);
-            container.Register<IStorageService, FileStorageService>(Reuse.Singleton);
-            container.Register<IObjectStorageService, YamlObjectStorageService>(Reuse.Singleton);
-
-            return container;
         }
 
         /// <summary>

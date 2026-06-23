@@ -29,7 +29,8 @@ dotnet add package SquidStd.Services.Core
 - `JobSystemService` — background job execution; `TimerWheelService` + cron scheduling for timed work.
 - `MainThreadDispatcherService` — marshal work back onto a main thread.
 - `MetricsCollectionService` — aggregates `IMetricProvider` samples.
-- File storage, object storage, and AES-GCM-protected secret store.
+- `HealthCheckService` — aggregates `IHealthCheck`s into one report (`RegisterHealthChecksService`).
+- AES-GCM-protected secret store. (File/object storage moved to `SquidStd.Storage`, opt-in via `AddFileStorage`.)
 
 ## Usage
 
