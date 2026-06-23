@@ -52,7 +52,7 @@ public class ElasticExpressionTranslatorTests
     [Fact]
     public void UnsupportedExpression_Throws()
     {
-        Assert.Throws<NotSupportedException>(() => Translate(s => s.Where(d => d.Name.ToUpper() == "X")));
+        Assert.Throws<NotSupportedException>(() => Translate(s => s.Where(d => d.Name.ToUpperInvariant() == "X")));
     }
 
     private sealed class TranslateOnlyQueryable<T> : IOrderedQueryable<T>, IQueryProvider

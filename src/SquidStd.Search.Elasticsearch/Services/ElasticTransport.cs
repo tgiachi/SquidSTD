@@ -14,6 +14,20 @@ public sealed class ElasticTransport
 {
     private static readonly JsonSerializerOptions WebOptions = new(JsonSerializerDefaults.Web);
 
+    // Elasticsearch 8.x rejects requests without an explicit media type, so force it on every request.
+    private static readonly RequestConfiguration JsonRequest = new()
+    {
+        Accept = "application/json",
+        ContentType = "application/json"
+    };
+
+    // The bulk API expects newline-delimited JSON.
+    private static readonly RequestConfiguration NdjsonRequest = new()
+    {
+        Accept = "application/json",
+        ContentType = "application/x-ndjson"
+    };
+
     private readonly ElasticsearchClient _client;
 
     public ElasticTransport(ElasticsearchClient client)
@@ -27,19 +41,27 @@ public sealed class ElasticTransport
         string path,
         JsonNode? body,
         CancellationToken cancellationToken)
-        => SendRawAsync(method, path, body?.ToJsonString(), cancellationToken);
+        => SendCoreAsync(method, path, body?.ToJsonString(), JsonRequest, cancellationToken);
 
-    /// <summary>Sends a raw (already-serialized) string body, e.g. NDJSON for the bulk API.</summary>
-    public async Task<(int Status, JsonNode? Body)> SendRawAsync(
+    /// <summary>Sends a raw (already-serialized) NDJSON body for the bulk API.</summary>
+    public Task<(int Status, JsonNode? Body)> SendRawAsync(
         HttpMethod method,
         string path,
         string? body,
+        CancellationToken cancellationToken)
+        => SendCoreAsync(method, path, body, NdjsonRequest, cancellationToken);
+
+    private async Task<(int Status, JsonNode? Body)> SendCoreAsync(
+        HttpMethod method,
+        string path,
+        string? body,
+        RequestConfiguration requestConfiguration,
         CancellationToken cancellationToken)
     {
         var postData = body is null ? null : PostData.String(body);
 
         var response = await _client.Transport
-            .RequestAsync<StringResponse>(method, path, postData, cancellationToken)
+            .RequestAsync<StringResponse>(method, path, postData, requestConfiguration, cancellationToken)
             .ConfigureAwait(false);
 
         var status = response.ApiCallDetails.HttpStatusCode ?? 0;
