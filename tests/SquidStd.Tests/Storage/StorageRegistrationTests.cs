@@ -11,7 +11,7 @@ public class StorageRegistrationTests
     public async Task AddFileStorage_ResolvesAndRoundTrips()
     {
         var root = Path.Combine(Path.GetTempPath(), "squidstd-storage-" + Guid.NewGuid().ToString("N"));
-        var container = new Container();
+        using var container = new Container();
 
         container.AddFileStorage(new StorageConfig { RootDirectory = root });
 
