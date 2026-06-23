@@ -1,3 +1,32 @@
+## [0.4.0](https://github.com/tgiachi/squid-std/compare/v0.3.0...v0.4.0) (2026-06-23)
+
+### Features
+
+* **core:** register a shared DirectoriesConfig in RegisterCoreServices ([d1f784c](https://github.com/tgiachi/squid-std/commit/d1f784cb98eb64c756dadbe1e6ad2734364fe252))
+* **messaging:** add in-memory topic provider, facade/bridge registration and tests ([06cee70](https://github.com/tgiachi/squid-std/commit/06cee7025a0f04a3a2417ff5ac96061839c96522))
+* **messaging:** add RabbitMQ fanout topic provider and registration ([83407ec](https://github.com/tgiachi/squid-std/commit/83407ec1ad08ab9c870738fcc41abe4a5b9e283c))
+* **messaging:** add topic pub/sub contracts, facade and event-bus bridge ([5ed2778](https://github.com/tgiachi/squid-std/commit/5ed2778fa8a5652395ab7f3bf5f5ba4fcdfcc248))
+* **templating:** add AddTemplating DI registration ([96dfc73](https://github.com/tgiachi/squid-std/commit/96dfc739ef5bfd4f33c6a5981f89522a84223d36))
+* **templating:** add SquidStd.Templating with Scriban renderer and named registry ([1a73232](https://github.com/tgiachi/squid-std/commit/1a7323267b000b3df7bf3554ac904a3e9cc11b28))
+* **workers-manager:** add AddWorkerManager registration extension ([38c990e](https://github.com/tgiachi/squid-std/commit/38c990e8c519f854d427de2fdca25335c074f930))
+* **workers-manager:** add config, status-change event and enqueue request types ([12874cd](https://github.com/tgiachi/squid-std/commit/12874cde4069dd4c8465a9dc6a05b75a7138c3a1))
+* **workers-manager:** add HeartbeatCollectorService folding heartbeats into the registry ([fcd6bee](https://github.com/tgiachi/squid-std/commit/fcd6bee5c84b17ec7ca430ab2e7589ba515f735c))
+* **workers-manager:** add HTTP endpoints for querying workers and enqueuing jobs ([b92c6b7](https://github.com/tgiachi/squid-std/commit/b92c6b75b82dd9d83ed1fe5e68b68884dcba590d))
+* **workers-manager:** add JobScheduler publishing jobs to the queue ([4bc4ce9](https://github.com/tgiachi/squid-std/commit/4bc4ce90516c6e9d3a927a2fa95ad57c510e4efe))
+* **workers-manager:** add WorkerOfflineSweepService marking stale workers offline ([23efd37](https://github.com/tgiachi/squid-std/commit/23efd3718995ef72c84d51db39777e31d7011b03))
+* **workers-manager:** add WorkerRegistry folding heartbeats into worker state ([7d73cb9](https://github.com/tgiachi/squid-std/commit/7d73cb944c3620ea99634d538d29d4531831e35f))
+* **workers:** add AddWorkers and AddJobHandler registration extensions ([fbb3033](https://github.com/tgiachi/squid-std/commit/fbb3033e482529b6fb9e19832c7bfdfa3ef4e939))
+* **workers:** add IJobHandler and JobHandlerNotFoundException ([544b5e4](https://github.com/tgiachi/squid-std/commit/544b5e4b7e579f59c19b9737b659101e37361a7f))
+* **workers:** add JobDispatcher routing jobs to handlers by name ([2e9d105](https://github.com/tgiachi/squid-std/commit/2e9d1053415e6724c5d7c5a7f2ed9c1decbb90aa))
+* **workers:** add JobRequest, WorkerHeartbeat and WorkerInfo contracts ([2a74d58](https://github.com/tgiachi/squid-std/commit/2a74d589bd930ebb01e19420a665cde3ec03afd6))
+* **workers:** add WorkerChannels conventional channel names ([94f44c0](https://github.com/tgiachi/squid-std/commit/94f44c0352499d65655d8b363aa3f19ea85392bd))
+* **workers:** add WorkerConsumerService consuming and dispatching jobs ([420f685](https://github.com/tgiachi/squid-std/commit/420f685422e129b5c3aaad36388fdbfea9ab8699))
+* **workers:** add WorkerHeartbeatService publishing periodic heartbeats ([d47ec85](https://github.com/tgiachi/squid-std/commit/d47ec8597208e866f3b90e7a573761ab704ca764))
+* **workers:** add WorkersConfig config section ([1b82a79](https://github.com/tgiachi/squid-std/commit/1b82a796f37ce30d31bc2e748d8e68d6e3805993))
+* **workers:** add WorkerState shared runtime state ([a3eff82](https://github.com/tgiachi/squid-std/commit/a3eff821fd88dfa1079863ac7108fc15f891d619))
+* **workers:** add WorkerStatusType enum ([c8a9fbd](https://github.com/tgiachi/squid-std/commit/c8a9fbd2e504b0e3a2a772791dfd828882712721))
+* **workers:** carry ActiveJobs and MaxConcurrency in heartbeat and worker info ([4fa8674](https://github.com/tgiachi/squid-std/commit/4fa86748d8f338f176df86ecc8223d2a23f10819))
+
 ## [0.3.0](https://github.com/tgiachi/squid-std/compare/v0.2.0...v0.3.0) (2026-06-23)
 
 ### Features
