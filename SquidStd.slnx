@@ -20,6 +20,7 @@
         <Project Path="src/SquidStd.Storage/SquidStd.Storage.csproj" />
         <Project Path="src/SquidStd.Templating/SquidStd.Templating.csproj" />
         <Project Path="src/SquidStd.Workers.Abstractions/SquidStd.Workers.Abstractions.csproj" />
+        <Project Path="src/SquidStd.Workers/SquidStd.Workers.csproj" />
     </Folder>
     <Folder Name="/tests/">
         <Project Path="tests/SquidStd.Tests/SquidStd.Tests.csproj" />

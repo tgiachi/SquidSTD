@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <PublishNuget>true</PublishNuget>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SquidStd.Messaging.Abstractions\SquidStd.Messaging.Abstractions.csproj" />
+        <ProjectReference Include="..\SquidStd.Workers.Abstractions\SquidStd.Workers.Abstractions.csproj" />
+    </ItemGroup>
+
+</Project>
