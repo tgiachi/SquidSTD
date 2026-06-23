@@ -105,7 +105,7 @@ squid-std follows a few consistent principles across every module:
 ## Documentation
 
 Full API documentation is published with DocFX to GitHub Pages:
-**[tgiachi.github.io/SquidStd](https://tgiachi.github.io/SquidStd/)**. Each package also ships its
+**[tgiachi.github.io/squid-std](https://tgiachi.github.io/squid-std/)**. Each package also ships its
 own README (linked in the table above).
 
 ## Build
