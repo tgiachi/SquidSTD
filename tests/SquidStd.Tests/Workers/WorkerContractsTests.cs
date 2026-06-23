@@ -25,32 +25,18 @@ public class WorkerContractsTests
     }
 
     [Fact]
-    public void WorkerHeartbeat_RoundTrips_WithCurrentJob()
+    public void WorkerHeartbeat_RoundTrips_PreservingAllFields()
     {
         var original = new WorkerHeartbeat(
             "worker-1",
             new DateTime(2026, 6, 23, 10, 0, 0, DateTimeKind.Utc),
             WorkerStatusType.Busy,
-            "resize-image");
+            3,
+            8);
 
         var restored = Serializer.Deserialize<WorkerHeartbeat>(Serializer.Serialize(original));
 
         Assert.Equal(original, restored);
-    }
-
-    [Fact]
-    public void WorkerHeartbeat_RoundTrips_WhenIdleWithNullJob()
-    {
-        var original = new WorkerHeartbeat(
-            "worker-2",
-            new DateTime(2026, 6, 23, 10, 5, 0, DateTimeKind.Utc),
-            WorkerStatusType.Idle,
-            null);
-
-        var restored = Serializer.Deserialize<WorkerHeartbeat>(Serializer.Serialize(original));
-
-        Assert.Equal(original, restored);
-        Assert.Null(restored.CurrentJob);
     }
 
     [Theory]
@@ -63,7 +49,8 @@ public class WorkerContractsTests
             "worker-3",
             new DateTime(2026, 6, 23, 11, 0, 0, DateTimeKind.Utc),
             status,
-            null);
+            0,
+            4);
 
         var restored = Serializer.Deserialize<WorkerHeartbeat>(Serializer.Serialize(original));
 
@@ -76,9 +63,10 @@ public class WorkerContractsTests
         var original = new WorkerInfo(
             "worker-4",
             WorkerStatusType.Offline,
+            2,
+            8,
             new DateTime(2026, 6, 23, 9, 0, 0, DateTimeKind.Utc),
-            new DateTime(2026, 6, 23, 9, 30, 0, DateTimeKind.Utc),
-            null);
+            new DateTime(2026, 6, 23, 9, 30, 0, DateTimeKind.Utc));
 
         var restored = Serializer.Deserialize<WorkerInfo>(Serializer.Serialize(original));
 
