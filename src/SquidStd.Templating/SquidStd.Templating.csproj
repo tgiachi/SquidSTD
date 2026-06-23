@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <PublishNuget>true</PublishNuget>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SquidStd.Core\SquidStd.Core.csproj" />
+        <ProjectReference Include="..\SquidStd.Abstractions\SquidStd.Abstractions.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="DryIoc.dll" Version="5.4.3" />
+        <PackageReference Include="Scriban" Version="7.2.5" />
+    </ItemGroup>
+
+</Project>

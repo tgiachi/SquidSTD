@@ -2,6 +2,7 @@ using DryIoc;
 using SquidStd.Abstractions.Data.Internal.Config;
 using SquidStd.Abstractions.Data.Internal.Services;
 using SquidStd.Core.Data.Bootstrap;
+using SquidStd.Core.Directories;
 using SquidStd.Core.Data.Jobs;
 using SquidStd.Core.Data.Metrics;
 using SquidStd.Core.Data.Storage;
@@ -178,6 +179,17 @@ public class RegisterDefaultServicesExtensionsTests
         Assert.False(container.IsRegistered<IObjectStorageService>());
         Assert.True(container.IsRegistered<ISecretProtector>());
         Assert.True(container.IsRegistered<ISecretStore>());
+    }
+
+    [Fact]
+    public void RegisterCoreServices_RegistersDirectoriesConfig()
+    {
+        using var temp = new TempDirectory();
+        using var container = new Container();
+
+        container.RegisterCoreServices("app", temp.Path);
+
+        Assert.True(container.IsRegistered<DirectoriesConfig>());
     }
 
     [Fact]

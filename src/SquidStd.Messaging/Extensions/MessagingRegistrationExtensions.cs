@@ -37,6 +37,10 @@ public static class MessagingRegistrationExtensions
         container.Register<IQueueProvider, InMemoryQueueProvider>(Reuse.Singleton);
         container.Register<IMessageQueue, MessageQueue>(Reuse.Singleton);
 
+        container.Register<ITopicProvider, InMemoryTopicProvider>(Reuse.Singleton);
+        container.Register<IMessageTopic, MessageTopic>(Reuse.Singleton);
+        container.Register<ITopicEventBridge, TopicEventBridge>(Reuse.Singleton);
+
         return container;
     }
 

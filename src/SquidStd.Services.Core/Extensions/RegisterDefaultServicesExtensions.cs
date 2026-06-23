@@ -4,6 +4,7 @@ using SquidStd.Abstractions.Extensions.Config;
 using SquidStd.Abstractions.Extensions.Container;
 using SquidStd.Abstractions.Extensions.Services;
 using SquidStd.Core.Data.Bootstrap;
+using SquidStd.Core.Directories;
 using SquidStd.Core.Data.Jobs;
 using SquidStd.Core.Data.Metrics;
 using SquidStd.Core.Data.Storage;
@@ -79,6 +80,7 @@ public static class RegisterDefaultServicesExtensions
         /// <returns>The same container for chaining.</returns>
         public IContainer RegisterCoreServices(string configName, string configDirectory)
         {
+            container.RegisterInstance(new DirectoriesConfig(configDirectory, []));
             container.RegisterDataSerializer();
             container.RegisterDefaultCoreConfigSections();
             container.RegisterConfigManagerService(configName, configDirectory);

@@ -86,6 +86,7 @@ block until cancellation for long-running hosts.
 | `SquidStd.Storage` | Local file storage backend (`AddFileStorage`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Storage/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Storage.svg)](https://www.nuget.org/packages/SquidStd.Storage/) |
 | `SquidStd.Storage.S3` | S3/MinIO storage backend (`AddS3Storage`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Storage.S3/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Storage.S3.svg)](https://www.nuget.org/packages/SquidStd.Storage.S3/) |
 | `SquidStd.Scripting.Lua` | Lua scripting engine with attribute-based modules and event bridging. | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Scripting.Lua/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Scripting.Lua.svg)](https://www.nuget.org/packages/SquidStd.Scripting.Lua/) |
+| `SquidStd.Templating` | Scriban templating with a named-template registry and `templates/*.tmpl` auto-load (`AddTemplating`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Templating/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Templating.svg)](https://www.nuget.org/packages/SquidStd.Templating/) |
 
 ## Architecture
 

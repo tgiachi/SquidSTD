@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <PublishNuget>true</PublishNuget>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SquidStd.Services.Core\SquidStd.Services.Core.csproj" />
+        <ProjectReference Include="..\SquidStd.Messaging.Abstractions\SquidStd.Messaging.Abstractions.csproj" />
+        <ProjectReference Include="..\SquidStd.Workers.Abstractions\SquidStd.Workers.Abstractions.csproj" />
+    </ItemGroup>
+
+</Project>

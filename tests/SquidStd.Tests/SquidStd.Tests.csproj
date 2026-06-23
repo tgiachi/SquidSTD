@@ -48,6 +48,10 @@
         <ProjectReference Include="..\..\src\SquidStd.Caching.Redis\SquidStd.Caching.Redis.csproj" />
         <ProjectReference Include="..\..\src\SquidStd.Storage\SquidStd.Storage.csproj" />
         <ProjectReference Include="..\..\src\SquidStd.Storage.S3\SquidStd.Storage.S3.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Templating\SquidStd.Templating.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Workers.Abstractions\SquidStd.Workers.Abstractions.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Workers\SquidStd.Workers.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Workers.Manager\SquidStd.Workers.Manager.csproj" />
     </ItemGroup>
 
 </Project>
