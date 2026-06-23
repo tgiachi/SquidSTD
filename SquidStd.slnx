@@ -21,6 +21,7 @@
         <Project Path="src/SquidStd.Templating/SquidStd.Templating.csproj" />
         <Project Path="src/SquidStd.Workers.Abstractions/SquidStd.Workers.Abstractions.csproj" />
         <Project Path="src/SquidStd.Workers/SquidStd.Workers.csproj" />
+        <Project Path="src/SquidStd.Workers.Manager/SquidStd.Workers.Manager.csproj" />
     </Folder>
     <Folder Name="/tests/">
         <Project Path="tests/SquidStd.Tests/SquidStd.Tests.csproj" />

@@ -38,6 +38,12 @@
   href: scripting-lua.md
 - name: SquidStd.Templating
   href: templating.md
+- name: SquidStd.Workers.Abstractions
+  href: workers-abstractions.md
+- name: SquidStd.Workers
+  href: workers.md
+- name: SquidStd.Workers.Manager
+  href: workers-manager.md
 - name: Serialization
   href: serialization.md
 - name: Scheduler
