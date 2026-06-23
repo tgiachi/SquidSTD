@@ -1,0 +1,4 @@
+<Project>
+    <!-- Intentionally empty: stops the repo root Directory.Build.props from being inherited by
+         template content projects while they live in this repo. -->
+</Project>
