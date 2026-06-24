@@ -55,6 +55,8 @@
         <ProjectReference Include="..\..\src\SquidStd.Workers.Manager\SquidStd.Workers.Manager.csproj" />
         <ProjectReference Include="..\..\src\SquidStd.Search.Abstractions\SquidStd.Search.Abstractions.csproj" />
         <ProjectReference Include="..\..\src\SquidStd.Search.Elasticsearch\SquidStd.Search.Elasticsearch.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Mail.Abstractions\SquidStd.Mail.Abstractions.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Mail.MailKit\SquidStd.Mail.MailKit.csproj" />
     </ItemGroup>
 
 </Project>

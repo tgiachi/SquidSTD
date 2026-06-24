@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <PublishNuget>true</PublishNuget>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MailKit" Version="4.17.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SquidStd.Mail.Abstractions\SquidStd.Mail.Abstractions.csproj" />
+    </ItemGroup>
+
+</Project>
