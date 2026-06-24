@@ -30,6 +30,7 @@
         <Project Path="src/SquidStd.Mail.Queue/SquidStd.Mail.Queue.csproj"/>
     </Folder>
     <Folder Name="/samples/">
+        <Project Path="samples/SquidStd.Samples.GettingStarted/SquidStd.Samples.GettingStarted.csproj" />
     </Folder>
     <Folder Name="/tests/">
         <Project Path="tests/SquidStd.Tests/SquidStd.Tests.csproj"/>
