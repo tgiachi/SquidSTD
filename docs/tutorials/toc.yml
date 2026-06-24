@@ -1,0 +1,32 @@
+- name: Overview
+  href: index.md
+- name: Getting started
+  href: getting-started.md
+- name: Events, jobs and scheduling
+  href: events-jobs-scheduling.md
+- name: Caching
+  href: caching.md
+- name: Messaging
+  href: messaging.md
+- name: ASP.NET apps and health checks
+  href: aspnetcore-app.md
+- name: Storage
+  href: storage.md
+- name: Database access
+  href: database.md
+- name: A worker system end-to-end
+  href: worker-system.md
+- name: Email
+  href: email.md
+- name: Indexing and search
+  href: search.md
+- name: Templating
+  href: templating.md
+- name: Lua scripting
+  href: scripting-lua.md
+- name: TCP networking
+  href: networking.md
+- name: Plugins
+  href: plugins.md
+- name: Scaffolding with dotnet new
+  href: scaffolding.md

@@ -29,6 +29,22 @@
         <Project Path="src/SquidStd.Mail.MailKit/SquidStd.Mail.MailKit.csproj"/>
         <Project Path="src/SquidStd.Mail.Queue/SquidStd.Mail.Queue.csproj"/>
     </Folder>
+    <Folder Name="/samples/">
+        <Project Path="samples/SquidStd.Samples.WorkerSystem/SquidStd.Samples.WorkerSystem.csproj" />
+        <Project Path="samples/SquidStd.Samples.Templating/SquidStd.Samples.Templating.csproj" />
+        <Project Path="samples/SquidStd.Samples.Storage/SquidStd.Samples.Storage.csproj" />
+        <Project Path="samples/SquidStd.Samples.Search/SquidStd.Samples.Search.csproj" />
+        <Project Path="samples/SquidStd.Samples.ScriptingLua/SquidStd.Samples.ScriptingLua.csproj" />
+        <Project Path="samples/SquidStd.Samples.Plugins/SquidStd.Samples.Plugins.csproj" />
+        <Project Path="samples/SquidStd.Samples.Networking/SquidStd.Samples.Networking.csproj" />
+        <Project Path="samples/SquidStd.Samples.Email/SquidStd.Samples.Email.csproj" />
+        <Project Path="samples/SquidStd.Samples.Database/SquidStd.Samples.Database.csproj" />
+        <Project Path="samples/SquidStd.Samples.AspNetCore/SquidStd.Samples.AspNetCore.csproj" />
+        <Project Path="samples/SquidStd.Samples.Messaging/SquidStd.Samples.Messaging.csproj" />
+        <Project Path="samples/SquidStd.Samples.Caching/SquidStd.Samples.Caching.csproj" />
+        <Project Path="samples/SquidStd.Samples.EventsJobsScheduling/SquidStd.Samples.EventsJobsScheduling.csproj" />
+        <Project Path="samples/SquidStd.Samples.GettingStarted/SquidStd.Samples.GettingStarted.csproj" />
+    </Folder>
     <Folder Name="/tests/">
         <Project Path="tests/SquidStd.Tests/SquidStd.Tests.csproj"/>
     </Folder>

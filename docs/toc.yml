@@ -2,5 +2,7 @@
   href: index.md
 - name: Articles
   href: articles/
+- name: Tutorials
+  href: tutorials/
 - name: API
   href: api/
