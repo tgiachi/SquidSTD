@@ -68,7 +68,7 @@ public sealed class MailKitMailSender : IMailSender
         }
         catch (Exception ex)
         {
-            await PublishSafelyAsync(new MailSendFailedEvent(message.To, message.Subject, ex.Message));
+            await PublishSafelyAsync(new MailSendFailedEvent(message.To, message.Subject, ex.Message), CancellationToken.None);
             _logger.Error(ex, "Failed to send mail '{Subject}'.", message.Subject);
 
             throw new MailSendException($"Failed to send mail '{message.Subject}'.", ex);
