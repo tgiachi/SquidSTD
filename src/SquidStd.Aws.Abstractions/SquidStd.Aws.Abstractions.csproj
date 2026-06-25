@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <PublishNuget>true</PublishNuget>
+        <PackageId>SquidStd.Aws.Abstractions</PackageId>
+        <Description>Shared AWS-style connection config (region, credentials, endpoint override) for SquidStd AWS-SDK providers.</Description>
+        <PackageTags>aws;config;credentials;squidstd</PackageTags>
+    </PropertyGroup>
+
+</Project>
