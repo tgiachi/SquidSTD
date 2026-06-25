@@ -97,6 +97,15 @@ block until cancellation for long-running hosts.
 | `SquidStd.Mail.MailKit` | IMAP/POP3 mail poller that publishes `MailReceivedEvent` (`AddMail`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Mail.MailKit/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Mail.MailKit.svg)](https://www.nuget.org/packages/SquidStd.Mail.MailKit/) |
 | `SquidStd.Mail.Queue` | Outbound mail send queue over the messaging queue (`AddMailQueue`, `IMailQueue`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Mail.Queue/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Mail.Queue.svg)](https://www.nuget.org/packages/SquidStd.Mail.Queue/) |
 
+## Related projects
+
+- **[Felix Network](https://github.com/tgiachi/SquidStd-Felix)** — a standalone secure binary
+  mesh-networking library for .NET (and a constrained C/ESP32 target): AES-256-GCM encrypted,
+  optionally DEFLATE-compressed messages over ENet (reliable UDP) behind a portable frame, with an
+  optional self-forming mesh layer and a pluggable transport (`ITransport`). Published as
+  `SquidStd.Felix`, `SquidStd.Felix.MemoryPack`, `SquidStd.Felix.Mesh` and
+  `SquidStd.Felix.Transport.Serial` on NuGet.
+
 ## Architecture
 
 squid-std follows a few consistent principles across every module:
