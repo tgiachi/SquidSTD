@@ -38,6 +38,23 @@ jobs:
       - name: Build
         run: dotnet build SquidStd.slnx -c Release --no-restore
 
+      - name: Authenticate to Docker Hub (Testcontainers image pulls)
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DOCKERHUB_USERNAME}" ] || [ -z "${DOCKERHUB_TOKEN}" ]; then
+            echo "No Docker Hub credentials configured; using anonymous pulls."
+            exit 0
+          fi
+          mkdir -p "$HOME/.docker"
+          AUTH="$(printf '%s:%s' "${DOCKERHUB_USERNAME}" "${DOCKERHUB_TOKEN}" | base64 -w0)"
+          cat > "$HOME/.docker/config.json" <<EOF
+          { "auths": { "https://index.docker.io/v1/": { "auth": "${AUTH}" } } }
+          EOF
+          echo "Docker Hub auth configured for ${DOCKERHUB_USERNAME}."
+
       - name: Test
         run: >
           dotnet test SquidStd.slnx -c Release --no-build --nologo
