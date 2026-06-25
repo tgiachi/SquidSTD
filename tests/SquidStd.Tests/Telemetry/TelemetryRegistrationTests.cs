@@ -27,4 +27,21 @@ public class TelemetryRegistrationTests
         await service.StartAsync();
         await service.StopAsync();
     }
+
+    [Fact]
+    public void ServiceCollection_RegistersTracerAndMeterProviders()
+    {
+        var services = new Microsoft.Extensions.DependencyInjection.ServiceCollection();
+        Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<IMetricsCollectionService>(
+            services,
+            new FakeMetricsCollectionService(new Dictionary<string, MetricSample>())
+        );
+
+        services.AddSquidStdTelemetry(new TelemetryOptions());
+
+        using var provider = Microsoft.Extensions.DependencyInjection.ServiceCollectionContainerBuilderExtensions.BuildServiceProvider(services);
+
+        Assert.NotNull(provider.GetService(typeof(global::OpenTelemetry.Trace.TracerProvider)));
+        Assert.NotNull(provider.GetService(typeof(global::OpenTelemetry.Metrics.MeterProvider)));
+    }
 }
