@@ -1,6 +1,7 @@
 <Solution>
     <Folder Name="/src/">
         <Project Path="src/SquidStd.Abstractions/SquidStd.Abstractions.csproj"/>
+        <Project Path="src/SquidStd.Telemetry.Abstractions/SquidStd.Telemetry.Abstractions.csproj"/>
         <Project Path="src/SquidStd.Aws.Abstractions/SquidStd.Aws.Abstractions.csproj"/>
         <Project Path="src/SquidStd.AspNetCore/SquidStd.AspNetCore.csproj"/>
         <Project Path="src/SquidStd.Caching.Abstractions/SquidStd.Caching.Abstractions.csproj"/>

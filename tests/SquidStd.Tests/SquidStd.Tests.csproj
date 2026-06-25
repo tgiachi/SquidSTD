@@ -35,6 +35,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\SquidStd.Core\SquidStd.Core.csproj" />
         <ProjectReference Include="..\..\src\SquidStd.Abstractions\SquidStd.Abstractions.csproj" />
+        <ProjectReference Include="..\..\src\SquidStd.Telemetry.Abstractions\SquidStd.Telemetry.Abstractions.csproj" />
         <ProjectReference Include="..\..\src\SquidStd.Aws.Abstractions\SquidStd.Aws.Abstractions.csproj" />
         <ProjectReference Include="..\..\src\SquidStd.AspNetCore\SquidStd.AspNetCore.csproj" />
         <ProjectReference Include="..\..\src\SquidStd.Plugin.Abstractions\SquidStd.Plugin.Abstractions.csproj" />

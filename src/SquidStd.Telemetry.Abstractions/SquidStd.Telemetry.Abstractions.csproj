@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <PublishNuget>true</PublishNuget>
+        <PackageId>SquidStd.Telemetry.Abstractions</PackageId>
+        <Description>Shared telemetry configuration for SquidStd: TelemetryOptions, OTLP protocol type, and the SquidStd ActivitySource convention. No OpenTelemetry SDK dependency.</Description>
+        <PackageTags>telemetry;observability;opentelemetry;tracing;metrics;squidstd</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SquidStd.Core\SquidStd.Core.csproj"/>
+    </ItemGroup>
+
+</Project>
