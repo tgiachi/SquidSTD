@@ -62,3 +62,5 @@
   href: scheduler.md
 - name: Health Checks
   href: health-checks.md
+- name: Felix Network
+  href: felix.md

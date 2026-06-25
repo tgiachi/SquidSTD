@@ -14,3 +14,5 @@ networking, plugins, data access, messaging, and Lua scripting — published as 
 - **[Getting started](articles/getting-started.md)** — install and bootstrap the core services.
 - **[API reference](api/index.md)** — the full type/member documentation.
 - **Packages** — see the per-package guides under [Articles](articles/getting-started.md).
+- **[Felix Network](articles/felix.md)** — companion secure binary mesh-networking library
+  (.NET + C/ESP32).
