@@ -1,6 +1,7 @@
 <Solution>
     <Folder Name="/src/">
         <Project Path="src/SquidStd.Abstractions/SquidStd.Abstractions.csproj"/>
+        <Project Path="src/SquidStd.Generators/SquidStd.Generators.csproj"/>
         <Project Path="src/SquidStd.Telemetry.Abstractions/SquidStd.Telemetry.Abstractions.csproj"/>
         <Project Path="src/SquidStd.Telemetry.OpenTelemetry/SquidStd.Telemetry.OpenTelemetry.csproj"/>
         <Project Path="src/SquidStd.Aws.Abstractions/SquidStd.Aws.Abstractions.csproj"/>
