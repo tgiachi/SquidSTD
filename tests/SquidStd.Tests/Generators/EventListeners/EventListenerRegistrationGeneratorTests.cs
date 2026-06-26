@@ -10,6 +10,46 @@ public class EventListenerRegistrationGeneratorTests
         const string source = """
             using System.Threading;
             using System.Threading.Tasks;
+            using SquidStd.Abstractions.Attributes;
+            using SquidStd.Core.Interfaces.Events;
+
+            namespace SampleApp;
+
+            public sealed record PingEvent(string Message) : IEvent;
+
+            [RegisterEventListener]
+            public sealed class PingListener : IEventListener<PingEvent>
+            {
+                public Task HandleAsync(PingEvent eventData, CancellationToken cancellationToken = default)
+                {
+                    return Task.CompletedTask;
+                }
+            }
+            """;
+
+        var result = GeneratorTestCompiler.Run(source);
+        var generatedTree = Assert.Single(
+            result.RunResult.GeneratedTrees,
+            tree => tree.FilePath.EndsWith("SquidStd.GeneratedEventListenerRegistration.g.cs", StringComparison.Ordinal)
+        );
+
+        var generatedSource = generatedTree.GetText().ToString();
+
+        Assert.Contains("RegisterGeneratedEventListeners", generatedSource, StringComparison.Ordinal);
+        Assert.Contains(
+            "RegisterEventListener<global::SampleApp.PingEvent, global::SampleApp.PingListener>(container);",
+            generatedSource,
+            StringComparison.Ordinal
+        );
+    }
+
+    [Fact]
+    public void Run_DoesNotRegisterListener_WhenAttributeIsMissing()
+    {
+        const string source = """
+            using System.Threading;
+            using System.Threading.Tasks;
+            using SquidStd.Abstractions.Attributes;
             using SquidStd.Core.Interfaces.Events;
 
             namespace SampleApp;
@@ -34,11 +74,7 @@ public class EventListenerRegistrationGeneratorTests
         var generatedSource = generatedTree.GetText().ToString();
 
         Assert.Contains("RegisterGeneratedEventListeners", generatedSource, StringComparison.Ordinal);
-        Assert.Contains(
-            "RegisterEventListener<global::SampleApp.PingEvent, global::SampleApp.PingListener>(container);",
-            generatedSource,
-            StringComparison.Ordinal
-        );
+        Assert.DoesNotContain("RegisterEventListener<", generatedSource, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -66,31 +102,32 @@ public class EventListenerRegistrationGeneratorTests
     }
 
     [Fact]
-    public void Run_ReportsDiagnostic_WhenListenerCannotBeReferencedFromGeneratedSource()
+    public void Run_ReportsDiagnostic_WhenAnnotatedListenerCannotBeGenerated()
     {
         const string source = """
             using System.Threading;
             using System.Threading.Tasks;
+            using SquidStd.Abstractions.Attributes;
             using SquidStd.Core.Interfaces.Events;
 
             namespace SampleApp;
 
-            public static class ListenerHost
-            {
-                private sealed record HiddenEvent(string Message) : IEvent;
+            public sealed record PingEvent(string Message) : IEvent;
 
-                private sealed class HiddenListener : IEventListener<HiddenEvent>
+            [RegisterEventListener]
+            public sealed class GenericListener<TValue> : IEventListener<PingEvent>
+            {
+                public Task HandleAsync(PingEvent eventData, CancellationToken cancellationToken = default)
                 {
-                    public Task HandleAsync(HiddenEvent eventData, CancellationToken cancellationToken = default)
-                    {
-                        return Task.CompletedTask;
-                    }
+                    return Task.CompletedTask;
                 }
             }
             """;
 
         var result = GeneratorTestCompiler.Run(source);
 
-        Assert.Contains(result.RunResult.Diagnostics, diagnostic => diagnostic.Id == "SQDGEN001");
+        var diagnostics = result.RunResult.Diagnostics.Concat(result.Diagnostics);
+
+        Assert.Contains(diagnostics, diagnostic => diagnostic.Id == "SQDGEN001");
     }
 }

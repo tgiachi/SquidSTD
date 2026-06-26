@@ -1,3 +1,4 @@
+using SquidStd.Abstractions.Attributes;
 using SquidStd.Core.Interfaces.Events;
 using SquidStd.Core.Interfaces.Jobs;
 using SquidStd.Core.Interfaces.Scheduling;
@@ -58,6 +59,7 @@ await bootstrap.StopAsync();
 public sealed record PingEvent(string Message) : IEvent;
 
 /// <summary>Handles <see cref="PingEvent" />.</summary>
+[RegisterEventListener]
 public sealed class PingListener : IEventListener<PingEvent>
 {
     public Task HandleAsync(PingEvent eventData, CancellationToken cancellationToken)

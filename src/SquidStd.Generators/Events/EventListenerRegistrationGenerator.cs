@@ -11,10 +11,13 @@ public sealed class EventListenerRegistrationGenerator : IIncrementalGenerator
     private const string EventListenerMetadataName = "IEventListener`1";
     private const string EventListenerNamespace = "SquidStd.Core.Interfaces.Events";
     private const string GeneratedFileName = "SquidStd.GeneratedEventListenerRegistration.g.cs";
+    private const string RegisterEventListenerAttributeName =
+        "SquidStd.Abstractions.Attributes.RegisterEventListenerAttribute";
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var candidateGroups = context.SyntaxProvider.CreateSyntaxProvider(
+        var candidateGroups = context.SyntaxProvider.ForAttributeWithMetadataName(
+            RegisterEventListenerAttributeName,
             static (node, _) => node is ClassDeclarationSyntax,
             static (context, cancellationToken) => CreateCandidates(context, cancellationToken)
         );
@@ -26,14 +29,13 @@ public sealed class EventListenerRegistrationGenerator : IIncrementalGenerator
     }
 
     private static ImmutableArray<EventListenerCandidate> CreateCandidates(
-        GeneratorSyntaxContext context,
+        GeneratorAttributeSyntaxContext context,
         CancellationToken cancellationToken
     )
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var classDeclaration = (ClassDeclarationSyntax)context.Node;
-        if (context.SemanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken) is not INamedTypeSymbol listenerType)
+        if (context.TargetSymbol is not INamedTypeSymbol listenerType)
         {
             return ImmutableArray<EventListenerCandidate>.Empty;
         }
@@ -67,7 +69,7 @@ public sealed class EventListenerRegistrationGenerator : IIncrementalGenerator
                     eventType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                     listenerType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                     listenerType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat),
-                    classDeclaration.Identifier.GetLocation(),
+                    listenerType.Locations.FirstOrDefault(),
                     isSupported
                 )
             );

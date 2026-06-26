@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using SquidStd.Abstractions.Attributes;
 using SquidStd.Abstractions.Extensions.Events;
 using SquidStd.Core.Interfaces.Events;
 using SquidStd.Generators.Events;
@@ -22,6 +23,7 @@ internal static class GeneratorTestCompiler
             .ToList();
 
         references.Add(MetadataReference.CreateFromFile(typeof(IEvent).Assembly.Location));
+        references.Add(MetadataReference.CreateFromFile(typeof(RegisterEventListenerAttribute).Assembly.Location));
         references.Add(MetadataReference.CreateFromFile(typeof(RegisterEventListenerExtension).Assembly.Location));
         references.Add(MetadataReference.CreateFromFile(typeof(DryIoc.IContainer).Assembly.Location));
 
