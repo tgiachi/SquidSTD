@@ -4,6 +4,7 @@ using System.Net.Security;
 using System.Net.Sockets;
 using Serilog;
 using SquidStd.Network.Client;
+using SquidStd.Network.Data;
 using SquidStd.Network.Data.Events;
 using SquidStd.Network.Data.Options;
 using SquidStd.Network.Interfaces.Framing;
@@ -23,6 +24,7 @@ public sealed class SquidTcpServer : INetworkServer, IAsyncDisposable, IDisposab
     private readonly ConcurrentDictionary<long, SquidStdTcpClient> _clients = new();
     private readonly IPEndPoint _endPoint;
     private readonly INetFramer? _framer;
+    private readonly Func<ConnectionPipeline>? _connectionPipelineFactory;
     private readonly int _historyBufferCapacity;
     private readonly SquidStdTcpServerTlsOptions? _tlsOptions;
 
@@ -81,12 +83,18 @@ public sealed class SquidTcpServer : INetworkServer, IAsyncDisposable, IDisposab
     /// </param>
     /// <param name="receiveBufferSize">Per-client receive chunk size.</param>
     /// <param name="historyBufferCapacity">Per-client history buffer capacity.</param>
+    /// <param name="connectionPipelineFactory">
+    /// Optional factory invoked once per accepted connection to produce its transport configuration.
+    /// It MUST return fresh per-connection state — in particular a new <c>ITransportCodec</c> instance per
+    /// call — because codecs are stateful and must not be shared across connections.
+    /// </param>
     public SquidTcpServer(
         IPEndPoint endPoint,
         INetFramer? framer = null,
         int receiveBufferSize = 8192,
         int historyBufferCapacity = 65536,
-        SquidStdTcpServerTlsOptions? tlsOptions = null
+        SquidStdTcpServerTlsOptions? tlsOptions = null,
+        Func<ConnectionPipeline>? connectionPipelineFactory = null
     )
     {
         _endPoint = endPoint;
@@ -94,6 +102,7 @@ public sealed class SquidTcpServer : INetworkServer, IAsyncDisposable, IDisposab
         _receiveBufferSize = receiveBufferSize;
         _historyBufferCapacity = historyBufferCapacity;
         _tlsOptions = tlsOptions;
+        _connectionPipelineFactory = connectionPipelineFactory;
     }
 
     /// <summary>
@@ -212,12 +221,16 @@ public sealed class SquidTcpServer : INetworkServer, IAsyncDisposable, IDisposab
                 var clientSocket = await serverSocket.AcceptAsync(cts.Token);
                 var clientStream = await CreateClientStreamAsync(clientSocket, cts.Token).ConfigureAwait(false);
 
-                var middlewareSnapshot = _middlewares;
+                var pipeline = _connectionPipelineFactory?.Invoke();
+                var middlewares = pipeline?.Middlewares ?? _middlewares;
+                var framer = pipeline?.Framer ?? _framer;
+                var codec = pipeline?.Codec;
                 var client = new SquidStdTcpClient(
                     clientSocket,
                     clientStream,
-                    middlewareSnapshot,
-                    _framer,
+                    middlewares,
+                    framer,
+                    codec,
                     _receiveBufferSize,
                     _historyBufferCapacity
                 );
