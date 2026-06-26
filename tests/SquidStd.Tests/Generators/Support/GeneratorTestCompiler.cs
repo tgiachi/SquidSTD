@@ -11,10 +11,8 @@ internal static class GeneratorTestCompiler
 {
     public static (Compilation Compilation, GeneratorDriverRunResult RunResult, ImmutableArray<Diagnostic> Diagnostics) Run(string source)
     {
-        var syntaxTree = CSharpSyntaxTree.ParseText(
-            source,
-            new CSharpParseOptions(LanguageVersion.Preview)
-        );
+        var parseOptions = new CSharpParseOptions(LanguageVersion.Preview);
+        var syntaxTree = CSharpSyntaxTree.ParseText(source, parseOptions);
 
         var trustedPlatformAssemblies = (string?)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") ?? string.Empty;
         var references = trustedPlatformAssemblies
@@ -34,7 +32,10 @@ internal static class GeneratorTestCompiler
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
         );
 
-        GeneratorDriver driver = CSharpGeneratorDriver.Create(new EventListenerRegistrationGenerator());
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(
+            new[] { new EventListenerRegistrationGenerator().AsSourceGenerator() },
+            parseOptions: parseOptions
+        );
         driver = driver.RunGeneratorsAndUpdateCompilation(
             compilation,
             out var updatedCompilation,
