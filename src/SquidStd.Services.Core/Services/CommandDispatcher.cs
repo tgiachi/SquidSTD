@@ -15,22 +15,8 @@ namespace SquidStd.Services.Core.Services;
 public sealed class CommandDispatcher<TContext> : ICommandDispatcher<TContext>, IDisposable
 {
     private readonly ConcurrentDictionary<Type, List<object>> _handlers = new();
-    private readonly ICommandContextFactory<TContext>? _contextFactory;
     private readonly ILogger _logger = Log.ForContext<CommandDispatcher<TContext>>();
     private bool _disposed;
-
-    /// <summary>Initializes the dispatcher without a context factory.</summary>
-    public CommandDispatcher()
-        : this(null)
-    {
-    }
-
-    /// <summary>Initializes the dispatcher with an optional context factory.</summary>
-    /// <param name="contextFactory">Factory used by the context-less dispatch overload, if any.</param>
-    public CommandDispatcher(ICommandContextFactory<TContext>? contextFactory)
-    {
-        _contextFactory = contextFactory;
-    }
 
     /// <inheritdoc />
     public IDisposable RegisterHandler<TCommand>(ICommandHandler<TCommand, TContext> handler)
@@ -76,22 +62,6 @@ public sealed class CommandDispatcher<TContext> : ICommandDispatcher<TContext>, 
         var errors = outcomes.Where(static error => error is not null).Select(static error => error!).ToArray();
 
         return new CommandDispatchResult(true, handlers.Length, errors);
-    }
-
-    /// <inheritdoc />
-    public Task<CommandDispatchResult> DispatchAsync<TCommand>(
-        TCommand command, CancellationToken cancellationToken = default
-    )
-        where TCommand : ICommand
-    {
-        if (_contextFactory is null)
-        {
-            throw new InvalidOperationException(
-                "No ICommandContextFactory<TContext> is registered; pass an explicit context instead."
-            );
-        }
-
-        return DispatchAsync(command, _contextFactory.Create(), cancellationToken);
     }
 
     private CommandSubscription Add(Type commandType, object handler)

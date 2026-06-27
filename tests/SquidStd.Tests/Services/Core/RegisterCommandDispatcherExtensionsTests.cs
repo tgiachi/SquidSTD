@@ -40,23 +40,6 @@ public class RegisterCommandDispatcherExtensionsTests
         Assert.Equal("hi", container.Resolve<PingHandler>().LastText);
     }
 
-    [Fact]
-    public async Task RegisterCommandContextFactory_IsUsedByContextlessDispatch()
-    {
-        using var container = new Container();
-        container.RegisterCommandContextFactory<Session, SessionFactory>();
-        container.RegisterCommandDispatcher<Session>();
-        container.RegisterCommandHandler<PingCommand, Session, PingHandler>();
-
-        await container.Resolve<CommandDispatcherActivator<Session>>().StartAsync(CancellationToken.None);
-
-        var dispatcher = container.Resolve<ICommandDispatcher<Session>>();
-        var result = await dispatcher.DispatchAsync(new PingCommand("auto"));
-
-        Assert.True(result.Matched);
-        Assert.Equal("auto", container.Resolve<PingHandler>().LastText);
-    }
-
     private sealed class Session
     {
     }
@@ -72,14 +55,6 @@ public class RegisterCommandDispatcherExtensionsTests
             LastText = command.Text;
 
             return Task.CompletedTask;
-        }
-    }
-
-    private sealed class SessionFactory : ICommandContextFactory<Session>
-    {
-        public Session Create()
-        {
-            return new Session();
         }
     }
 }

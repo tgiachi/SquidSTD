@@ -26,7 +26,7 @@ dotnet add package SquidStd.Services.Core
 - One-line bootstrap: `container.RegisterCoreServices()` registers the full default service set.
 - `ConfigManagerService` — loads/saves YAML config sections and substitutes `$ENV_VAR` tokens.
 - `EventBusService` — in-process publish/subscribe over `IEvent`.
-- `CommandDispatcher<TContext>` — typed protocol command dispatch with fan-out, fault isolation, and a `CommandDispatchResult` (`RegisterCommandDispatcher` / `RegisterCommandHandler` / `RegisterCommandContextFactory`).
+- `CommandDispatcher<TContext>` — typed protocol command dispatch with fan-out, fault isolation, and a `CommandDispatchResult` (`RegisterCommandDispatcher` / `RegisterCommandHandler` / `RegisterSeededCommandDispatcher`).
 - `JobSystemService` — background job execution; `TimerWheelService` + cron scheduling for timed work.
 - `MainThreadDispatcherService` — marshal work back onto a main thread.
 - `MetricsCollectionService` — aggregates `IMetricProvider` samples.
@@ -48,13 +48,12 @@ container.RegisterCoreServices("squidstd", Directory.GetCurrentDirectory());
 ## Command dispatch
 
 ```csharp
-// Register a dispatcher for your context type, a context factory, and handlers.
-container.RegisterCommandContextFactory<Session, CurrentSessionFactory>();
+// Register a dispatcher for your context type and handlers.
 container.RegisterCommandDispatcher<Session>();
 container.RegisterCommandHandler<PingCommand, Session, PingHandler>();
 
-// Dispatch (handlers auto-subscribed at bootstrap). Build the context from the factory:
-var result = await dispatcher.DispatchAsync(new PingCommand("hi"));
+// Dispatch (handlers auto-subscribed at bootstrap). Pass the context explicitly:
+var result = await dispatcher.DispatchAsync(new PingCommand("hi"), session);
 if (!result.Matched)
 {
     // unknown command

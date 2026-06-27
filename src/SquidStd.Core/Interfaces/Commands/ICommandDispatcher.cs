@@ -29,15 +29,4 @@ public interface ICommandDispatcher<TContext>
     /// <returns>The dispatch result.</returns>
     Task<CommandDispatchResult> DispatchAsync<TCommand>(TCommand command, TContext context, CancellationToken cancellationToken = default)
         where TCommand : ICommand;
-
-    /// <summary>
-    ///     Dispatches a command, building the context from the registered
-    ///     <see cref="ICommandContextFactory{TContext}" />.
-    /// </summary>
-    /// <typeparam name="TCommand">The command type.</typeparam>
-    /// <param name="command">The command payload.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The dispatch result.</returns>
-    Task<CommandDispatchResult> DispatchAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default)
-        where TCommand : ICommand;
 }

@@ -111,32 +111,6 @@ public class CommandDispatcherTests
         Assert.Same(session, seenContext);
     }
 
-    [Fact]
-    public async Task DispatchAsync_WithoutContext_UsesFactory()
-    {
-        var factory = new CountingFactory();
-        using var dispatcher = new CommandDispatcher<Session>(factory);
-        var handler = new RecordingHandler();
-        dispatcher.RegisterHandler(handler);
-
-        var result = await dispatcher.DispatchAsync(new PingCommand("auto"));
-
-        Assert.True(result.Matched);
-        Assert.Equal("auto", handler.LastText);
-        Assert.Same(factory.Last, handler.LastContext);
-        Assert.Equal(1, factory.CreateCount);
-    }
-
-    [Fact]
-    public async Task DispatchAsync_WithoutContext_WhenNoFactory_Throws()
-    {
-        using var dispatcher = new CommandDispatcher<Session>();
-
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            () => dispatcher.DispatchAsync(new PingCommand("x"))
-        );
-    }
-
     private sealed class Session
     {
     }
@@ -163,21 +137,6 @@ public class CommandDispatcherTests
         public Task HandleAsync(PingCommand command, Session context, CancellationToken cancellationToken = default)
         {
             throw new InvalidOperationException("Synthetic failure.");
-        }
-    }
-
-    private sealed class CountingFactory : ICommandContextFactory<Session>
-    {
-        public int CreateCount { get; private set; }
-
-        public Session? Last { get; private set; }
-
-        public Session Create()
-        {
-            CreateCount++;
-            Last = new Session();
-
-            return Last;
         }
     }
 }

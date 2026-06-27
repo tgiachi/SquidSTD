@@ -26,7 +26,7 @@ dotnet add package SquidStd.Core
 
 - Configuration contracts: `IConfigEntry` (a YAML section) and `IConfigManagerService`.
 - In-process messaging: `IEventBus` with `ISyncEventListener<T>` / `IAsyncEventListener<T>` over `IEvent`.
-- Command dispatch: `ICommandDispatcher<TContext>` with `ICommandHandler<TCommand,TContext>`, fan-out, fault isolation, and a `CommandDispatchResult`; `ICommandContextFactory<TContext>` builds the current context.
+- Command dispatch: `ICommandDispatcher<TContext>` with `ICommandHandler<TCommand,TContext>`, fan-out, fault isolation, and a `CommandDispatchResult`; `ICommandContextFactory<TContext,TSeed>` builds the context from a seed for `ISeededCommandDispatcher<TContext,TSeed>`.
 - Background work & timing: `IJobSystem`, `ITimerService`, `IMainThreadDispatcher`.
 - Metrics & secrets: `IMetricProvider` and secret-protection contracts.
 - Serialization: `IDataSerializer` / `IDataDeserializer` (default `JsonDataSerializer`), plus `YamlUtils` / `JsonUtils`.
