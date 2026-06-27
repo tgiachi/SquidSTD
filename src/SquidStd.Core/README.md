@@ -32,6 +32,8 @@ dotnet add package SquidStd.Core
 - Serialization: `IDataSerializer` / `IDataDeserializer` (default `JsonDataSerializer`), plus `YamlUtils` / `JsonUtils`.
 - File watching: `IFileWatcherService` / `FileWatcherService` — recursive, debounced watchers that publish `FileChangedEvent` on the event bus.
 - Object pooling: `ObjectPool<T>` — thread-safe, non-blocking, factory-based reuse with optional reset.
+- Cryptography: `CryptoUtils` (AES-GCM authenticated encrypt/decrypt + key generation), `EncryptString`/`DecryptString` string helpers, base64 extensions, and `SslUtils` for loading PEM/PFX TLS certificates.
+- Randomness: `BuiltInRng` (seedable ambient RNG), `RandomUtils` (dice, coin flips), and collection `Shuffle`/`RandomElement`/`RandomSample` extensions.
 - Utilities: a Serilog `EventSink`, and string/env/directory extensions.
 - Shared domain enums under `Types` (e.g. `LogLevelType`, `PlatformType`, `FileChangeKind`).
 
