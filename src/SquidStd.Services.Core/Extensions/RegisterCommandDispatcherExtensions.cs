@@ -44,5 +44,29 @@ public static class RegisterCommandDispatcherExtensions
 
             return container;
         }
+
+        /// <summary>
+        ///     Registers a seeded context factory and an <see cref="ISeededCommandDispatcher{TContext,TSeed}" />
+        ///     singleton over the existing <see cref="ICommandDispatcher{TContext}" /> (which must already be
+        ///     registered via <see cref="RegisterCommandDispatcher{TContext}" />).
+        /// </summary>
+        /// <typeparam name="TContext">The dispatcher context type.</typeparam>
+        /// <typeparam name="TSeed">The seed the context is built from.</typeparam>
+        /// <typeparam name="TFactory">The seeded factory implementation type.</typeparam>
+        /// <returns>The same container for chaining.</returns>
+        public IContainer RegisterSeededCommandDispatcher<TContext, TSeed, TFactory>()
+            where TFactory : class, ICommandContextFactory<TContext, TSeed>
+        {
+            container.Register<ICommandContextFactory<TContext, TSeed>, TFactory>(Reuse.Singleton);
+            container.RegisterDelegate<ISeededCommandDispatcher<TContext, TSeed>>(
+                resolver => new SeededCommandDispatcher<TContext, TSeed>(
+                    resolver.Resolve<ICommandDispatcher<TContext>>(),
+                    resolver.Resolve<ICommandContextFactory<TContext, TSeed>>()
+                ),
+                Reuse.Singleton
+            );
+
+            return container;
+        }
     }
 }

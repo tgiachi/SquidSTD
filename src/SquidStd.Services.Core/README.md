@@ -61,6 +61,18 @@ if (!result.Matched)
 }
 ```
 
+For network-driven dispatch, build the context from a seed (e.g. the originating connection):
+
+```csharp
+container.RegisterCommandDispatcher<Session>();
+container.RegisterCommandHandler<PingCommand, Session, PingHandler>();
+container.RegisterSeededCommandDispatcher<Session, Connection, ConnectionSessionFactory>();
+
+// in the receive loop, where the connection is known:
+var seeded = container.Resolve<ISeededCommandDispatcher<Session, Connection>>();
+await seeded.DispatchAsync(command, connection);   // factory maps connection -> Session
+```
+
 ## Key types
 
 | Type                                | Purpose                                                                   |
