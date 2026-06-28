@@ -122,6 +122,10 @@ var folderVault = new CryptoFileSystem(new PhysicalFileSystem("/secure/dir"));
 - A wrong passphrase fails the index authentication tag → `CryptographicException`; operations on a locked
   vault throw `InvalidOperationException`.
 
+## Related
+
+- Tutorial: [Crypto (PGP)](https://tgiachi.github.io/squid-std/tutorials/crypto.html)
+
 ## License
 
 MIT — part of [SquidStd](https://github.com/tgiachi/squid-std).

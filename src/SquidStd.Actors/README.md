@@ -79,6 +79,11 @@ using var sub = session.SubscribeToEventBus(eventBus, (UserJoinedEvent e) => new
 
 `DisposeAsync` completes the mailbox, drains in-flight work, and faults any still-pending requests.
 
+## Related
+
+- Tutorial: [Actors](https://tgiachi.github.io/squid-std/tutorials/actors.html)
+- Concept: [Messaging models](https://tgiachi.github.io/squid-std/articles/concepts/messaging-models.html)
+
 ## License
 
 MIT — part of [SquidStd](https://github.com/tgiachi/squid-std).

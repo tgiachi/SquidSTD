@@ -60,6 +60,10 @@ Logical paths are normalized (forward slashes, root-relative) and reject `..` tr
 | `VfsDirectories` | Named directory layout (`DirectoriesConfig` analogue) over any backend. |
 | `RegisterVfsExtensions` | `RegisterVfs(...)` registration. |
 
+## Related
+
+- Tutorial: [Virtual filesystem](https://tgiachi.github.io/squid-std/tutorials/vfs.html)
+
 ## License
 
 MIT — part of [SquidStd](https://github.com/tgiachi/squid-std).

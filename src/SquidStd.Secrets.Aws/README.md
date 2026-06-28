@@ -68,6 +68,10 @@ await foreach (var name in store.ListNamesAsync("db/")) { /* ... */ }
 - **Tested against LocalStack** — the KMS and Secrets Manager adapters are covered by integration tests
   running on a `localstack/localstack` container.
 
+## Related
+
+- Tutorial: [Secrets (KMS / Secrets Manager)](https://tgiachi.github.io/squid-std/tutorials/secrets.html)
+
 ## License
 
 MIT — part of [SquidStd](https://github.com/tgiachi/squid-std).

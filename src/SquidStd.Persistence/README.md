@@ -66,6 +66,10 @@ container.ApplyPersistedEntityRegistrations();   // builds descriptors into IPer
 | `SnapshotService`                     | Atomic per-type binary snapshot files with payload checksum.  |
 | `RegisterPersistedEntity<T,TKey>()`   | DI helper recording an entity for descriptor construction.    |
 
+## Related
+
+- Tutorial: [Persistence](https://tgiachi.github.io/squid-std/tutorials/persistence.html)
+
 ## License
 
 MIT — part of [SquidStd](https://github.com/tgiachi/squid-std).

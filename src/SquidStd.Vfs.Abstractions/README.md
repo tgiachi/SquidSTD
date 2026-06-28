@@ -17,6 +17,10 @@ dotnet add package SquidStd.Vfs.Abstractions
 | `VfsPath` | Static helper that normalizes logical paths to forward-slash, root-relative form and rejects `.`/`..` traversal segments. |
 | `VfsEntry` | Record describing a listed entry: its logical path, byte size and last-modified UTC timestamp. |
 
+## Related
+
+- Tutorial: [Virtual filesystem](https://tgiachi.github.io/squid-std/tutorials/vfs.html)
+
 ## License
 
 MIT — part of [SquidStd](https://github.com/tgiachi/squid-std).
