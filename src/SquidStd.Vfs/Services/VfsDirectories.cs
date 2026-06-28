@@ -1,5 +1,5 @@
 using SquidStd.Vfs.Abstractions.Interfaces;
-using SquidStd.Vfs.Internal;
+using SquidStd.Vfs.Abstractions;
 
 namespace SquidStd.Vfs.Services;
 

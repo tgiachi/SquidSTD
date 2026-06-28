@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using SquidStd.Vfs.Abstractions.Data;
 using SquidStd.Vfs.Abstractions.Interfaces;
-using SquidStd.Vfs.Internal;
+using SquidStd.Vfs.Abstractions;
 
 namespace SquidStd.Vfs.Services;
 
