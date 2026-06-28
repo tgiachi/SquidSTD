@@ -20,6 +20,7 @@
         <ProjectReference Include="..\SquidStd.Core\SquidStd.Core.csproj"/>
         <ProjectReference Include="..\SquidStd.Services.Core\SquidStd.Services.Core.csproj"/>
         <ProjectReference Include="..\SquidStd.Vfs.Abstractions\SquidStd.Vfs.Abstractions.csproj"/>
+        <ProjectReference Include="..\SquidStd.Vfs\SquidStd.Vfs.csproj"/>
     </ItemGroup>
 
 </Project>
