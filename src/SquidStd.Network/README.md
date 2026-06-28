@@ -21,14 +21,6 @@ designed for low-allocation, high-throughput byte processing.
 dotnet add package SquidStd.Network
 ```
 
-## Features
-
-- TCP server/client (`SquidTcpServer`, `SquidStdTcpClient`) with optional TLS.
-- UDP server/client (`SquidStdUdpServer`, `SquidStdUdpClient`).
-- Session management (`ISessionManager<TState>`) with typed per-connection state.
-- Composable framing (`INetFramer`) and middleware pipeline (`INetMiddleware`).
-- Zero-copy binary I/O via `SpanReader` / `SpanWriter` and a reusable `CircularBuffer`.
-
 ## Usage
 
 ```csharp
@@ -51,6 +43,10 @@ await server.StopAsync(CancellationToken.None);
 | `INetFramer`                | Splits the byte stream into messages.               |
 | `INetMiddleware`            | Pipeline stage over inbound/outbound data.          |
 | `SpanReader` / `SpanWriter` | Allocation-free binary read/write.                  |
+
+## Related
+
+- Tutorial: [Networking](https://tgiachi.github.io/squid-std/tutorials/networking.html)
 
 ## License
 

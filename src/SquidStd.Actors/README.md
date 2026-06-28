@@ -53,6 +53,15 @@ using SquidStd.Actors.Extensions;
 using var sub = session.SubscribeToEventBus(eventBus, (UserJoinedEvent e) => new SendText($":{e.Nick} JOIN"));
 ```
 
+## Key types
+
+| Type                      | Purpose                                            |
+|---------------------------|----------------------------------------------------|
+| `Actor<TMessage>`         | Mailbox base class (`TellAsync` / `AskAsync`).     |
+| `ActorRequest<TReply>`    | Base record for request/response messages.         |
+| `IActorRequest<TReply>`   | Request contract (implement directly if not using the base). |
+| `ActorOptions`            | Capacity / overflow / error configuration.         |
+
 ## Options
 
 `ActorOptions` controls the mailbox:
@@ -69,15 +78,6 @@ using var sub = session.SubscribeToEventBus(eventBus, (UserJoinedEvent e) => new
   always propagate to the caller regardless of policy.
 
 `DisposeAsync` completes the mailbox, drains in-flight work, and faults any still-pending requests.
-
-## Key types
-
-| Type                      | Purpose                                            |
-|---------------------------|----------------------------------------------------|
-| `Actor<TMessage>`         | Mailbox base class (`TellAsync` / `AskAsync`).     |
-| `ActorRequest<TReply>`    | Base record for request/response messages.         |
-| `IActorRequest<TReply>`   | Request contract (implement directly if not using the base). |
-| `ActorOptions`            | Capacity / overflow / error configuration.         |
 
 ## License
 
