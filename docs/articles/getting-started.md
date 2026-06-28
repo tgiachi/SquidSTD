@@ -7,14 +7,19 @@ dotnet add package SquidStd.Services.Core
 ```
 
 ```csharp
-using DryIoc;
-using SquidStd.Services.Core.Extensions;
+using SquidStd.Core.Data.Bootstrap;
+using SquidStd.Services.Core.Services.Bootstrap;
 
-var container = new Container();
+// Core services wired automatically: config manager, event bus, command dispatcher,
+// job system, timer/cron scheduler, metrics, health checks, storage and secrets.
+var bootstrap = SquidStdBootstrap.Create(
+    new SquidStdOptions { ConfigName = "squidstd", RootDirectory = AppContext.BaseDirectory });
 
-// config manager + event bus + jobs + timer wheel + dispatcher + metrics + storage + secrets
-container.RegisterCoreServices("squidstd", Directory.GetCurrentDirectory());
+await bootstrap.StartAsync();
+// … resolve services, opt into modules with bootstrap.ConfigureServices(…) …
+await bootstrap.StopAsync();
 ```
 
-From here, add focused packages as needed — see the per-package guides in the sidebar and the
-[API reference](../api/index.md).
+Opt into modules with `ConfigureServices`, e.g. `container.AddInMemoryCache()`. See the
+[Concepts](concepts/bootstrap-lifecycle.md) for the full lifecycle and
+[Packages](getting-started.md) for per-module reference.
