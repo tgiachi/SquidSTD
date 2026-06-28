@@ -21,12 +21,6 @@ with shared boot data.
 dotnet add package SquidStd.Plugin.Abstractions
 ```
 
-## Features
-
-- `ISquidStdPlugin` — the plugin entry point: `Metadata` + `Configure(IContainer, PluginContext)`.
-- `PluginMetadata` — id, name, `Version`, author, optional description, and dependency declarations.
-- `PluginContext` — a typed bag of boot data shared with the plugin (`GetData<T>(key)`).
-
 ## Usage
 
 ```csharp
@@ -58,6 +52,10 @@ public sealed class MyPlugin : ISquidStdPlugin
 | `ISquidStdPlugin` | Plugin entry point (`Metadata`, `Configure`). |
 | `PluginMetadata`  | Plugin identity and dependency declarations.  |
 | `PluginContext`   | Shared boot data passed to the plugin.        |
+
+## Related
+
+- Tutorial: [Plugins](https://tgiachi.github.io/squid-std/tutorials/plugins.html)
 
 ## License
 

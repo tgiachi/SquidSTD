@@ -22,21 +22,6 @@ SquidStd packages build on.
 dotnet add package SquidStd.Core
 ```
 
-## Features
-
-- Configuration contracts: `IConfigEntry` (a YAML section) and `IConfigManagerService`.
-- In-process messaging: `IEventBus` with `ISyncEventListener<T>` / `IAsyncEventListener<T>` over `IEvent`.
-- Command dispatch: `ICommandDispatcher<TContext>` with `ICommandHandler<TCommand,TContext>`, fan-out, fault isolation, and a `CommandDispatchResult`; `ICommandContextFactory<TContext,TSeed>` builds the context from a seed for `ISeededCommandDispatcher<TContext,TSeed>`.
-- Background work & timing: `IJobSystem`, `ITimerService`, `IMainThreadDispatcher`.
-- Metrics & secrets: `IMetricProvider` and secret-protection contracts.
-- Serialization: `IDataSerializer` / `IDataDeserializer` (default `JsonDataSerializer`), plus `YamlUtils` / `JsonUtils`.
-- File watching: `IFileWatcherService` / `FileWatcherService` — recursive, debounced watchers that publish `FileChangedEvent` on the event bus.
-- Object pooling: `ObjectPool<T>` — thread-safe, non-blocking, factory-based reuse with optional reset.
-- Cryptography: `CryptoUtils` (AES-GCM authenticated encrypt/decrypt + key generation), `EncryptString`/`DecryptString` string helpers, base64 extensions, and `SslUtils` for loading PEM/PFX TLS certificates.
-- Randomness: `BuiltInRng` (seedable ambient RNG), `RandomUtils` (dice, coin flips), and collection `Shuffle`/`RandomElement`/`RandomSample` extensions.
-- Utilities: a Serilog `EventSink`, and string/env/directory extensions.
-- Shared domain enums under `Types` (e.g. `LogLevelType`, `PlatformType`, `FileChangeKind`).
-
 ## Usage
 
 ```csharp
@@ -87,6 +72,10 @@ pool.Return(builder);
 | `IFileWatcherService`   | Recursive, debounced file watcher publishing to the event bus. |
 | `ObjectPool<T>`         | Thread-safe, non-blocking object pool.        |
 | `ICommandDispatcher<TContext>` | Typed protocol command dispatch with context. |
+
+## Related
+
+- Tutorial: [Events, jobs & scheduling](https://tgiachi.github.io/squid-std/tutorials/events-jobs-scheduling.html)
 
 ## License
 
