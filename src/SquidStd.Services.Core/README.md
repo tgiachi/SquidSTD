@@ -21,18 +21,6 @@ main-thread dispatcher, metrics collection, storage, and secrets services.
 dotnet add package SquidStd.Services.Core
 ```
 
-## Features
-
-- One-line bootstrap: `container.RegisterCoreServices()` registers the full default service set.
-- `ConfigManagerService` — loads/saves YAML config sections and substitutes `$ENV_VAR` tokens.
-- `EventBusService` — in-process publish/subscribe over `IEvent`.
-- `CommandDispatcher<TContext>` — typed protocol command dispatch with fan-out, fault isolation, and a `CommandDispatchResult` (`RegisterCommandDispatcher` / `RegisterCommandHandler` / `RegisterSeededCommandDispatcher`).
-- `JobSystemService` — background job execution; `TimerWheelService` + cron scheduling for timed work.
-- `MainThreadDispatcherService` — marshal work back onto a main thread.
-- `MetricsCollectionService` — aggregates `IMetricProvider` samples.
-- `HealthCheckService` — aggregates `IHealthCheck`s into one report (`RegisterHealthChecksService`).
-- AES-GCM-protected secret store. (File/object storage moved to `SquidStd.Storage`, opt-in via `AddFileStorage`.)
-
 ## Usage
 
 ```csharp
@@ -45,7 +33,7 @@ var container = new Container();
 container.RegisterCoreServices("squidstd", Directory.GetCurrentDirectory());
 ```
 
-## Command dispatch
+### Command dispatch
 
 ```csharp
 // Register a dispatcher for your context type and handlers.
@@ -84,6 +72,10 @@ await seeded.DispatchAsync(command, connection);   // factory maps connection ->
 | `TimerWheelService`                 | Timer-wheel scheduling.                                                   |
 | `MainThreadDispatcherService`       | Main-thread work dispatch.                                                |
 | `MetricsCollectionService`          | Metric sample aggregation.                                                |
+
+## Related
+
+- Tutorial: [Events, jobs & scheduling](https://tgiachi.github.io/squid-std/tutorials/events-jobs-scheduling.html)
 
 ## License
 
