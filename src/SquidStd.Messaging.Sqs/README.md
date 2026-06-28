@@ -46,4 +46,3 @@ container.AddSqsMessaging(new SqsOptions { Aws = new AwsConfigEntry { Region = "
 ## License
 
 MIT — part of [SquidStd](https://github.com/tgiachi/squid-std).
-</content>

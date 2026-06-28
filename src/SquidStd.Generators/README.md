@@ -46,5 +46,3 @@ The generated method reuses the normal `RegisterEventListener<TEvent,TListener>(
 ## License
 
 MIT — part of [SquidStd](https://github.com/tgiachi/squid-std).
-</content>
-</invoke>
