@@ -200,8 +200,6 @@ public class LuaScriptEngineServiceTests
         );
     }
 
-    private sealed record LimitConfig(string Name, int Count);
-
     public sealed class FiveArgumentUserData(int first, int second, int third, int fourth, int fifth)
     {
         public int Total { get; } = first + second + third + fourth + fifth;
@@ -232,4 +230,6 @@ public class LuaScriptEngineServiceTests
         {
         }
     }
+
+    private sealed record LimitConfig(string Name, int Count);
 }

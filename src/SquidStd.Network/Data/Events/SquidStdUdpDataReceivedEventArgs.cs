@@ -8,13 +8,6 @@ namespace SquidStd.Network.Data.Events;
 /// </summary>
 public sealed class SquidStdUdpDataReceivedEventArgs : EventArgs
 {
-    public SquidStdUdpDataReceivedEventArgs(SquidStdUdpClient client, IPEndPoint remoteEndPoint, ReadOnlyMemory<byte> data)
-    {
-        Client = client;
-        RemoteEndPoint = remoteEndPoint;
-        Data = data;
-    }
-
     /// <summary>
     ///     UDP client that received the datagram.
     /// </summary>
@@ -29,4 +22,11 @@ public sealed class SquidStdUdpDataReceivedEventArgs : EventArgs
     ///     Received datagram payload.
     /// </summary>
     public ReadOnlyMemory<byte> Data { get; }
+
+    public SquidStdUdpDataReceivedEventArgs(SquidStdUdpClient client, IPEndPoint remoteEndPoint, ReadOnlyMemory<byte> data)
+    {
+        Client = client;
+        RemoteEndPoint = remoteEndPoint;
+        Data = data;
+    }
 }

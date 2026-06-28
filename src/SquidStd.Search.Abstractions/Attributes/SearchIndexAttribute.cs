@@ -7,12 +7,12 @@ namespace SquidStd.Search.Abstractions.Attributes;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = false)]
 public sealed class SearchIndexAttribute : Attribute
 {
+    /// <summary>The index name (template).</summary>
+    public string Name { get; }
+
     /// <summary>Initializes the attribute with the index name template.</summary>
     public SearchIndexAttribute(string name)
     {
         Name = name;
     }
-
-    /// <summary>The index name (template).</summary>
-    public string Name { get; }
 }

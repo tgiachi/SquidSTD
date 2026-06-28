@@ -14,6 +14,9 @@ public sealed class MessagingMetricsProvider : IMessagingMetrics, IMetricProvide
     private readonly ConcurrentDictionary<string, QueueCounters> _queues = new(StringComparer.Ordinal);
 
     /// <inheritdoc />
+    public string ProviderName => "messaging";
+
+    /// <inheritdoc />
     public void OnDeadLettered(string queueName)
     {
         Interlocked.Increment(ref Counters(queueName).DeadLettered);
@@ -54,9 +57,6 @@ public sealed class MessagingMetricsProvider : IMessagingMetrics, IMetricProvide
     {
         Volatile.Write(ref Counters(queueName).Subscribers, count);
     }
-
-    /// <inheritdoc />
-    public string ProviderName => "messaging";
 
     /// <inheritdoc />
     public ValueTask<IReadOnlyList<MetricSample>> CollectAsync(CancellationToken cancellationToken = default)

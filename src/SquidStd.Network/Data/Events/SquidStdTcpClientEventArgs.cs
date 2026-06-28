@@ -7,13 +7,13 @@ namespace SquidStd.Network.Data.Events;
 /// </summary>
 public sealed class SquidStdTcpClientEventArgs : EventArgs
 {
-    public SquidStdTcpClientEventArgs(SquidStdTcpClient client)
-    {
-        Client = client;
-    }
-
     /// <summary>
     ///     Connected or disconnected client.
     /// </summary>
     public SquidStdTcpClient Client { get; }
+
+    public SquidStdTcpClientEventArgs(SquidStdTcpClient client)
+    {
+        Client = client;
+    }
 }

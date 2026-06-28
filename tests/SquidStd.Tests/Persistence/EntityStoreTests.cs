@@ -8,13 +8,6 @@ namespace SquidStd.Tests.Persistence;
 
 public sealed class EntityStoreTests : IAsyncDisposable
 {
-    private sealed class Player
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public List<string> Tags { get; set; } = [];
-    }
-
     private readonly string _dir = Path.Combine(Path.GetTempPath(), "squidstd-store-" + Guid.NewGuid().ToString("N"));
     private readonly BinaryJournalService _journal;
     private readonly PersistenceStateStore _stateStore = new();
@@ -106,5 +99,12 @@ public sealed class EntityStoreTests : IAsyncDisposable
         {
             Directory.Delete(_dir, true);
         }
+    }
+
+    private sealed class Player
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public List<string> Tags { get; set; } = [];
     }
 }

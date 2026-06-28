@@ -12,11 +12,6 @@ public sealed class RecordingJobHandler : IJobHandler
     private readonly List<JobRequest> _received = [];
     private readonly Lock _sync = new();
 
-    public RecordingJobHandler(string jobName)
-    {
-        JobName = jobName;
-    }
-
     public Exception? ThrowOnHandle { get; set; }
 
     /// <summary>When set, <see cref="HandleAsync" /> awaits this before returning.</summary>
@@ -34,6 +29,11 @@ public sealed class RecordingJobHandler : IJobHandler
     }
 
     public string JobName { get; }
+
+    public RecordingJobHandler(string jobName)
+    {
+        JobName = jobName;
+    }
 
     public async Task HandleAsync(JobRequest job, CancellationToken cancellationToken)
     {

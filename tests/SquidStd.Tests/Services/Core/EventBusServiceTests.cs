@@ -179,22 +179,18 @@ public class EventBusServiceTests
         Assert.Contains("b:payload", calls);
     }
 
-    private sealed record TestEvent(string Payload) : IEvent;
-
-    private sealed record OtherEvent(int Value) : IEvent;
-
     private sealed class RecordingListener : IEventListener<TestEvent>
     {
         private readonly List<string> _calls;
         private readonly string _name;
+
+        public TestEvent? LastEvent { get; private set; }
 
         public RecordingListener(string name, List<string> calls)
         {
             _name = name;
             _calls = calls;
         }
-
-        public TestEvent? LastEvent { get; private set; }
 
         public Task HandleAsync(TestEvent eventData, CancellationToken cancellationToken = default)
         {
@@ -298,4 +294,8 @@ public class EventBusServiceTests
             }
         }
     }
+
+    private sealed record TestEvent(string Payload) : IEvent;
+
+    private sealed record OtherEvent(int Value) : IEvent;
 }

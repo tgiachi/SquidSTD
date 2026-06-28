@@ -7,12 +7,6 @@ namespace SquidStd.Network.Data.Events;
 /// </summary>
 public sealed class SquidStdUdpExceptionEventArgs : EventArgs
 {
-    public SquidStdUdpExceptionEventArgs(Exception exception, SquidStdUdpClient? client = null)
-    {
-        Exception = exception;
-        Client = client;
-    }
-
     /// <summary>
     ///     Exception raised by the networking component.
     /// </summary>
@@ -22,4 +16,10 @@ public sealed class SquidStdUdpExceptionEventArgs : EventArgs
     ///     UDP client related to the exception, when available.
     /// </summary>
     public SquidStdUdpClient? Client { get; }
+
+    public SquidStdUdpExceptionEventArgs(Exception exception, SquidStdUdpClient? client = null)
+    {
+        Exception = exception;
+        Client = client;
+    }
 }

@@ -7,13 +7,6 @@ namespace SquidStd.Tests.Persistence.Integration;
 
 public sealed class PersistenceEndToEndTests : IDisposable
 {
-    public sealed class Item
-    {
-        public int Id { get; set; }
-        public string Label { get; set; } = string.Empty;
-        public int Quantity { get; set; }
-    }
-
     private readonly string _dir = Path.Combine(Path.GetTempPath(), "squidstd-e2e-" + Guid.NewGuid().ToString("N"));
 
     private PersistenceService Create()
@@ -59,5 +52,12 @@ public sealed class PersistenceEndToEndTests : IDisposable
         {
             Directory.Delete(_dir, true);
         }
+    }
+
+    public sealed class Item
+    {
+        public int Id { get; set; }
+        public string Label { get; set; } = string.Empty;
+        public int Quantity { get; set; }
     }
 }

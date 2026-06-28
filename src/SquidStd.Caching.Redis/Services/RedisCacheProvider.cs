@@ -13,13 +13,13 @@ public sealed class RedisCacheProvider : ICacheProvider, IAsyncDisposable
     private IConnectionMultiplexer? _connection;
     private int _disposed;
 
+    private IDatabase Database
+        => (_connection ?? throw new InvalidOperationException("Provider not started.")).GetDatabase();
+
     public RedisCacheProvider(RedisCacheOptions options)
     {
         _options = options;
     }
-
-    private IDatabase Database
-        => (_connection ?? throw new InvalidOperationException("Provider not started.")).GetDatabase();
 
     /// <inheritdoc />
     public async ValueTask DisposeAsync()

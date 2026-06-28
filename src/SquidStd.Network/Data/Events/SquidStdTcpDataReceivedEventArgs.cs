@@ -7,12 +7,6 @@ namespace SquidStd.Network.Data.Events;
 /// </summary>
 public sealed class SquidStdTcpDataReceivedEventArgs : EventArgs
 {
-    public SquidStdTcpDataReceivedEventArgs(SquidStdTcpClient client, ReadOnlyMemory<byte> data)
-    {
-        Client = client;
-        Data = data;
-    }
-
     /// <summary>
     ///     Source client for the data payload.
     /// </summary>
@@ -22,4 +16,10 @@ public sealed class SquidStdTcpDataReceivedEventArgs : EventArgs
     ///     Received data payload.
     /// </summary>
     public ReadOnlyMemory<byte> Data { get; }
+
+    public SquidStdTcpDataReceivedEventArgs(SquidStdTcpClient client, ReadOnlyMemory<byte> data)
+    {
+        Client = client;
+        Data = data;
+    }
 }

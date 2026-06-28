@@ -184,16 +184,16 @@ public class MetricsCollectionServiceTests
         private readonly double _value;
         private int _collectionCount;
 
+        public int CollectionCount => Volatile.Read(ref _collectionCount);
+
+        public string ProviderName { get; }
+
         public CountingMetricProvider(string providerName, string metricName, double value)
         {
             ProviderName = providerName;
             _metricName = metricName;
             _value = value;
         }
-
-        public int CollectionCount => Volatile.Read(ref _collectionCount);
-
-        public string ProviderName { get; }
 
         public ValueTask<IReadOnlyList<MetricSample>> CollectAsync(CancellationToken cancellationToken = default)
         {
@@ -205,12 +205,12 @@ public class MetricsCollectionServiceTests
 
     private sealed class ThrowingMetricProvider : IMetricProvider
     {
+        public string ProviderName { get; }
+
         public ThrowingMetricProvider(string providerName)
         {
             ProviderName = providerName;
         }
-
-        public string ProviderName { get; }
 
         public ValueTask<IReadOnlyList<MetricSample>> CollectAsync(CancellationToken cancellationToken = default)
         {

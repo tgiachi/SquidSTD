@@ -16,6 +16,9 @@ public sealed class CacheMetricsProvider : ICacheMetrics, IMetricProvider
     private long _sets;
 
     /// <inheritdoc />
+    public string ProviderName => "cache";
+
+    /// <inheritdoc />
     public void OnHit(string key)
     {
         Interlocked.Increment(ref _hits);
@@ -38,9 +41,6 @@ public sealed class CacheMetricsProvider : ICacheMetrics, IMetricProvider
     {
         Interlocked.Increment(ref _sets);
     }
-
-    /// <inheritdoc />
-    public string ProviderName => "cache";
 
     /// <inheritdoc />
     public ValueTask<IReadOnlyList<MetricSample>> CollectAsync(CancellationToken cancellationToken = default)

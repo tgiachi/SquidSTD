@@ -60,11 +60,6 @@ public class EventSink : ILogEventSink
     }
 
     /// <summary>
-    ///     Event raised when a log event is received.
-    /// </summary>
-    public static event EventHandler<LogEventData>? OnLogReceived;
-
-    /// <summary>
     ///     Clears all event subscribers.
     ///     Useful for cleanup or testing.
     /// </summary>
@@ -72,4 +67,9 @@ public class EventSink : ILogEventSink
     {
         OnLogReceived = null;
     }
+
+    /// <summary>
+    ///     Event raised when a log event is received.
+    /// </summary>
+    public static event EventHandler<LogEventData>? OnLogReceived;
 }

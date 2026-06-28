@@ -7,6 +7,11 @@ namespace SquidStd.Tests.Support;
 /// </summary>
 public sealed class TempDirectory : IDisposable
 {
+    /// <summary>
+    ///     Gets the absolute path of the temporary directory.
+    /// </summary>
+    public string Path { get; }
+
     public TempDirectory()
     {
         Path = SysPath.Combine(SysPath.GetTempPath(), "squidstd-tests", Guid.NewGuid().ToString("N"));
@@ -14,9 +19,14 @@ public sealed class TempDirectory : IDisposable
     }
 
     /// <summary>
-    ///     Gets the absolute path of the temporary directory.
+    ///     Combines a relative path with the temporary directory root.
     /// </summary>
-    public string Path { get; }
+    /// <param name="relative">The relative path.</param>
+    /// <returns>The combined absolute path.</returns>
+    public string Combine(string relative)
+    {
+        return SysPath.Combine(Path, relative);
+    }
 
     public void Dispose()
     {
@@ -31,15 +41,5 @@ public sealed class TempDirectory : IDisposable
         {
             // Best-effort cleanup; ignore failures during teardown.
         }
-    }
-
-    /// <summary>
-    ///     Combines a relative path with the temporary directory root.
-    /// </summary>
-    /// <param name="relative">The relative path.</param>
-    /// <returns>The combined absolute path.</returns>
-    public string Combine(string relative)
-    {
-        return SysPath.Combine(Path, relative);
     }
 }

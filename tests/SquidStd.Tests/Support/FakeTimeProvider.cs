@@ -35,13 +35,13 @@ public sealed class FakeTimeProvider : TimeProvider
             return true;
         }
 
-        public void Dispose()
-        {
-        }
-
         public ValueTask DisposeAsync()
         {
             return ValueTask.CompletedTask;
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

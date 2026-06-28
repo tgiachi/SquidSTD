@@ -28,16 +28,6 @@ public sealed class MetricsSnapshotBridge : IDisposable
         EnsureInstruments();
     }
 
-    public void Dispose()
-    {
-        if (Interlocked.Exchange(ref _disposed, 1) != 0)
-        {
-            return;
-        }
-
-        _meter.Dispose();
-    }
-
     /// <summary>Creates observable instruments for any snapshot metric names not yet registered.</summary>
     public void EnsureInstruments()
     {
@@ -71,5 +61,15 @@ public sealed class MetricsSnapshotBridge : IDisposable
             : [];
 
         return [new Measurement<double>(sample.Value, tags)];
+    }
+
+    public void Dispose()
+    {
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
+        {
+            return;
+        }
+
+        _meter.Dispose();
     }
 }

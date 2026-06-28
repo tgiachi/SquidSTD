@@ -4,12 +4,6 @@ namespace SquidStd.Tests.Persistence;
 
 public class MessagePackDataSerializerTests
 {
-    public sealed class Player
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-    }
-
     [Fact]
     public void SerializeDeserialize_RoundTrips()
     {
@@ -31,5 +25,11 @@ public class MessagePackDataSerializerTests
 
         // MessagePack of an object is not a JSON '{' opener.
         Assert.NotEqual((byte)'{', bytes[0]);
+    }
+
+    public sealed class Player
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }

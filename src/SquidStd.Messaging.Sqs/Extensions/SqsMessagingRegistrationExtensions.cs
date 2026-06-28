@@ -17,6 +17,44 @@ namespace SquidStd.Messaging.Sqs.Extensions;
 /// </summary>
 public static class SqsMessagingRegistrationExtensions
 {
+    /// <summary>Parses a "sqs://[ak:sk@]region[?params]" connection string into <see cref="SqsOptions" />.</summary>
+    public static SqsOptions ParseOptions(string connectionString)
+    {
+        var cs = MessagingConnectionString.Parse(connectionString);
+
+        if (!string.Equals(cs.Scheme, "sqs", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new ArgumentException(
+                $"Expected a 'sqs://' connection string but got '{cs.Scheme}://'.",
+                nameof(connectionString)
+            );
+        }
+
+        return new SqsOptions
+        {
+            Aws = new AwsConfigEntry
+            {
+                Region = string.IsNullOrEmpty(cs.Host) ? "us-east-1" : cs.Host,
+                AccessKey = cs.UserName,
+                SecretKey = cs.Password,
+                SessionToken = cs.Parameters.TryGetValue("sessionToken", out var token) ? token : null,
+                ServiceUrl = cs.Parameters.TryGetValue("endpoint", out var endpoint) ? endpoint : null
+            },
+            MaxNumberOfMessages = cs.Parameters.TryGetValue("maxMessages", out var max) &&
+                                  int.TryParse(max, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedMax)
+                ? parsedMax
+                : 10,
+            VisibilityTimeout = cs.Parameters.TryGetValue("visibilityTimeoutSec", out var vis) &&
+                                int.TryParse(vis, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedVis)
+                ? TimeSpan.FromSeconds(parsedVis)
+                : TimeSpan.FromSeconds(30),
+            WaitTimeSeconds = cs.Parameters.TryGetValue("waitTimeSec", out var wait) &&
+                              int.TryParse(wait, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedWait)
+                ? parsedWait
+                : 20
+        };
+    }
+
     extension(IContainer container)
     {
         /// <summary>Registers SQS/SNS messaging from an explicit options object.</summary>
@@ -67,43 +105,5 @@ public static class SqsMessagingRegistrationExtensions
 
             return container.AddSqsMessaging(ParseOptions(connectionString), cs.ToMessagingOptions());
         }
-    }
-
-    /// <summary>Parses a "sqs://[ak:sk@]region[?params]" connection string into <see cref="SqsOptions" />.</summary>
-    public static SqsOptions ParseOptions(string connectionString)
-    {
-        var cs = MessagingConnectionString.Parse(connectionString);
-
-        if (!string.Equals(cs.Scheme, "sqs", StringComparison.OrdinalIgnoreCase))
-        {
-            throw new ArgumentException(
-                $"Expected a 'sqs://' connection string but got '{cs.Scheme}://'.",
-                nameof(connectionString)
-            );
-        }
-
-        return new SqsOptions
-        {
-            Aws = new AwsConfigEntry
-            {
-                Region = string.IsNullOrEmpty(cs.Host) ? "us-east-1" : cs.Host,
-                AccessKey = cs.UserName,
-                SecretKey = cs.Password,
-                SessionToken = cs.Parameters.TryGetValue("sessionToken", out var token) ? token : null,
-                ServiceUrl = cs.Parameters.TryGetValue("endpoint", out var endpoint) ? endpoint : null
-            },
-            MaxNumberOfMessages = cs.Parameters.TryGetValue("maxMessages", out var max) &&
-                                  int.TryParse(max, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedMax)
-                ? parsedMax
-                : 10,
-            VisibilityTimeout = cs.Parameters.TryGetValue("visibilityTimeoutSec", out var vis) &&
-                                int.TryParse(vis, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedVis)
-                ? TimeSpan.FromSeconds(parsedVis)
-                : TimeSpan.FromSeconds(30),
-            WaitTimeSeconds = cs.Parameters.TryGetValue("waitTimeSec", out var wait) &&
-                              int.TryParse(wait, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedWait)
-                ? parsedWait
-                : 20
-        };
     }
 }

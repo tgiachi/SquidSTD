@@ -4,6 +4,18 @@ namespace SquidStd.Generators.Config;
 
 internal sealed class ConfigSectionRegistrationCandidate
 {
+    public string ConfigTypeName { get; }
+
+    public string SectionName { get; }
+
+    public string DisplayName { get; }
+
+    public Location? Location { get; }
+
+    public int Priority { get; }
+
+    public bool IsSupported { get; }
+
     public ConfigSectionRegistrationCandidate(
         string configTypeName,
         string sectionName,
@@ -20,16 +32,4 @@ internal sealed class ConfigSectionRegistrationCandidate
         Priority = priority;
         IsSupported = isSupported;
     }
-
-    public string ConfigTypeName { get; }
-
-    public string SectionName { get; }
-
-    public string DisplayName { get; }
-
-    public Location? Location { get; }
-
-    public int Priority { get; }
-
-    public bool IsSupported { get; }
 }

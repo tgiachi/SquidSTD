@@ -6,6 +6,12 @@ public sealed class ConfigRegistrationData : IConfigEntry
 {
     private readonly Func<object> _createDefault;
 
+    public int Priority { get; }
+
+    public string SectionName { get; }
+
+    public Type ConfigType { get; }
+
     public ConfigRegistrationData(
         string sectionName,
         Type configType,
@@ -22,12 +28,6 @@ public sealed class ConfigRegistrationData : IConfigEntry
         _createDefault = createDefault;
         Priority = priority;
     }
-
-    public int Priority { get; }
-
-    public string SectionName { get; }
-
-    public Type ConfigType { get; }
 
     public object CreateDefault()
     {

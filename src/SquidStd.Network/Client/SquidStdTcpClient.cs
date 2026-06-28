@@ -42,6 +42,85 @@ public sealed class SquidStdTcpClient : INetworkConnection, IAsyncDisposable, ID
     private int _started;
 
     /// <summary>
+    ///     Receives payload chunk size in bytes.
+    /// </summary>
+    public int ReceiveBufferSize { get; }
+
+    /// <summary>
+    ///     Local endpoint used for this connection, when available.
+    /// </summary>
+    public EndPoint? LocalEndPoint
+    {
+        get
+        {
+            try
+            {
+                return _socket.LocalEndPoint;
+            }
+            catch (ObjectDisposedException)
+            {
+                return null;
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Gets the number of bytes currently available in the receive circular buffer.
+    /// </summary>
+    public int AvailableBytes
+    {
+        get
+        {
+            lock (_receiveBufferSync)
+            {
+                return _receiveBuffer.Size;
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Gets whether the receive circular buffer is full.
+    /// </summary>
+    public bool IsReceiveBufferFull
+    {
+        get
+        {
+            lock (_receiveBufferSync)
+            {
+                return _receiveBuffer.IsFull;
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Unique session identifier for this client connection.
+    /// </summary>
+    public long SessionId { get; }
+
+    /// <summary>
+    ///     Client remote endpoint, when connected.
+    /// </summary>
+    public EndPoint? RemoteEndPoint
+    {
+        get
+        {
+            try
+            {
+                return _socket.RemoteEndPoint;
+            }
+            catch (ObjectDisposedException)
+            {
+                return null;
+            }
+        }
+    }
+
+    /// <summary>
+    ///     True when the underlying socket is connected and client not closed.
+    /// </summary>
+    public bool IsConnected => _socket.Connected && Volatile.Read(ref _closed) == 0;
+
+    /// <summary>
     ///     Creates a client wrapper for an accepted socket.
     /// </summary>
     /// <param name="socket">Connected socket.</param>
@@ -97,57 +176,6 @@ public sealed class SquidStdTcpClient : INetworkConnection, IAsyncDisposable, ID
         SessionId = Interlocked.Increment(ref _sessionIdSequence);
     }
 
-    /// <summary>
-    ///     Receives payload chunk size in bytes.
-    /// </summary>
-    public int ReceiveBufferSize { get; }
-
-    /// <summary>
-    ///     Local endpoint used for this connection, when available.
-    /// </summary>
-    public EndPoint? LocalEndPoint
-    {
-        get
-        {
-            try
-            {
-                return _socket.LocalEndPoint;
-            }
-            catch (ObjectDisposedException)
-            {
-                return null;
-            }
-        }
-    }
-
-    /// <summary>
-    ///     Gets the number of bytes currently available in the receive circular buffer.
-    /// </summary>
-    public int AvailableBytes
-    {
-        get
-        {
-            lock (_receiveBufferSync)
-            {
-                return _receiveBuffer.Size;
-            }
-        }
-    }
-
-    /// <summary>
-    ///     Gets whether the receive circular buffer is full.
-    /// </summary>
-    public bool IsReceiveBufferFull
-    {
-        get
-        {
-            lock (_receiveBufferSync)
-            {
-                return _receiveBuffer.IsFull;
-            }
-        }
-    }
-
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
@@ -171,40 +199,6 @@ public sealed class SquidStdTcpClient : INetworkConnection, IAsyncDisposable, ID
         _internalCancellationTokenSource.Dispose();
         _socket.Dispose();
     }
-
-    /// <inheritdoc />
-    public void Dispose() // Sync-over-async: best effort. Prefer DisposeAsync.
-    {
-        DisposeAsync().AsTask().GetAwaiter().GetResult();
-    }
-
-    /// <summary>
-    ///     Unique session identifier for this client connection.
-    /// </summary>
-    public long SessionId { get; }
-
-    /// <summary>
-    ///     Client remote endpoint, when connected.
-    /// </summary>
-    public EndPoint? RemoteEndPoint
-    {
-        get
-        {
-            try
-            {
-                return _socket.RemoteEndPoint;
-            }
-            catch (ObjectDisposedException)
-            {
-                return null;
-            }
-        }
-    }
-
-    /// <summary>
-    ///     True when the underlying socket is connected and client not closed.
-    /// </summary>
-    public bool IsConnected => _socket.Connected && Volatile.Read(ref _closed) == 0;
 
     /// <summary>
     ///     Closes the client connection and raises disconnect event once.
@@ -302,26 +296,6 @@ public sealed class SquidStdTcpClient : INetworkConnection, IAsyncDisposable, ID
             _sendLock.Release();
         }
     }
-
-    /// <summary>
-    ///     Raised when the client is fully connected and receive loop starts.
-    /// </summary>
-    public event EventHandler<SquidStdTcpClientEventArgs>? OnConnected;
-
-    /// <summary>
-    ///     Raised when the client is disconnected.
-    /// </summary>
-    public event EventHandler<SquidStdTcpClientEventArgs>? OnDisconnected;
-
-    /// <summary>
-    ///     Raised when data is received (after middleware pipeline).
-    /// </summary>
-    public event EventHandler<SquidStdTcpDataReceivedEventArgs>? OnDataReceived;
-
-    /// <summary>
-    ///     Raised when receive/send loops throw an exception.
-    /// </summary>
-    public event EventHandler<SquidStdTcpExceptionEventArgs>? OnException;
 
     /// <summary>
     ///     Adds a middleware component to this client pipeline.
@@ -652,4 +626,30 @@ public sealed class SquidStdTcpClient : INetworkConnection, IAsyncDisposable, ID
         _pendingBuffer = null;
         _pendingLength = 0;
     }
+
+    /// <inheritdoc />
+    public void Dispose() // Sync-over-async: best effort. Prefer DisposeAsync.
+    {
+        DisposeAsync().AsTask().GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    ///     Raised when the client is fully connected and receive loop starts.
+    /// </summary>
+    public event EventHandler<SquidStdTcpClientEventArgs>? OnConnected;
+
+    /// <summary>
+    ///     Raised when the client is disconnected.
+    /// </summary>
+    public event EventHandler<SquidStdTcpClientEventArgs>? OnDisconnected;
+
+    /// <summary>
+    ///     Raised when data is received (after middleware pipeline).
+    /// </summary>
+    public event EventHandler<SquidStdTcpDataReceivedEventArgs>? OnDataReceived;
+
+    /// <summary>
+    ///     Raised when receive/send loops throw an exception.
+    /// </summary>
+    public event EventHandler<SquidStdTcpExceptionEventArgs>? OnException;
 }

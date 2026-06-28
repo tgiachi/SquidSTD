@@ -12,12 +12,6 @@ public sealed class WorkerState : IWorkerState
 {
     private int _activeJobs;
 
-    public WorkerState(WorkersConfig config)
-    {
-        WorkerId = string.IsNullOrWhiteSpace(config.WorkerId) ? Environment.MachineName : config.WorkerId;
-        MaxConcurrency = config.MaxConcurrency > 0 ? config.MaxConcurrency : Environment.ProcessorCount;
-    }
-
     /// <inheritdoc />
     public string WorkerId { get; }
 
@@ -29,6 +23,12 @@ public sealed class WorkerState : IWorkerState
 
     /// <inheritdoc />
     public WorkerStatusType Status => ActiveJobs == 0 ? WorkerStatusType.Idle : WorkerStatusType.Busy;
+
+    public WorkerState(WorkersConfig config)
+    {
+        WorkerId = string.IsNullOrWhiteSpace(config.WorkerId) ? Environment.MachineName : config.WorkerId;
+        MaxConcurrency = config.MaxConcurrency > 0 ? config.MaxConcurrency : Environment.ProcessorCount;
+    }
 
     /// <inheritdoc />
     public void JobFinished()

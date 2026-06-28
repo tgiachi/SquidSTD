@@ -17,6 +17,18 @@ public sealed class ConfigManagerService : IConfigManagerService, ISquidStdServi
     private readonly Dictionary<Type, object> _values = [];
     private int _started;
 
+    /// <inheritdoc />
+    public string ConfigName { get; }
+
+    /// <inheritdoc />
+    public string ConfigDirectory { get; }
+
+    /// <inheritdoc />
+    public string ConfigPath { get; }
+
+    /// <inheritdoc />
+    public IReadOnlyCollection<IConfigEntry> Entries => GetEntries();
+
     /// <summary>
     ///     Initializes the config manager service.
     /// </summary>
@@ -33,18 +45,6 @@ public sealed class ConfigManagerService : IConfigManagerService, ISquidStdServi
         ConfigDirectory = Path.GetFullPath(configDirectory);
         ConfigPath = ResolveConfigPath(configName, ConfigDirectory);
     }
-
-    /// <inheritdoc />
-    public string ConfigName { get; }
-
-    /// <inheritdoc />
-    public string ConfigDirectory { get; }
-
-    /// <inheritdoc />
-    public string ConfigPath { get; }
-
-    /// <inheritdoc />
-    public IReadOnlyCollection<IConfigEntry> Entries => GetEntries();
 
     /// <inheritdoc />
     public string Compose()

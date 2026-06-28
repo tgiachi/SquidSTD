@@ -15,15 +15,6 @@ public interface ISessionManager<TState>
     /// <summary>Snapshot of all active sessions.</summary>
     IReadOnlyCollection<Session<TState>> Sessions { get; }
 
-    /// <summary>Raised when a new session is created.</summary>
-    event EventHandler<SquidStdSessionEventArgs<TState>>? OnSessionCreated;
-
-    /// <summary>Raised when a session is removed.</summary>
-    event EventHandler<SquidStdSessionEventArgs<TState>>? OnSessionRemoved;
-
-    /// <summary>Raised when a session receives data.</summary>
-    event EventHandler<SquidStdSessionDataEventArgs<TState>>? OnSessionData;
-
     /// <summary>Sends a payload to every active session, isolating per-session failures.</summary>
     Task BroadcastAsync(ReadOnlyMemory<byte> payload, CancellationToken cancellationToken = default);
 
@@ -35,4 +26,13 @@ public interface ISessionManager<TState>
 
     /// <summary>Looks up a session by its id.</summary>
     bool TryGetSession(long sessionId, out Session<TState>? session);
+
+    /// <summary>Raised when a new session is created.</summary>
+    event EventHandler<SquidStdSessionEventArgs<TState>>? OnSessionCreated;
+
+    /// <summary>Raised when a session is removed.</summary>
+    event EventHandler<SquidStdSessionEventArgs<TState>>? OnSessionRemoved;
+
+    /// <summary>Raised when a session receives data.</summary>
+    event EventHandler<SquidStdSessionDataEventArgs<TState>>? OnSessionData;
 }

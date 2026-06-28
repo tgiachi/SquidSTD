@@ -6,11 +6,6 @@ namespace SquidStd.Tests.Persistence;
 
 public class PersistenceEntityRegistryTests
 {
-    private sealed class Player
-    {
-        public int Id { get; set; }
-    }
-
     private static PersistenceEntityDescriptor<Player, int> Descriptor(ushort typeId = 1)
     {
         var serializer = new JsonDataSerializer();
@@ -60,4 +55,9 @@ public class PersistenceEntityRegistryTests
     [Fact]
     public void GetDescriptor_Unregistered_Throws()
         => Assert.Throws<InvalidOperationException>(() => new PersistenceEntityRegistry().GetDescriptor(99));
+
+    private sealed class Player
+    {
+        public int Id { get; set; }
+    }
 }

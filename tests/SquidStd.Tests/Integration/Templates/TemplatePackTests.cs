@@ -15,6 +15,9 @@ public sealed class TemplatePackTests : IDisposable
     private readonly string _repoRoot;
     private readonly string _workDir;
 
+    // xUnit 2.9.3 has no dynamic skip; guard with an early return when the CLI/install is unavailable.
+    private bool Ready => _dotnetAvailable && _installed;
+
     public TemplatePackTests()
     {
         _repoRoot = FindRepoRoot();
@@ -42,17 +45,6 @@ public sealed class TemplatePackTests : IDisposable
             .First();
 
         _installed = TryRun("dotnet", $"new install \"{nupkg}\" --debug:custom-hive \"{_hive}\"", _repoRoot, out _);
-    }
-
-    // xUnit 2.9.3 has no dynamic skip; guard with an early return when the CLI/install is unavailable.
-    private bool Ready => _dotnetAvailable && _installed;
-
-    public void Dispose()
-    {
-        // The hive is isolated to this test instance, so deleting it fully uninstalls the pack — no
-        // global state to clean up.
-        TryDelete(_workDir);
-        TryDelete(_hive);
     }
 
     [Fact]
@@ -185,5 +177,13 @@ public sealed class TemplatePackTests : IDisposable
         process.WaitForExit(120_000);
 
         return process.HasExited && process.ExitCode == 0;
+    }
+
+    public void Dispose()
+    {
+        // The hive is isolated to this test instance, so deleting it fully uninstalls the pack — no
+        // global state to clean up.
+        TryDelete(_workDir);
+        TryDelete(_hive);
     }
 }

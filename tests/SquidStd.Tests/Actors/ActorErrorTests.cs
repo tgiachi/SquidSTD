@@ -9,7 +9,7 @@ public class ActorErrorTests
     [Fact]
     public async Task Isolate_KeepsProcessingAfterHandlerThrows()
     {
-        await using var actor = new ProbeActor();   // default Isolate
+        await using var actor = new ProbeActor(); // default Isolate
 
         await actor.TellAsync(new Append("a"));
         await actor.TellAsync(new Boom());
@@ -26,8 +26,8 @@ public class ActorErrorTests
     {
         await using var actor = new ProbeActor();
 
-        var ex = await Assert.ThrowsAsync<InvalidOperationException>(
-            () => actor.AskAsync<FailingRequest, string>(new FailingRequest())
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            actor.AskAsync<FailingRequest, string>(new FailingRequest())
         );
 
         Assert.Equal("ask-boom", ex.Message);
@@ -40,11 +40,10 @@ public class ActorErrorTests
             new ActorOptions { ErrorPolicy = ActorErrorPolicy.StopOnError }
         );
 
-        await actor.TellAsync(new Boom());   // faults the mailbox
+        await actor.TellAsync(new Boom()); // faults the mailbox
         await Task.Delay(50);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            () => actor.AskAsync<GetLog, string>(new GetLog())
+        await Assert.ThrowsAsync<InvalidOperationException>(() => actor.AskAsync<GetLog, string>(new GetLog())
         );
     }
 }

@@ -10,23 +10,6 @@ namespace SquidStd.Search.Elasticsearch.Extensions;
 /// <summary>DryIoc registration helpers for the Elasticsearch search provider.</summary>
 public static class SearchRegistrationExtensions
 {
-    extension(IContainer container)
-    {
-        /// <summary>Registers the Elasticsearch client, transport helper, and <see cref="ISearchService" />.</summary>
-        public IContainer AddElasticsearch(ElasticsearchOptions options)
-        {
-            ArgumentNullException.ThrowIfNull(container);
-            ArgumentNullException.ThrowIfNull(options);
-
-            container.RegisterInstance(options);
-            container.RegisterDelegate(_ => CreateClient(options), Reuse.Singleton);
-            container.Register<ElasticTransport>(Reuse.Singleton);
-            container.Register<ISearchService, ElasticSearchService>(Reuse.Singleton);
-
-            return container;
-        }
-    }
-
     private static ElasticsearchClient CreateClient(ElasticsearchOptions options)
     {
         var settings = new ElasticsearchClientSettings(options.Uri);
@@ -46,5 +29,22 @@ public static class SearchRegistrationExtensions
         }
 
         return new ElasticsearchClient(settings);
+    }
+
+    extension(IContainer container)
+    {
+        /// <summary>Registers the Elasticsearch client, transport helper, and <see cref="ISearchService" />.</summary>
+        public IContainer AddElasticsearch(ElasticsearchOptions options)
+        {
+            ArgumentNullException.ThrowIfNull(container);
+            ArgumentNullException.ThrowIfNull(options);
+
+            container.RegisterInstance(options);
+            container.RegisterDelegate(_ => CreateClient(options), Reuse.Singleton);
+            container.Register<ElasticTransport>(Reuse.Singleton);
+            container.Register<ISearchService, ElasticSearchService>(Reuse.Singleton);
+
+            return container;
+        }
     }
 }

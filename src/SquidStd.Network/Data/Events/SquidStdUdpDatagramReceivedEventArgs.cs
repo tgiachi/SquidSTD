@@ -7,15 +7,15 @@ namespace SquidStd.Network.Data.Events;
 /// </summary>
 public sealed class SquidStdUdpDatagramReceivedEventArgs : EventArgs
 {
-    public SquidStdUdpDatagramReceivedEventArgs(IPEndPoint remoteEndPoint, ReadOnlyMemory<byte> data)
-    {
-        RemoteEndPoint = remoteEndPoint;
-        Data = data;
-    }
-
     /// <summary>Endpoint that sent the datagram.</summary>
     public IPEndPoint RemoteEndPoint { get; }
 
     /// <summary>Received datagram payload.</summary>
     public ReadOnlyMemory<byte> Data { get; }
+
+    public SquidStdUdpDatagramReceivedEventArgs(IPEndPoint remoteEndPoint, ReadOnlyMemory<byte> data)
+    {
+        RemoteEndPoint = remoteEndPoint;
+        Data = data;
+    }
 }

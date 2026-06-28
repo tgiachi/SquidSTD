@@ -202,31 +202,6 @@ public sealed class SqsQueueProvider : IQueueProvider
             _handler = handler;
         }
 
-        public void Dispose()
-        {
-            if (Interlocked.Exchange(ref _disposed, 1) != 0)
-            {
-                return;
-            }
-
-            _cts.Cancel();
-
-            try
-            {
-                _loop?.GetAwaiter().GetResult();
-            }
-            catch
-            {
-                // Best-effort teardown.
-            }
-
-            _cts.Dispose();
-            _provider._metrics.SetSubscriberCount(
-                _queueName,
-                _provider._subscriberCounts.AddOrUpdate(_queueName, 0, static (_, count) => Math.Max(0, count - 1))
-            );
-        }
-
         public void Start()
         {
             _loop = Task.Run(() => RunAsync(_cts.Token));
@@ -299,6 +274,31 @@ public sealed class SqsQueueProvider : IQueueProvider
                     }
                 }
             }
+        }
+
+        public void Dispose()
+        {
+            if (Interlocked.Exchange(ref _disposed, 1) != 0)
+            {
+                return;
+            }
+
+            _cts.Cancel();
+
+            try
+            {
+                _loop?.GetAwaiter().GetResult();
+            }
+            catch
+            {
+                // Best-effort teardown.
+            }
+
+            _cts.Dispose();
+            _provider._metrics.SetSubscriberCount(
+                _queueName,
+                _provider._subscriberCounts.AddOrUpdate(_queueName, 0, static (_, count) => Math.Max(0, count - 1))
+            );
         }
     }
 }

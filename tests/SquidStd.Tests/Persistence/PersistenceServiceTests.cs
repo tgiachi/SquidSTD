@@ -7,12 +7,6 @@ namespace SquidStd.Tests.Persistence;
 
 public sealed class PersistenceServiceTests : IDisposable
 {
-    private sealed class Player
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-    }
-
     private readonly string _dir = Path.Combine(Path.GetTempPath(), "squidstd-persistence-" + Guid.NewGuid().ToString("N"));
 
     private (PersistenceService Service, PersistenceEntityRegistry Registry) Create()
@@ -95,5 +89,11 @@ public sealed class PersistenceServiceTests : IDisposable
         {
             Directory.Delete(_dir, true);
         }
+    }
+
+    private sealed class Player
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }

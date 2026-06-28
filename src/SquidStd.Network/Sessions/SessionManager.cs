@@ -20,6 +20,12 @@ public sealed class SessionManager<TState> : ISessionManager<TState>, IDisposabl
     private readonly Func<INetworkConnection, TState> _stateFactory;
     private int _disposed;
 
+    /// <inheritdoc />
+    public int Count => _sessions.Count;
+
+    /// <inheritdoc />
+    public IReadOnlyCollection<Session<TState>> Sessions => _sessions.Values.ToArray();
+
     public SessionManager(SquidTcpServer server, Func<INetworkConnection, TState> stateFactory)
     {
         ArgumentNullException.ThrowIfNull(server);
@@ -32,34 +38,6 @@ public sealed class SessionManager<TState> : ISessionManager<TState>, IDisposabl
         _server.OnClientDisconnect += HandleServerClientDisconnect;
         _server.OnDataReceived += HandleServerDataReceived;
     }
-
-    public void Dispose()
-    {
-        if (Interlocked.Exchange(ref _disposed, 1) != 0)
-        {
-            return;
-        }
-
-        _server.OnClientConnect -= HandleServerClientConnect;
-        _server.OnClientDisconnect -= HandleServerClientDisconnect;
-        _server.OnDataReceived -= HandleServerDataReceived;
-        _sessions.Clear();
-    }
-
-    /// <inheritdoc />
-    public int Count => _sessions.Count;
-
-    /// <inheritdoc />
-    public IReadOnlyCollection<Session<TState>> Sessions => _sessions.Values.ToArray();
-
-    /// <inheritdoc />
-    public event EventHandler<SquidStdSessionEventArgs<TState>>? OnSessionCreated;
-
-    /// <inheritdoc />
-    public event EventHandler<SquidStdSessionEventArgs<TState>>? OnSessionRemoved;
-
-    /// <inheritdoc />
-    public event EventHandler<SquidStdSessionDataEventArgs<TState>>? OnSessionData;
 
     /// <inheritdoc />
     public async Task BroadcastAsync(ReadOnlyMemory<byte> payload, CancellationToken cancellationToken = default)
@@ -198,4 +176,26 @@ public sealed class SessionManager<TState> : ISessionManager<TState>, IDisposabl
             _logger.Warning(ex, "Broadcast send failed for session {SessionId}", session.SessionId);
         }
     }
+
+    public void Dispose()
+    {
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
+        {
+            return;
+        }
+
+        _server.OnClientConnect -= HandleServerClientConnect;
+        _server.OnClientDisconnect -= HandleServerClientDisconnect;
+        _server.OnDataReceived -= HandleServerDataReceived;
+        _sessions.Clear();
+    }
+
+    /// <inheritdoc />
+    public event EventHandler<SquidStdSessionEventArgs<TState>>? OnSessionCreated;
+
+    /// <inheritdoc />
+    public event EventHandler<SquidStdSessionEventArgs<TState>>? OnSessionRemoved;
+
+    /// <inheritdoc />
+    public event EventHandler<SquidStdSessionDataEventArgs<TState>>? OnSessionData;
 }

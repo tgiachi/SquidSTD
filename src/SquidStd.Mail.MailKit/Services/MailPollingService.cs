@@ -42,12 +42,6 @@ public sealed class MailPollingService : ISquidStdService, IDisposable
     }
 
     /// <inheritdoc />
-    public void Dispose()
-    {
-        _gate.Dispose();
-    }
-
-    /// <inheritdoc />
     public ValueTask StartAsync(CancellationToken cancellationToken = default)
     {
         _timerId = _timer.RegisterTimer("mail-poll", _interval, OnTick, _interval, true);
@@ -97,5 +91,11 @@ public sealed class MailPollingService : ISquidStdService, IDisposable
     private void OnTick()
     {
         _ = PollOnceAsync();
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        _gate.Dispose();
     }
 }

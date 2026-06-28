@@ -8,25 +8,6 @@ namespace SquidStd.Messaging.Abstractions.Data.Config;
 /// </summary>
 public sealed class MessagingConnectionString
 {
-    private MessagingConnectionString(
-        string scheme,
-        string host,
-        int? port,
-        string? userName,
-        string? password,
-        string virtualHost,
-        IReadOnlyDictionary<string, string> parameters
-    )
-    {
-        Scheme = scheme;
-        Host = host;
-        Port = port;
-        UserName = userName;
-        Password = password;
-        VirtualHost = virtualHost;
-        Parameters = parameters;
-    }
-
     /// <summary>URI scheme, e.g. "memory" or "rabbitmq".</summary>
     public string Scheme { get; }
 
@@ -47,6 +28,25 @@ public sealed class MessagingConnectionString
 
     /// <summary>Query-string parameters.</summary>
     public IReadOnlyDictionary<string, string> Parameters { get; }
+
+    private MessagingConnectionString(
+        string scheme,
+        string host,
+        int? port,
+        string? userName,
+        string? password,
+        string virtualHost,
+        IReadOnlyDictionary<string, string> parameters
+    )
+    {
+        Scheme = scheme;
+        Host = host;
+        Port = port;
+        UserName = userName;
+        Password = password;
+        VirtualHost = virtualHost;
+        Parameters = parameters;
+    }
 
     /// <summary>Parses a messaging connection string.</summary>
     public static MessagingConnectionString Parse(string connectionString)

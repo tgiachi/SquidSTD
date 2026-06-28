@@ -9,16 +9,6 @@ namespace SquidStd.Network.Sessions;
 /// <typeparam name="TState">Application-defined per-connection state.</typeparam>
 public sealed class Session<TState>
 {
-    public Session(long sessionId, INetworkConnection connection, TState state, DateTimeOffset createdAtUtc)
-    {
-        ArgumentNullException.ThrowIfNull(connection);
-
-        Connection = connection;
-        SessionId = sessionId;
-        State = state;
-        CreatedAtUtc = createdAtUtc;
-    }
-
     /// <summary>Unique connection identifier assigned by the transport.</summary>
     public long SessionId { get; }
 
@@ -36,6 +26,16 @@ public sealed class Session<TState>
 
     /// <summary>Whether the underlying connection is still open.</summary>
     public bool IsConnected => Connection.IsConnected;
+
+    public Session(long sessionId, INetworkConnection connection, TState state, DateTimeOffset createdAtUtc)
+    {
+        ArgumentNullException.ThrowIfNull(connection);
+
+        Connection = connection;
+        SessionId = sessionId;
+        State = state;
+        CreatedAtUtc = createdAtUtc;
+    }
 
     /// <summary>Closes the underlying connection.</summary>
     public Task CloseAsync(CancellationToken cancellationToken = default)

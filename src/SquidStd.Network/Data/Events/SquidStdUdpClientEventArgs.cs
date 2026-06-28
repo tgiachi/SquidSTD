@@ -7,13 +7,13 @@ namespace SquidStd.Network.Data.Events;
 /// </summary>
 public sealed class SquidStdUdpClientEventArgs : EventArgs
 {
-    public SquidStdUdpClientEventArgs(SquidStdUdpClient client)
-    {
-        Client = client;
-    }
-
     /// <summary>
     ///     Started or closed UDP client.
     /// </summary>
     public SquidStdUdpClient Client { get; }
+
+    public SquidStdUdpClientEventArgs(SquidStdUdpClient client)
+    {
+        Client = client;
+    }
 }

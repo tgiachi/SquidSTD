@@ -4,6 +4,14 @@ namespace SquidStd.Generators.Workers;
 
 internal sealed class JobHandlerRegistrationCandidate
 {
+    public string HandlerTypeName { get; }
+
+    public string DisplayName { get; }
+
+    public Location? Location { get; }
+
+    public bool IsSupported { get; }
+
     public JobHandlerRegistrationCandidate(
         string handlerTypeName,
         string displayName,
@@ -16,12 +24,4 @@ internal sealed class JobHandlerRegistrationCandidate
         Location = location;
         IsSupported = isSupported;
     }
-
-    public string HandlerTypeName { get; }
-
-    public string DisplayName { get; }
-
-    public Location? Location { get; }
-
-    public bool IsSupported { get; }
 }

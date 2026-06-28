@@ -14,14 +14,14 @@ public class ActorOverflowTests
             new ActorOptions { Capacity = 2, OverflowPolicy = ActorOverflowPolicy.Wait }
         );
 
-        await actor.TellAsync(new Hold(gate));     // occupies the consumer (slot 1)
-        await actor.TellAsync(new Append("a"));    // buffered (slot 2) -> full
+        await actor.TellAsync(new Hold(gate));  // occupies the consumer (slot 1)
+        await actor.TellAsync(new Append("a")); // buffered (slot 2) -> full
 
         var blocked = actor.TellAsync(new Append("b")).AsTask();
         await Task.Delay(50);
         Assert.False(blocked.IsCompleted);
 
-        gate.SetResult();                          // release the consumer
+        gate.SetResult(); // release the consumer
         Assert.True(await blocked);
     }
 
@@ -33,7 +33,7 @@ public class ActorOverflowTests
             new ActorOptions { Capacity = 1, OverflowPolicy = ActorOverflowPolicy.DropNewest }
         );
 
-        await actor.TellAsync(new Hold(gate));     // occupies the only slot
+        await actor.TellAsync(new Hold(gate)); // occupies the only slot
 
         var accepted = await actor.TellAsync(new Append("dropped"));
 

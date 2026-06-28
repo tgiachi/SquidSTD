@@ -39,6 +39,21 @@ public sealed class SquidTcpServer : INetworkServer, IAsyncDisposable, IDisposab
     private int _started;
 
     /// <summary>
+    ///     Transport type exposed by this server.
+    /// </summary>
+    public ServerType ServerType => ServerType.TCP;
+
+    /// <summary>
+    ///     Current listening port. Returns 0 when the server is stopped.
+    /// </summary>
+    public int Port => ((IPEndPoint?)_serverSocket?.LocalEndPoint)?.Port ?? 0;
+
+    /// <summary>
+    ///     True when the server is currently accepting connections.
+    /// </summary>
+    public bool IsRunning => Volatile.Read(ref _started) != 0;
+
+    /// <summary>
     ///     Initializes a TCP server bound to the given endpoint.
     /// </summary>
     /// <param name="endPoint">Endpoint to bind on every <c>StartAsync</c>.</param>
@@ -69,27 +84,6 @@ public sealed class SquidTcpServer : INetworkServer, IAsyncDisposable, IDisposab
         _tlsOptions = tlsOptions;
         _connectionPipelineFactory = connectionPipelineFactory;
     }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        DisposeAsync().AsTask().GetAwaiter().GetResult();
-    }
-
-    /// <summary>
-    ///     Transport type exposed by this server.
-    /// </summary>
-    public ServerType ServerType => ServerType.TCP;
-
-    /// <summary>
-    ///     Current listening port. Returns 0 when the server is stopped.
-    /// </summary>
-    public int Port => ((IPEndPoint?)_serverSocket?.LocalEndPoint)?.Port ?? 0;
-
-    /// <summary>
-    ///     True when the server is currently accepting connections.
-    /// </summary>
-    public bool IsRunning => Volatile.Read(ref _started) != 0;
 
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
@@ -174,26 +168,6 @@ public sealed class SquidTcpServer : INetworkServer, IAsyncDisposable, IDisposab
         _listenerCancellationTokenSource = null;
         _acceptLoopTask = null;
     }
-
-    /// <summary>
-    ///     Raised when a client connects.
-    /// </summary>
-    public event EventHandler<SquidStdTcpClientEventArgs>? OnClientConnect;
-
-    /// <summary>
-    ///     Raised when a client disconnects.
-    /// </summary>
-    public event EventHandler<SquidStdTcpClientEventArgs>? OnClientDisconnect;
-
-    /// <summary>
-    ///     Raised when a client sends data after middleware processing.
-    /// </summary>
-    public event EventHandler<SquidStdTcpDataReceivedEventArgs>? OnDataReceived;
-
-    /// <summary>
-    ///     Raised when an exception happens in accept loop or client loops.
-    /// </summary>
-    public event EventHandler<SquidStdTcpExceptionEventArgs>? OnException;
 
     /// <summary>
     ///     Registers middleware in execution order.
@@ -329,4 +303,30 @@ public sealed class SquidTcpServer : INetworkServer, IAsyncDisposable, IDisposab
             OnClientDisconnect?.Invoke(this, args);
         };
     }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        DisposeAsync().AsTask().GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    ///     Raised when a client connects.
+    /// </summary>
+    public event EventHandler<SquidStdTcpClientEventArgs>? OnClientConnect;
+
+    /// <summary>
+    ///     Raised when a client disconnects.
+    /// </summary>
+    public event EventHandler<SquidStdTcpClientEventArgs>? OnClientDisconnect;
+
+    /// <summary>
+    ///     Raised when a client sends data after middleware processing.
+    /// </summary>
+    public event EventHandler<SquidStdTcpDataReceivedEventArgs>? OnDataReceived;
+
+    /// <summary>
+    ///     Raised when an exception happens in accept loop or client loops.
+    /// </summary>
+    public event EventHandler<SquidStdTcpExceptionEventArgs>? OnException;
 }

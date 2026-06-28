@@ -45,25 +45,23 @@ public class SeededCommandDispatcherTests
 
     private sealed class Connection
     {
+        public string Id { get; }
+
         public Connection(string id)
         {
             Id = id;
         }
-
-        public string Id { get; }
     }
 
     private sealed class Session
     {
+        public string Id { get; }
+
         public Session(string id)
         {
             Id = id;
         }
-
-        public string Id { get; }
     }
-
-    private sealed record PingCommand(string Text) : ICommand;
 
     private sealed class ConnectionSessionFactory : ICommandContextFactory<Session, Connection>
     {
@@ -102,4 +100,6 @@ public class SeededCommandDispatcherTests
             return Task.CompletedTask;
         }
     }
+
+    private sealed record PingCommand(string Text) : ICommand;
 }

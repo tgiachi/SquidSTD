@@ -10,19 +10,6 @@ public class DirectoriesConfig
     private readonly string[] _directories;
 
     /// <summary>
-    ///     Initializes a new instance of the DirectoriesConfig class.
-    /// </summary>
-    /// <param name="rootDirectory">The root directory path.</param>
-    /// <param name="directories">The array of directory types.</param>
-    public DirectoriesConfig(string rootDirectory, string[] directories)
-    {
-        _directories = directories;
-        Root = rootDirectory;
-
-        Init();
-    }
-
-    /// <summary>
     ///     Gets the root directory path.
     /// </summary>
     public string Root { get; }
@@ -40,6 +27,19 @@ public class DirectoriesConfig
     /// <param name="directoryType">The directory type enum.</param>
     /// <returns>The path for the directory type.</returns>
     public string this[Enum directoryType] => GetPath(directoryType.ToString());
+
+    /// <summary>
+    ///     Initializes a new instance of the DirectoriesConfig class.
+    /// </summary>
+    /// <param name="rootDirectory">The root directory path.</param>
+    /// <param name="directories">The array of directory types.</param>
+    public DirectoriesConfig(string rootDirectory, string[] directories)
+    {
+        _directories = directories;
+        Root = rootDirectory;
+
+        Init();
+    }
 
     /// <summary>
     ///     Gets the path for the specified directory type enum.

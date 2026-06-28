@@ -27,18 +27,6 @@ public sealed class TelemetryService : ISquidStdService, IDisposable
         _bridge = bridge;
     }
 
-    public void Dispose()
-    {
-        if (Interlocked.Exchange(ref _disposed, 1) != 0)
-        {
-            return;
-        }
-
-        _meterProvider?.Dispose();
-        _tracerProvider?.Dispose();
-        _bridge.Dispose();
-    }
-
     /// <inheritdoc />
     public ValueTask StartAsync(CancellationToken cancellationToken = default)
     {
@@ -75,5 +63,17 @@ public sealed class TelemetryService : ISquidStdService, IDisposable
         Dispose();
 
         return ValueTask.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
+        {
+            return;
+        }
+
+        _meterProvider?.Dispose();
+        _tracerProvider?.Dispose();
+        _bridge.Dispose();
     }
 }

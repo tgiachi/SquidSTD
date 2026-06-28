@@ -151,37 +151,6 @@ public sealed class SqsTopicProvider : ITopicProvider
             _handler = handler;
         }
 
-        public void Dispose()
-        {
-            if (Interlocked.Exchange(ref _disposed, 1) != 0)
-            {
-                return;
-            }
-
-            _cts.Cancel();
-
-            try
-            {
-                _loop?.GetAwaiter().GetResult();
-
-                if (_subscriptionArn is not null)
-                {
-                    _provider._sns!.UnsubscribeAsync(_subscriptionArn).GetAwaiter().GetResult();
-                }
-
-                if (_queueUrl is not null)
-                {
-                    _provider._sqs!.DeleteQueueAsync(_queueUrl).GetAwaiter().GetResult();
-                }
-            }
-            catch
-            {
-                // Best-effort teardown.
-            }
-
-            _cts.Dispose();
-        }
-
         public void Start()
         {
             _loop = Task.Run(() => RunAsync(_cts.Token));
@@ -315,6 +284,37 @@ public sealed class SqsTopicProvider : ITopicProvider
                     }
                 }
             }
+        }
+
+        public void Dispose()
+        {
+            if (Interlocked.Exchange(ref _disposed, 1) != 0)
+            {
+                return;
+            }
+
+            _cts.Cancel();
+
+            try
+            {
+                _loop?.GetAwaiter().GetResult();
+
+                if (_subscriptionArn is not null)
+                {
+                    _provider._sns!.UnsubscribeAsync(_subscriptionArn).GetAwaiter().GetResult();
+                }
+
+                if (_queueUrl is not null)
+                {
+                    _provider._sqs!.DeleteQueueAsync(_queueUrl).GetAwaiter().GetResult();
+                }
+            }
+            catch
+            {
+                // Best-effort teardown.
+            }
+
+            _cts.Dispose();
         }
     }
 }

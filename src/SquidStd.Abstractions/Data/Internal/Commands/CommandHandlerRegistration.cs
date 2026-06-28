@@ -13,4 +13,5 @@ namespace SquidStd.Abstractions.Data.Internal.Commands;
 /// <param name="Subscribe">Resolves the handler and subscribes it to the dispatcher.</param>
 public sealed record CommandHandlerRegistration<TContext>(
     Type HandlerType,
-    Action<ICommandDispatcher<TContext>, IResolverContext> Subscribe);
+    Action<ICommandDispatcher<TContext>, IResolverContext> Subscribe
+);

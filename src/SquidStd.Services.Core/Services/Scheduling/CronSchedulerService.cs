@@ -24,12 +24,6 @@ public sealed class CronSchedulerService : ICronScheduler, ISquidStdService, IDi
     private readonly ITimerService _timer;
     private int _disposed;
 
-    public CronSchedulerService(ITimerService timer, IJobSystem jobs)
-    {
-        _timer = timer;
-        _jobs = jobs;
-    }
-
     /// <inheritdoc />
     public IReadOnlyCollection<CronJobInfo> Jobs
         => _entries.Values
@@ -45,6 +39,12 @@ public sealed class CronSchedulerService : ICronScheduler, ISquidStdService, IDi
                 }
             )
             .ToArray();
+
+    public CronSchedulerService(ITimerService timer, IJobSystem jobs)
+    {
+        _timer = timer;
+        _jobs = jobs;
+    }
 
     /// <inheritdoc />
     public string Schedule(string name, string cronExpression, Func<CancellationToken, Task> handler)
@@ -101,18 +101,6 @@ public sealed class CronSchedulerService : ICronScheduler, ISquidStdService, IDi
         }
 
         return removed;
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        if (Interlocked.Exchange(ref _disposed, 1) != 0)
-        {
-            return;
-        }
-
-        _cts.Cancel();
-        _cts.Dispose();
     }
 
     /// <inheritdoc />
@@ -203,5 +191,17 @@ public sealed class CronSchedulerService : ICronScheduler, ISquidStdService, IDi
 
         entry.NextOccurrenceUtc = next.Value;
         entry.TimerId = _timer.RegisterTimer(entry.Name, delay, () => OnTimer(entry));
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
+        {
+            return;
+        }
+
+        _cts.Cancel();
+        _cts.Dispose();
     }
 }

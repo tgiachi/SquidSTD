@@ -25,6 +25,12 @@ public sealed class SquidStdBootstrap : ISquidStdBootstrap
     private bool _loggerConfigured;
     private BootstrapStateType _state;
 
+    /// <inheritdoc />
+    public SquidStdOptions Options { get; }
+
+    /// <inheritdoc />
+    public IContainer Container { get; }
+
     /// <summary>
     ///     Initializes a bootstrapper with default options.
     /// </summary>
@@ -58,12 +64,6 @@ public sealed class SquidStdBootstrap : ISquidStdBootstrap
         Container.RegisterInstance(Options, IfAlreadyRegistered.Replace);
         Container.RegisterCoreServices(Options.ConfigName, Options.RootDirectory);
     }
-
-    /// <inheritdoc />
-    public SquidStdOptions Options { get; }
-
-    /// <inheritdoc />
-    public IContainer Container { get; }
 
     /// <inheritdoc />
     public ISquidStdBootstrap ConfigureService(Func<IContainer, IContainer> configure)

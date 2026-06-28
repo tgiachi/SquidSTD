@@ -84,9 +84,9 @@ public abstract class Actor<TMessage> : IAsyncDisposable
 
         _outstanding[request] = 0;
 
-        using var registration = cancellationToken.Register(
-            () => request.Fail(new OperationCanceledException(cancellationToken))
-        );
+        using var registration =
+            cancellationToken.Register(() => request.Fail(new OperationCanceledException(cancellationToken))
+            );
 
         try
         {

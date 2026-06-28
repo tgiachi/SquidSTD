@@ -135,13 +135,13 @@ public class WorkerSystemIntegrationTests
     {
         private readonly TaskCompletionSource<JobRequest> _completion;
 
+        public string JobName { get; }
+
         public CapturingJobHandler(string jobName, TaskCompletionSource<JobRequest> completion)
         {
             JobName = jobName;
             _completion = completion;
         }
-
-        public string JobName { get; }
 
         public Task HandleAsync(JobRequest job, CancellationToken cancellationToken)
         {

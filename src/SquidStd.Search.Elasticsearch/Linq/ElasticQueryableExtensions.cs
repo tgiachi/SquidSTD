@@ -9,6 +9,14 @@ namespace SquidStd.Search.Elasticsearch.Linq;
 /// </summary>
 public static class ElasticQueryableExtensions
 {
+    private static ElasticQueryProvider Provider<T>(IQueryable<T> source)
+    {
+        return source.Provider as ElasticQueryProvider ??
+               throw new NotSupportedException(
+                   "These async terminals require a query created by ISearchService.Query<T>()."
+               );
+    }
+
     extension<T>(IQueryable<T> source)
     {
         /// <summary>Executes a count of matching documents.</summary>
@@ -58,13 +66,5 @@ public static class ElasticQueryableExtensions
         {
             return Provider(source).ToListAsync<T>(source.Expression, cancellationToken);
         }
-    }
-
-    private static ElasticQueryProvider Provider<T>(IQueryable<T> source)
-    {
-        return source.Provider as ElasticQueryProvider ??
-               throw new NotSupportedException(
-                   "These async terminals require a query created by ISearchService.Query<T>()."
-               );
     }
 }

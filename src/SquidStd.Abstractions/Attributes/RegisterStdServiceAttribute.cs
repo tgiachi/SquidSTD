@@ -7,15 +7,6 @@ namespace SquidStd.Abstractions.Attributes;
 public sealed class RegisterStdServiceAttribute : Attribute
 {
     /// <summary>
-    ///     Initializes a new instance of the attribute.
-    /// </summary>
-    /// <param name="serviceType">The service contract registered for the annotated implementation.</param>
-    public RegisterStdServiceAttribute(Type? serviceType = null)
-    {
-        ServiceType = serviceType;
-    }
-
-    /// <summary>
     ///     Gets the service contract registered for the annotated implementation.
     /// </summary>
     public Type? ServiceType { get; }
@@ -24,4 +15,13 @@ public sealed class RegisterStdServiceAttribute : Attribute
     ///     Gets or sets the lifecycle start priority.
     /// </summary>
     public int Priority { get; set; }
+
+    /// <summary>
+    ///     Initializes a new instance of the attribute.
+    /// </summary>
+    /// <param name="serviceType">The service contract registered for the annotated implementation.</param>
+    public RegisterStdServiceAttribute(Type? serviceType = null)
+    {
+        ServiceType = serviceType;
+    }
 }

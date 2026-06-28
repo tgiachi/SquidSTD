@@ -5,8 +5,6 @@ namespace SquidStd.Tests.Actors;
 
 public class ActorAskTests
 {
-    private sealed record SampleRequest : ActorRequest<int>;
-
     [Fact]
     public async Task Reply_CompletesTheCompletionTask()
     {
@@ -46,7 +44,7 @@ public class ActorAskTests
     {
         var gate = new TaskCompletionSource();
         await using var actor = new ProbeActor();
-        await actor.TellAsync(new Hold(gate));   // occupy the consumer so the request waits
+        await actor.TellAsync(new Hold(gate)); // occupy the consumer so the request waits
 
         using var cts = new CancellationTokenSource();
         var ask = actor.AskAsync<GetLog, string>(new GetLog(), cts.Token);
@@ -55,4 +53,6 @@ public class ActorAskTests
         await Assert.ThrowsAsync<OperationCanceledException>(() => ask);
         gate.SetResult();
     }
+
+    private sealed record SampleRequest : ActorRequest<int>;
 }

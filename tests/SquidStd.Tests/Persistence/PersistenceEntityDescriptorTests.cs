@@ -5,13 +5,6 @@ namespace SquidStd.Tests.Persistence;
 
 public class PersistenceEntityDescriptorTests
 {
-    private sealed class Player
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public List<string> Tags { get; set; } = [];
-    }
-
     private static PersistenceEntityDescriptor<Player, int> CreateDescriptor()
     {
         var serializer = new JsonDataSerializer();
@@ -66,5 +59,12 @@ public class PersistenceEntityDescriptorTests
         var descriptor = CreateDescriptor();
 
         Assert.Equal(99, descriptor.DeserializeKey(descriptor.SerializeKey(99)));
+    }
+
+    private sealed class Player
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public List<string> Tags { get; set; } = [];
     }
 }

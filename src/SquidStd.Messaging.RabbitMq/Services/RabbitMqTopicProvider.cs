@@ -161,32 +161,6 @@ public sealed class RabbitMqTopicProvider : ITopicProvider
             _handler = handler;
         }
 
-        public void Dispose()
-        {
-            if (Interlocked.Exchange(ref _disposed, 1) != 0)
-            {
-                return;
-            }
-
-            if (_channel is not null)
-            {
-                try
-                {
-                    if (_consumerTag is not null)
-                    {
-                        _channel.BasicCancelAsync(_consumerTag).GetAwaiter().GetResult();
-                    }
-
-                    _channel.CloseAsync().GetAwaiter().GetResult();
-                    _channel.DisposeAsync().AsTask().GetAwaiter().GetResult();
-                }
-                catch
-                {
-                    // Best-effort teardown.
-                }
-            }
-        }
-
         public void Start()
         {
             StartAsync().GetAwaiter().GetResult();
@@ -217,6 +191,32 @@ public sealed class RabbitMqTopicProvider : ITopicProvider
             consumer.ReceivedAsync += OnReceivedAsync;
 
             _consumerTag = await _channel.BasicConsumeAsync(queue.QueueName, true, consumer);
+        }
+
+        public void Dispose()
+        {
+            if (Interlocked.Exchange(ref _disposed, 1) != 0)
+            {
+                return;
+            }
+
+            if (_channel is not null)
+            {
+                try
+                {
+                    if (_consumerTag is not null)
+                    {
+                        _channel.BasicCancelAsync(_consumerTag).GetAwaiter().GetResult();
+                    }
+
+                    _channel.CloseAsync().GetAwaiter().GetResult();
+                    _channel.DisposeAsync().AsTask().GetAwaiter().GetResult();
+                }
+                catch
+                {
+                    // Best-effort teardown.
+                }
+            }
         }
     }
 }

@@ -8,23 +8,6 @@ namespace SquidStd.Caching.Abstractions.Data.Config;
 /// </summary>
 public sealed class CacheConnectionString
 {
-    private CacheConnectionString(
-        string scheme,
-        string host,
-        int? port,
-        string? userName,
-        string? password,
-        IReadOnlyDictionary<string, string> parameters
-    )
-    {
-        Scheme = scheme;
-        Host = host;
-        Port = port;
-        UserName = userName;
-        Password = password;
-        Parameters = parameters;
-    }
-
     /// <summary>URI scheme, e.g. "memory" or "redis".</summary>
     public string Scheme { get; }
 
@@ -42,6 +25,23 @@ public sealed class CacheConnectionString
 
     /// <summary>Query-string parameters.</summary>
     public IReadOnlyDictionary<string, string> Parameters { get; }
+
+    private CacheConnectionString(
+        string scheme,
+        string host,
+        int? port,
+        string? userName,
+        string? password,
+        IReadOnlyDictionary<string, string> parameters
+    )
+    {
+        Scheme = scheme;
+        Host = host;
+        Port = port;
+        UserName = userName;
+        Password = password;
+        Parameters = parameters;
+    }
 
     /// <summary>Parses a cache connection string.</summary>
     public static CacheConnectionString Parse(string connectionString)

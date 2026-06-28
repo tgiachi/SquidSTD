@@ -4,6 +4,14 @@ namespace SquidStd.Generators.Scripting.Lua;
 
 internal sealed class ScriptModuleRegistrationCandidate
 {
+    public string ScriptModuleTypeName { get; }
+
+    public string DisplayName { get; }
+
+    public Location? Location { get; }
+
+    public bool IsSupported { get; }
+
     public ScriptModuleRegistrationCandidate(
         string scriptModuleTypeName,
         string displayName,
@@ -16,12 +24,4 @@ internal sealed class ScriptModuleRegistrationCandidate
         Location = location;
         IsSupported = isSupported;
     }
-
-    public string ScriptModuleTypeName { get; }
-
-    public string DisplayName { get; }
-
-    public Location? Location { get; }
-
-    public bool IsSupported { get; }
 }

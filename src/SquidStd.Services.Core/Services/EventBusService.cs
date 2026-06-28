@@ -35,18 +35,6 @@ public sealed class EventBusService : IEventBus, IDisposable
     }
 
     /// <inheritdoc />
-    public void Dispose()
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        _disposed = true;
-        _listeners.Clear();
-    }
-
-    /// <inheritdoc />
     public void Publish<TEvent>(TEvent eventData)
         where TEvent : IEvent
     {
@@ -193,5 +181,17 @@ public sealed class EventBusService : IEventBus, IDisposable
         {
             throw new ObjectDisposedException(nameof(EventBusService));
         }
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        _listeners.Clear();
     }
 }

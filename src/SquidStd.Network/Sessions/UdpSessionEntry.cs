@@ -6,12 +6,12 @@ namespace SquidStd.Network.Sessions;
 /// <typeparam name="TState">Application-defined per-connection state.</typeparam>
 internal sealed class UdpSessionEntry<TState>
 {
+    public Session<TState> Session { get; }
+    public DateTimeOffset LastActivityUtc { get; set; }
+
     public UdpSessionEntry(Session<TState> session, DateTimeOffset lastActivityUtc)
     {
         Session = session;
         LastActivityUtc = lastActivityUtc;
     }
-
-    public Session<TState> Session { get; }
-    public DateTimeOffset LastActivityUtc { get; set; }
 }

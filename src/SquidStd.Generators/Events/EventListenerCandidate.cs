@@ -4,6 +4,16 @@ namespace SquidStd.Generators.Events;
 
 internal sealed class EventListenerCandidate
 {
+    public string EventTypeName { get; }
+
+    public string ListenerTypeName { get; }
+
+    public string DisplayName { get; }
+
+    public Location? Location { get; }
+
+    public bool IsSupported { get; }
+
     public EventListenerCandidate(
         string eventTypeName,
         string listenerTypeName,
@@ -18,14 +28,4 @@ internal sealed class EventListenerCandidate
         Location = location;
         IsSupported = isSupported;
     }
-
-    public string EventTypeName { get; }
-
-    public string ListenerTypeName { get; }
-
-    public string DisplayName { get; }
-
-    public Location? Location { get; }
-
-    public bool IsSupported { get; }
 }

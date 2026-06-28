@@ -13,6 +13,8 @@ public sealed class FakeHealthCheck : IHealthCheck
     private readonly HealthCheckResult? _result;
     private readonly Exception? _throw;
 
+    public string Name { get; }
+
     public FakeHealthCheck(
         string name,
         HealthCheckResult? result = null,
@@ -25,8 +27,6 @@ public sealed class FakeHealthCheck : IHealthCheck
         _delay = delay ?? TimeSpan.Zero;
         _throw = throwException;
     }
-
-    public string Name { get; }
 
     public async ValueTask<HealthCheckResult> CheckAsync(CancellationToken cancellationToken = default)
     {

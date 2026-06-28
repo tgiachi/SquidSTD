@@ -11,12 +11,6 @@ public sealed class FakeNetworkConnection : INetworkConnection
 {
     private readonly List<byte[]> _sent = new();
 
-    public FakeNetworkConnection(long sessionId = 1, EndPoint? remoteEndPoint = null)
-    {
-        SessionId = sessionId;
-        RemoteEndPoint = remoteEndPoint ?? new IPEndPoint(IPAddress.Loopback, 1234);
-    }
-
     public IReadOnlyList<byte[]> SentPayloads => _sent;
     public int CloseCount { get; private set; }
     public Func<ReadOnlyMemory<byte>, Task>? SendCallback { get; set; }
@@ -24,6 +18,12 @@ public sealed class FakeNetworkConnection : INetworkConnection
     public long SessionId { get; }
     public EndPoint? RemoteEndPoint { get; }
     public bool IsConnected { get; private set; } = true;
+
+    public FakeNetworkConnection(long sessionId = 1, EndPoint? remoteEndPoint = null)
+    {
+        SessionId = sessionId;
+        RemoteEndPoint = remoteEndPoint ?? new IPEndPoint(IPAddress.Loopback, 1234);
+    }
 
     public Task CloseAsync(CancellationToken cancellationToken = default)
     {

@@ -7,6 +7,16 @@ namespace SquidStd.Scripting.Lua.Attributes.Scripts;
 public class ScriptFunctionAttribute : Attribute
 {
     /// <summary>
+    ///     Gets the optional name override for the script function.
+    /// </summary>
+    public string? FunctionName { get; }
+
+    /// <summary>
+    ///     Gets the optional help text describing the function's purpose.
+    /// </summary>
+    public string? HelpText { get; }
+
+    /// <summary>
     ///     Initializes a new instance of the ScriptFunctionAttribute class.
     /// </summary>
     /// <param name="functionName">The optional name override for the script function.</param>
@@ -16,14 +26,4 @@ public class ScriptFunctionAttribute : Attribute
         FunctionName = functionName;
         HelpText = helpText;
     }
-
-    /// <summary>
-    ///     Gets the optional name override for the script function.
-    /// </summary>
-    public string? FunctionName { get; }
-
-    /// <summary>
-    ///     Gets the optional help text describing the function's purpose.
-    /// </summary>
-    public string? HelpText { get; }
 }

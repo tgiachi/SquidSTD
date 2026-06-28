@@ -19,10 +19,6 @@ public sealed class ManualJobSystem : IJobSystem
 
     public long CompletedCount { get; private set; }
 
-    public void Dispose()
-    {
-    }
-
     public Task ScheduleAsync(Action work, CancellationToken cancellationToken = default)
     {
         _pending.Add(work);
@@ -51,5 +47,9 @@ public sealed class ManualJobSystem : IJobSystem
         }
 
         return snapshot.Length;
+    }
+
+    public void Dispose()
+    {
     }
 }

@@ -39,8 +39,6 @@ public class EventListenerActivatorTests
         Assert.Null(exception);
     }
 
-    private sealed record PingEvent(string Message) : IEvent;
-
     private sealed class PingListener : IEventListener<PingEvent>
     {
         public PingEvent? LastEvent { get; private set; }
@@ -52,4 +50,6 @@ public class EventListenerActivatorTests
             return Task.CompletedTask;
         }
     }
+
+    private sealed record PingEvent(string Message) : IEvent;
 }

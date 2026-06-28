@@ -31,18 +31,6 @@ public sealed class S3StorageService : IStorageService, IDisposable
     }
 
     /// <inheritdoc />
-    public void Dispose()
-    {
-        if (Interlocked.Exchange(ref _disposed, 1) != 0)
-        {
-            return;
-        }
-
-        _client.Dispose();
-        _bucketLock.Dispose();
-    }
-
-    /// <inheritdoc />
     public async ValueTask<bool> DeleteAsync(string key, CancellationToken cancellationToken = default)
     {
         if (!await ExistsAsync(key, cancellationToken))
@@ -187,5 +175,17 @@ public sealed class S3StorageService : IStorageService, IDisposable
         {
             _bucketLock.Release();
         }
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
+        {
+            return;
+        }
+
+        _client.Dispose();
+        _bucketLock.Dispose();
     }
 }

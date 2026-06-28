@@ -9,11 +9,6 @@ namespace SquidStd.Tests.Persistence;
 
 public class PersistenceRegistrationExtensionsTests
 {
-    private sealed class Player
-    {
-        public int Id { get; set; }
-    }
-
     [Fact]
     public void RegisterPersistedEntity_PopulatesRegistry()
     {
@@ -29,5 +24,10 @@ public class PersistenceRegistrationExtensionsTests
         var registry = container.Resolve<IPersistenceEntityRegistry>();
         Assert.True(registry.IsRegistered<Player, int>());
         Assert.Equal("Player", registry.GetDescriptor(1).TypeName);
+    }
+
+    private sealed class Player
+    {
+        public int Id { get; set; }
     }
 }

@@ -170,7 +170,7 @@ public sealed class FileWatcherService : IFileWatcherService
         {
             WatcherChangeTypes.Created => FileChangeKind.Created,
             WatcherChangeTypes.Deleted => FileChangeKind.Deleted,
-            _ => FileChangeKind.Changed
+            _                          => FileChangeKind.Changed
         };
 
         Schedule(new FileChangedEvent(kind, Path.GetFullPath(e.FullPath)));
@@ -183,7 +183,9 @@ public sealed class FileWatcherService : IFileWatcherService
             return;
         }
 
-        Schedule(new FileChangedEvent(FileChangeKind.Renamed, Path.GetFullPath(e.FullPath), Path.GetFullPath(e.OldFullPath)));
+        Schedule(
+            new FileChangedEvent(FileChangeKind.Renamed, Path.GetFullPath(e.FullPath), Path.GetFullPath(e.OldFullPath))
+        );
     }
 
     private void Schedule(FileChangedEvent change)

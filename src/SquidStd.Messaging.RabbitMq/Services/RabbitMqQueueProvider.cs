@@ -213,37 +213,6 @@ public sealed class RabbitMqQueueProvider : IQueueProvider
             _handler = handler;
         }
 
-        public void Dispose()
-        {
-            if (Interlocked.Exchange(ref _disposed, 1) != 0)
-            {
-                return;
-            }
-
-            if (_channel is not null)
-            {
-                try
-                {
-                    if (_consumerTag is not null)
-                    {
-                        _channel.BasicCancelAsync(_consumerTag).GetAwaiter().GetResult();
-                    }
-
-                    _channel.CloseAsync().GetAwaiter().GetResult();
-                    _channel.DisposeAsync().AsTask().GetAwaiter().GetResult();
-                }
-                catch
-                {
-                    // Best-effort teardown.
-                }
-            }
-
-            _provider._metrics.SetSubscriberCount(
-                _queueName,
-                _provider._subscriberCounts.AddOrUpdate(_queueName, 0, static (_, count) => Math.Max(0, count - 1))
-            );
-        }
-
         public void Start()
         {
             StartAsync().GetAwaiter().GetResult();
@@ -277,6 +246,37 @@ public sealed class RabbitMqQueueProvider : IQueueProvider
             consumer.ReceivedAsync += OnReceivedAsync;
 
             _consumerTag = await _channel.BasicConsumeAsync(_queueName, false, consumer);
+        }
+
+        public void Dispose()
+        {
+            if (Interlocked.Exchange(ref _disposed, 1) != 0)
+            {
+                return;
+            }
+
+            if (_channel is not null)
+            {
+                try
+                {
+                    if (_consumerTag is not null)
+                    {
+                        _channel.BasicCancelAsync(_consumerTag).GetAwaiter().GetResult();
+                    }
+
+                    _channel.CloseAsync().GetAwaiter().GetResult();
+                    _channel.DisposeAsync().AsTask().GetAwaiter().GetResult();
+                }
+                catch
+                {
+                    // Best-effort teardown.
+                }
+            }
+
+            _provider._metrics.SetSubscriberCount(
+                _queueName,
+                _provider._subscriberCounts.AddOrUpdate(_queueName, 0, static (_, count) => Math.Max(0, count - 1))
+            );
         }
     }
 }

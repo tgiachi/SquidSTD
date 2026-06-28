@@ -6,13 +6,6 @@ namespace SquidStd.Network.Data.Options;
 
 public sealed class SquidStdTcpServerTlsOptions
 {
-    public SquidStdTcpServerTlsOptions(X509Certificate2 serverCertificate)
-    {
-        ArgumentNullException.ThrowIfNull(serverCertificate);
-
-        ServerCertificate = serverCertificate;
-    }
-
     public X509Certificate2 ServerCertificate { get; }
 
     public bool ClientCertificateRequired { get; init; }
@@ -20,6 +13,13 @@ public sealed class SquidStdTcpServerTlsOptions
     public bool CheckCertificateRevocation { get; init; }
 
     public SslProtocols EnabledSslProtocols { get; init; } = SslProtocols.None;
+
+    public SquidStdTcpServerTlsOptions(X509Certificate2 serverCertificate)
+    {
+        ArgumentNullException.ThrowIfNull(serverCertificate);
+
+        ServerCertificate = serverCertificate;
+    }
 
     internal SslServerAuthenticationOptions ToAuthenticationOptions()
     {

@@ -26,6 +26,15 @@ public sealed class UdpSessionManager<TState> : ISessionManager<TState>, IDispos
     private int _disposed;
     private long _sessionIdSequence;
 
+    /// <summary>Idle period after which an inactive session is removed.</summary>
+    public TimeSpan IdleTimeout { get; }
+
+    /// <inheritdoc />
+    public int Count => _byEndpoint.Count;
+
+    /// <inheritdoc />
+    public IReadOnlyCollection<Session<TState>> Sessions => _byEndpoint.Values.Select(entry => entry.Session).ToArray();
+
     public UdpSessionManager(
         SquidStdUdpServer server,
         Func<INetworkConnection, TState> stateFactory,
@@ -49,37 +58,6 @@ public sealed class UdpSessionManager<TState> : ISessionManager<TState>, IDispos
         var interval = sweepInterval ?? TimeSpan.FromSeconds(10);
         _sweepTimer = _timeProvider.CreateTimer(_ => SafeSweep(), null, interval, interval);
     }
-
-    /// <summary>Idle period after which an inactive session is removed.</summary>
-    public TimeSpan IdleTimeout { get; }
-
-    public void Dispose()
-    {
-        if (Interlocked.Exchange(ref _disposed, 1) != 0)
-        {
-            return;
-        }
-
-        _server.OnDatagramReceived -= HandleServerDatagram;
-        _sweepTimer.Dispose();
-        _byEndpoint.Clear();
-        _byId.Clear();
-    }
-
-    /// <inheritdoc />
-    public int Count => _byEndpoint.Count;
-
-    /// <inheritdoc />
-    public IReadOnlyCollection<Session<TState>> Sessions => _byEndpoint.Values.Select(entry => entry.Session).ToArray();
-
-    /// <inheritdoc />
-    public event EventHandler<SquidStdSessionEventArgs<TState>>? OnSessionCreated;
-
-    /// <inheritdoc />
-    public event EventHandler<SquidStdSessionEventArgs<TState>>? OnSessionRemoved;
-
-    /// <inheritdoc />
-    public event EventHandler<SquidStdSessionDataEventArgs<TState>>? OnSessionData;
 
     /// <inheritdoc />
     public async Task BroadcastAsync(ReadOnlyMemory<byte> payload, CancellationToken cancellationToken = default)
@@ -296,4 +274,26 @@ public sealed class UdpSessionManager<TState> : ISessionManager<TState>, IDispos
             _logger.Warning(ex, "Broadcast send failed for session {SessionId}", session.SessionId);
         }
     }
+
+    public void Dispose()
+    {
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
+        {
+            return;
+        }
+
+        _server.OnDatagramReceived -= HandleServerDatagram;
+        _sweepTimer.Dispose();
+        _byEndpoint.Clear();
+        _byId.Clear();
+    }
+
+    /// <inheritdoc />
+    public event EventHandler<SquidStdSessionEventArgs<TState>>? OnSessionCreated;
+
+    /// <inheritdoc />
+    public event EventHandler<SquidStdSessionEventArgs<TState>>? OnSessionRemoved;
+
+    /// <inheritdoc />
+    public event EventHandler<SquidStdSessionDataEventArgs<TState>>? OnSessionData;
 }

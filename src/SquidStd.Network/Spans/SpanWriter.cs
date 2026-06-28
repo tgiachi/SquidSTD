@@ -53,57 +53,12 @@ public ref struct SpanWriter : IDisposable
         BytesWritten = 0;
     }
 
-    /// <summary>
-    ///     Represents SpanOwner.
-    /// </summary>
-    public struct SpanOwner : IDisposable
-    {
-        private readonly int _length;
-        private readonly byte[]? _buffer;
-        private readonly bool _isPooled;
-
-        public Span<byte> Span
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _buffer is null ? Span<byte>.Empty : _buffer.AsSpan(0, _length);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal SpanOwner(int length, byte[]? buffer, bool isPooled)
-        {
-            _length = length;
-            _buffer = buffer;
-            _isPooled = isPooled;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Dispose()
-        {
-            if (_isPooled && _buffer is not null)
-            {
-                ArrayPool<byte>.Shared.Return(_buffer);
-            }
-        }
-    }
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Clear(int count)
     {
         GrowIfNeeded(count);
         _buffer.Slice(_position, count).Clear();
         Position += count;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Dispose()
-    {
-        var toReturn = _arrayToReturnToPool;
-        this = default;
-
-        if (toReturn is not null)
-        {
-            ArrayPool<byte>.Shared.Return(toReturn);
-        }
     }
 
     public void EnsureCapacity(int capacity)
@@ -461,5 +416,50 @@ public ref struct SpanWriter : IDisposable
         }
 
         Grow(count);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Dispose()
+    {
+        var toReturn = _arrayToReturnToPool;
+        this = default;
+
+        if (toReturn is not null)
+        {
+            ArrayPool<byte>.Shared.Return(toReturn);
+        }
+    }
+
+    /// <summary>
+    ///     Represents SpanOwner.
+    /// </summary>
+    public struct SpanOwner : IDisposable
+    {
+        private readonly int _length;
+        private readonly byte[]? _buffer;
+        private readonly bool _isPooled;
+
+        public Span<byte> Span
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _buffer is null ? Span<byte>.Empty : _buffer.AsSpan(0, _length);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal SpanOwner(int length, byte[]? buffer, bool isPooled)
+        {
+            _length = length;
+            _buffer = buffer;
+            _isPooled = isPooled;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Dispose()
+        {
+            if (_isPooled && _buffer is not null)
+            {
+                ArrayPool<byte>.Shared.Return(_buffer);
+            }
+        }
     }
 }

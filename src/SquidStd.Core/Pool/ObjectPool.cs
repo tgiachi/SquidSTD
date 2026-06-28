@@ -20,6 +20,11 @@ public sealed class ObjectPool<T> : IDisposable
     private bool _disposed;
 
     /// <summary>
+    ///     Gets the number of instances currently retained for reuse.
+    /// </summary>
+    public int Count => Volatile.Read(ref _retained);
+
+    /// <summary>
     ///     Initializes the pool.
     /// </summary>
     /// <param name="factory">Creates a new instance when the pool is empty.</param>
@@ -38,11 +43,6 @@ public sealed class ObjectPool<T> : IDisposable
         _maxRetained = maxRetained;
         _onReturn = onReturn;
     }
-
-    /// <summary>
-    ///     Gets the number of instances currently retained for reuse.
-    /// </summary>
-    public int Count => Volatile.Read(ref _retained);
 
     /// <summary>
     ///     Rents an instance from the pool, creating one through the factory when the pool is empty.

@@ -51,13 +51,12 @@ public class ElasticExpressionTranslatorTests
         return ElasticExpressionTranslator.Translate(query.Expression, typeof(Doc));
     }
 
-    private sealed record Doc(string Status, int Total, string Name) : IIndexableEntity
-    {
-        public string IndexId => Name;
-    }
-
     private sealed class TranslateOnlyQueryable<T> : IOrderedQueryable<T>, IQueryProvider
     {
+        public Type ElementType => typeof(T);
+        public Expression Expression { get; }
+        public IQueryProvider Provider => this;
+
         public TranslateOnlyQueryable()
         {
             Expression = Expression.Constant(this);
@@ -67,10 +66,6 @@ public class ElasticExpressionTranslatorTests
         {
             Expression = expression;
         }
-
-        public Type ElementType => typeof(T);
-        public Expression Expression { get; }
-        public IQueryProvider Provider => this;
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -101,5 +96,10 @@ public class ElasticExpressionTranslatorTests
         {
             throw new NotSupportedException();
         }
+    }
+
+    private sealed record Doc(string Status, int Total, string Name) : IIndexableEntity
+    {
+        public string IndexId => Name;
     }
 }

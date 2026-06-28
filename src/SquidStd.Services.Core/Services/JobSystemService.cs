@@ -23,6 +23,18 @@ public sealed class JobSystemService : IJobSystem, ISquidStdService
     private int _pendingCount;
     private int _started;
 
+    /// <inheritdoc />
+    public int ActiveCount => Volatile.Read(ref _activeCount);
+
+    /// <inheritdoc />
+    public long CompletedCount => Interlocked.Read(ref _completedCount);
+
+    /// <inheritdoc />
+    public int PendingCount => Volatile.Read(ref _pendingCount);
+
+    /// <inheritdoc />
+    public int WorkerCount { get; }
+
     /// <summary>
     ///     Initializes the job system service.
     /// </summary>
@@ -40,26 +52,6 @@ public sealed class JobSystemService : IJobSystem, ISquidStdService
             }
         );
         _workers = new Thread[WorkerCount];
-    }
-
-    /// <inheritdoc />
-    public int ActiveCount => Volatile.Read(ref _activeCount);
-
-    /// <inheritdoc />
-    public long CompletedCount => Interlocked.Read(ref _completedCount);
-
-    /// <inheritdoc />
-    public int PendingCount => Volatile.Read(ref _pendingCount);
-
-    /// <inheritdoc />
-    public int WorkerCount { get; }
-
-    /// <summary>
-    ///     Releases worker resources.
-    /// </summary>
-    public void Dispose()
-    {
-        Stop(CancellationToken.None);
     }
 
     /// <inheritdoc />
@@ -320,5 +312,13 @@ public sealed class JobSystemService : IJobSystem, ISquidStdService
         {
             _logger.Error(ex, "JobSystemService worker loop terminated unexpectedly");
         }
+    }
+
+    /// <summary>
+    ///     Releases worker resources.
+    /// </summary>
+    public void Dispose()
+    {
+        Stop(CancellationToken.None);
     }
 }

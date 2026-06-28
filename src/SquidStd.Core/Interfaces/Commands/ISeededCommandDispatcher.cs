@@ -19,6 +19,8 @@ public interface ISeededCommandDispatcher<TContext, in TSeed>
     /// <param name="seed">The seed used to build the context.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The dispatch result.</returns>
-    Task<CommandDispatchResult> DispatchAsync<TCommand>(TCommand command, TSeed seed, CancellationToken cancellationToken = default)
+    Task<CommandDispatchResult> DispatchAsync<TCommand>(
+        TCommand command, TSeed seed, CancellationToken cancellationToken = default
+    )
         where TCommand : ICommand;
 }

@@ -9,39 +9,6 @@ namespace SquidStd.Scripting.Lua.Interfaces.Scripts;
 public interface IScriptEngineService : ISquidStdService
 {
     /// <summary>
-    ///     Delegate for handling script file change events.
-    /// </summary>
-    /// <param name="filePath">The path to the changed file.</param>
-    /// <returns>True if the file change was handled successfully, false otherwise.</returns>
-    delegate bool LuaFileChangedHandler(string filePath);
-
-    /// <summary>
-    ///     Event raised when a script file is modified.
-    /// </summary>
-    event LuaFileChangedHandler? FileChanged;
-
-    /// <summary>
-    ///     Event raised when a script error occurs
-    /// </summary>
-    event EventHandler<ScriptErrorInfo>? OnScriptError;
-
-    /// <summary>
-    ///     Fires once during <c>StartAsync</c>, after script modules have been registered
-    ///     but before bootstrap scripts run. Handlers can install additional UserData types, globals,
-    ///     or scanners that depend on the script runtime being ready. The argument is the underlying
-    ///     MoonSharp <c>Script</c>, typed as <see cref="object" /> so the interface stays
-    ///     implementation-agnostic; callers cast as needed.
-    /// </summary>
-    event Action<object>? AfterModulesRegistered;
-
-    /// <summary>
-    ///     Fires when a <c>.lua</c> file under a <c>components/</c> subdirectory of the scripts
-    ///     directory changes on disk. Carries the full file path. Used by the engine-side
-    ///     component loader to hot-reload Lua-defined components.
-    /// </summary>
-    event Action<string>? OnComponentFileChanged;
-
-    /// <summary>
     ///     Adds a callback function that can be called from Lua.
     /// </summary>
     /// <param name="name">The name of the callback function in Lua.</param>
@@ -178,4 +145,37 @@ public interface IScriptEngineService : ISquidStdService
     /// <param name="name">The name of the global to unregister.</param>
     /// <returns>True if the global was found and removed, false otherwise.</returns>
     bool UnregisterGlobal(string name);
+
+    /// <summary>
+    ///     Delegate for handling script file change events.
+    /// </summary>
+    /// <param name="filePath">The path to the changed file.</param>
+    /// <returns>True if the file change was handled successfully, false otherwise.</returns>
+    delegate bool LuaFileChangedHandler(string filePath);
+
+    /// <summary>
+    ///     Event raised when a script file is modified.
+    /// </summary>
+    event LuaFileChangedHandler? FileChanged;
+
+    /// <summary>
+    ///     Event raised when a script error occurs
+    /// </summary>
+    event EventHandler<ScriptErrorInfo>? OnScriptError;
+
+    /// <summary>
+    ///     Fires once during <c>StartAsync</c>, after script modules have been registered
+    ///     but before bootstrap scripts run. Handlers can install additional UserData types, globals,
+    ///     or scanners that depend on the script runtime being ready. The argument is the underlying
+    ///     MoonSharp <c>Script</c>, typed as <see cref="object" /> so the interface stays
+    ///     implementation-agnostic; callers cast as needed.
+    /// </summary>
+    event Action<object>? AfterModulesRegistered;
+
+    /// <summary>
+    ///     Fires when a <c>.lua</c> file under a <c>components/</c> subdirectory of the scripts
+    ///     directory changes on disk. Carries the full file path. Used by the engine-side
+    ///     component loader to hot-reload Lua-defined components.
+    /// </summary>
+    event Action<string>? OnComponentFileChanged;
 }

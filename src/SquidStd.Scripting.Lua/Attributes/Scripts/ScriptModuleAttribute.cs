@@ -6,6 +6,12 @@ namespace SquidStd.Scripting.Lua.Attributes.Scripts;
 [AttributeUsage(AttributeTargets.Class)]
 public class ScriptModuleAttribute : Attribute
 {
+    /// <summary>Gets the name under which the module will be accessible in Lua.</summary>
+    public string Name { get; }
+
+    /// <summary>Gets the optional help text describing the module's purpose.</summary>
+    public string? HelpText { get; }
+
     /// <summary>
     ///     Initializes a new instance of the ScriptModuleAttribute class.
     /// </summary>
@@ -18,10 +24,4 @@ public class ScriptModuleAttribute : Attribute
         Name = name;
         HelpText = helpText;
     }
-
-    /// <summary>Gets the name under which the module will be accessible in Lua.</summary>
-    public string Name { get; }
-
-    /// <summary>Gets the optional help text describing the module's purpose.</summary>
-    public string? HelpText { get; }
 }

@@ -32,18 +32,6 @@ public sealed class TimerWheelPumpService : ISquidStdService, IDisposable
     }
 
     /// <inheritdoc />
-    public void Dispose()
-    {
-        if (Interlocked.Exchange(ref _disposed, 1) != 0)
-        {
-            return;
-        }
-
-        _cts.Cancel();
-        _cts.Dispose();
-    }
-
-    /// <inheritdoc />
     public ValueTask StartAsync(CancellationToken cancellationToken = default)
     {
         _loop = Task.Run(() => PumpLoopAsync(_cts.Token), CancellationToken.None);
@@ -96,5 +84,17 @@ public sealed class TimerWheelPumpService : ISquidStdService, IDisposable
         {
             // Expected on shutdown.
         }
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
+        {
+            return;
+        }
+
+        _cts.Cancel();
+        _cts.Dispose();
     }
 }

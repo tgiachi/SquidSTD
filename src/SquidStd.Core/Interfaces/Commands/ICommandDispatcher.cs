@@ -27,6 +27,8 @@ public interface ICommandDispatcher<TContext>
     /// <param name="context">The ambient context.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The dispatch result.</returns>
-    Task<CommandDispatchResult> DispatchAsync<TCommand>(TCommand command, TContext context, CancellationToken cancellationToken = default)
+    Task<CommandDispatchResult> DispatchAsync<TCommand>(
+        TCommand command, TContext context, CancellationToken cancellationToken = default
+    )
         where TCommand : ICommand;
 }

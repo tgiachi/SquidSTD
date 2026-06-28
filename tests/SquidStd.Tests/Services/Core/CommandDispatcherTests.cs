@@ -69,8 +69,11 @@ public class CommandDispatcherTests
             }
         );
 
-        await Assert.ThrowsAsync<OperationCanceledException>(
-            () => dispatcher.DispatchAsync(new PingCommand("x"), new Session(), cts.Token)
+        await Assert.ThrowsAsync<OperationCanceledException>(() => dispatcher.DispatchAsync(
+                new PingCommand("x"),
+                new Session(),
+                cts.Token
+            )
         );
     }
 
@@ -115,8 +118,6 @@ public class CommandDispatcherTests
     {
     }
 
-    private sealed record PingCommand(string Text) : ICommand;
-
     private sealed class RecordingHandler : ICommandHandler<PingCommand, Session>
     {
         public string? LastText { get; private set; }
@@ -139,4 +140,6 @@ public class CommandDispatcherTests
             throw new InvalidOperationException("Synthetic failure.");
         }
     }
+
+    private sealed record PingCommand(string Text) : ICommand;
 }

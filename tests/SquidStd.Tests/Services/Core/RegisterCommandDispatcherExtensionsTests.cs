@@ -44,8 +44,6 @@ public class RegisterCommandDispatcherExtensionsTests
     {
     }
 
-    private sealed record PingCommand(string Text) : ICommand;
-
     private sealed class PingHandler : ICommandHandler<PingCommand, Session>
     {
         public string? LastText { get; private set; }
@@ -57,4 +55,6 @@ public class RegisterCommandDispatcherExtensionsTests
             return Task.CompletedTask;
         }
     }
+
+    private sealed record PingCommand(string Text) : ICommand;
 }

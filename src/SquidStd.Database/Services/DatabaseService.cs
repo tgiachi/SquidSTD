@@ -18,6 +18,9 @@ public sealed class DatabaseService : IDatabaseService
     private IFreeSql? _orm;
     private int _started;
 
+    /// <inheritdoc />
+    public IFreeSql Orm => _orm ?? throw new InvalidOperationException("Database service is not started.");
+
     /// <summary>
     ///     Initializes the database service.
     /// </summary>
@@ -26,9 +29,6 @@ public sealed class DatabaseService : IDatabaseService
     {
         _config = config;
     }
-
-    /// <inheritdoc />
-    public IFreeSql Orm => _orm ?? throw new InvalidOperationException("Database service is not started.");
 
     /// <inheritdoc />
     public ValueTask StartAsync(CancellationToken cancellationToken = default)

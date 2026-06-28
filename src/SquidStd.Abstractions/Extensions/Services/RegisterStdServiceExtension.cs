@@ -14,7 +14,9 @@ public static class RegisterStdServiceExtension
         {
             container.Register<TService, TImplementation>(Reuse.Singleton);
 
-            container.AddToRegisterTypedList(new ServiceRegistrationData(typeof(TService), typeof(TImplementation), priority));
+            container.AddToRegisterTypedList(
+                new ServiceRegistrationData(typeof(TService), typeof(TImplementation), priority)
+            );
 
             return container;
         }

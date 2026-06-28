@@ -15,6 +15,10 @@ internal sealed class UdpSessionConnection : INetworkConnection
     private readonly SquidStdUdpServer _server;
     private int _closed;
 
+    public long SessionId { get; }
+    public EndPoint? RemoteEndPoint => _remoteEndPoint;
+    public bool IsConnected => Volatile.Read(ref _closed) == 0;
+
     public UdpSessionConnection(SquidStdUdpServer server, IPEndPoint remoteEndPoint, long sessionId, Action onClose)
     {
         _server = server;
@@ -22,10 +26,6 @@ internal sealed class UdpSessionConnection : INetworkConnection
         SessionId = sessionId;
         _onClose = onClose;
     }
-
-    public long SessionId { get; }
-    public EndPoint? RemoteEndPoint => _remoteEndPoint;
-    public bool IsConnected => Volatile.Read(ref _closed) == 0;
 
     public Task CloseAsync(CancellationToken cancellationToken = default)
     {

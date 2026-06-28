@@ -62,6 +62,16 @@ public class LuaScriptEngineService : IScriptEngineService, IDisposable
     private FileSystemWatcher? _watcher;
 
     /// <summary>
+    ///     Gets the MoonSharp script instance.
+    /// </summary>
+    public Script LuaScript { get; }
+
+    /// <summary>
+    ///     Gets the script engine instance.
+    /// </summary>
+    public object Engine => LuaScript;
+
+    /// <summary>
     ///     Initializes a new instance of the LuaScriptEngineService class.
     /// </summary>
     /// <param name="directoriesConfig">The directories configuration.</param>
@@ -95,62 +105,6 @@ public class LuaScriptEngineService : IScriptEngineService, IDisposable
 
         LoadToUserData();
     }
-
-    /// <summary>
-    ///     Gets the MoonSharp script instance.
-    /// </summary>
-    public Script LuaScript { get; }
-
-    /// <summary>
-    ///     Gets the script engine instance.
-    /// </summary>
-    public object Engine => LuaScript;
-
-    /// <summary>
-    ///     Disposes of the resources used by the LuaScriptEngineService.
-    /// </summary>
-    public void Dispose()
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        try
-        {
-            _loadedModules.Clear();
-            _callbacks.Clear();
-            _constants.Clear();
-
-            GC.SuppressFinalize(this);
-
-            _logger.Debug("Lua engine disposed successfully");
-        }
-        catch (Exception ex)
-        {
-            _logger.Warning(ex, "Error during Lua engine disposal");
-        }
-        finally
-        {
-            _disposed = true;
-        }
-    }
-
-    /// <summary>
-    ///     Raised when a watched Lua file changes.
-    /// </summary>
-    public event IScriptEngineService.LuaFileChangedHandler? FileChanged;
-
-    /// <summary>
-    ///     Event raised when a script error occurs
-    /// </summary>
-    public event EventHandler<ScriptErrorInfo>? OnScriptError;
-
-    /// <inheritdoc />
-    public event Action<object>? AfterModulesRegistered;
-
-    /// <inheritdoc />
-    public event Action<string>? OnComponentFileChanged;
 
     /// <summary>
     ///     Adds a callback function that can be called from Lua scripts.
@@ -1510,4 +1464,50 @@ public class LuaScriptEngineService : IScriptEngineService, IDisposable
 
         RegisterEnums();
     }
+
+    /// <summary>
+    ///     Disposes of the resources used by the LuaScriptEngineService.
+    /// </summary>
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        try
+        {
+            _loadedModules.Clear();
+            _callbacks.Clear();
+            _constants.Clear();
+
+            GC.SuppressFinalize(this);
+
+            _logger.Debug("Lua engine disposed successfully");
+        }
+        catch (Exception ex)
+        {
+            _logger.Warning(ex, "Error during Lua engine disposal");
+        }
+        finally
+        {
+            _disposed = true;
+        }
+    }
+
+    /// <summary>
+    ///     Raised when a watched Lua file changes.
+    /// </summary>
+    public event IScriptEngineService.LuaFileChangedHandler? FileChanged;
+
+    /// <summary>
+    ///     Event raised when a script error occurs
+    /// </summary>
+    public event EventHandler<ScriptErrorInfo>? OnScriptError;
+
+    /// <inheritdoc />
+    public event Action<object>? AfterModulesRegistered;
+
+    /// <inheritdoc />
+    public event Action<string>? OnComponentFileChanged;
 }
