@@ -10,6 +10,24 @@
       href: concepts/abstractions-first.md
     - name: Messaging models
       href: concepts/messaging-models.md
+- name: Guides
+  items:
+    - name: Configuration
+      href: guides/configuration.md
+    - name: Observability
+      href: guides/observability.md
+    - name: Testing
+      href: guides/testing.md
+    - name: Security
+      href: guides/security.md
+    - name: Choosing a messaging backend
+      href: guides/choosing-messaging.md
+    - name: Choosing a cache
+      href: guides/choosing-caching.md
+    - name: Choosing a storage backend
+      href: guides/choosing-storage.md
+    - name: Choosing search & database
+      href: guides/choosing-search-database.md
 - name: Getting Started
   href: getting-started.md
 - name: SquidStd.Core
