@@ -21,14 +21,6 @@ with a single `AddInMemoryMessaging()` call. Ideal for single-process apps, test
 dotnet add package SquidStd.Messaging
 ```
 
-## Features
-
-- One-line registration: `container.AddInMemoryMessaging()` (facade, provider, serializer, metrics).
-- Channel-based per-queue buffering with a dedicated consumer loop.
-- Round-robin delivery across multiple subscribers of the same queue.
-- Retry with configurable max attempts and dead-letter queues (`MessagingOptions`).
-- Built-in delivery metrics via `MessagingMetricsProvider`.
-
 ## Usage
 
 ```csharp
@@ -49,6 +41,10 @@ await queue.PublishAsync("orders", new { Id = 1 });
 |-----------------------------------|-------------------------------------------|
 | `MessagingRegistrationExtensions` | `AddInMemoryMessaging(...)` registration. |
 | `InMemoryQueueProvider`           | Channel-based in-memory `IQueueProvider`. |
+
+## Related
+
+- Tutorial: [Messaging](https://tgiachi.github.io/squid-std/tutorials/messaging.html)
 
 ## License
 

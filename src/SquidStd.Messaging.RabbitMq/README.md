@@ -21,13 +21,6 @@ so the same `IMessageQueue` API publishes to and consumes from a real broker. Re
 dotnet add package SquidStd.Messaging.RabbitMq
 ```
 
-## Features
-
-- One-line registration: `container.AddRabbitMqMessaging(connectionString)` or with `RabbitMqOptions`.
-- Broker-backed `IQueueProvider` reusing the shared `IMessageQueue` facade and serializer.
-- Connection via a `rabbitmq://` connection string or explicit `RabbitMqOptions` (host/port/vhost/credentials).
-- Configurable consumer prefetch count (`?prefetch=` on the connection string, or `RabbitMqOptions.PrefetchCount`).
-
 ## Usage
 
 ```csharp
@@ -49,6 +42,10 @@ await queue.PublishAsync("orders", new { Id = 1 });
 | `RabbitMqMessagingRegistrationExtensions` | `AddRabbitMqMessaging(...)` registration. |
 | `RabbitMqQueueProvider`                   | RabbitMQ-backed `IQueueProvider`.         |
 | `RabbitMqOptions`                         | Connection + prefetch configuration.      |
+
+## Related
+
+- Tutorial: [Messaging](https://tgiachi.github.io/squid-std/tutorials/messaging.html)
 
 ## License
 

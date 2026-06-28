@@ -22,15 +22,6 @@ implementation (in-memory or RabbitMQ) from a companion package.
 dotnet add package SquidStd.Messaging.Abstractions
 ```
 
-## Features
-
-- `IMessageQueue` — typed `PublishAsync<T>` / `Subscribe<T>` facade over named queues.
-- `IQueueProvider` — the raw transport contract implemented per backend.
-- `IMessageSerializer` (+ default `JsonMessageSerializer`) — payload (de)serialization.
-- `IQueueMessageListener<T>` / `IQueueMessageListenerAsync<T>` — sync/async subscribers.
-- `IMessagingMetrics` (+ `MessagingMetricsProvider`, `NoOpMessagingMetrics`) — delivery metrics.
-- `MessagingOptions` and `MessagingConnectionString` — configuration and connection parsing.
-
 ## Usage
 
 ```csharp
@@ -58,6 +49,10 @@ public async Task PublishAsync(IMessageQueue queue)
 | `IQueueMessageListener<T>` | Subscriber callbacks.                                         |
 | `IMessagingMetrics`        | Delivery metrics sink.                                        |
 | `MessagingOptions`         | Delivery attempts, retry delay, and dead-letter-queue suffix. |
+
+## Related
+
+- Tutorial: [Messaging](https://tgiachi.github.io/squid-std/tutorials/messaging.html)
 
 ## License
 
