@@ -36,4 +36,12 @@ public interface ISecretStore
     /// <param name="value">The secret value.</param>
     /// <param name="cancellationToken">Token used to cancel the operation.</param>
     ValueTask SetAsync(string name, string value, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Enumerates stored secret names, optionally filtered by prefix.
+    /// </summary>
+    /// <param name="prefix">Optional name prefix; <c>null</c> or empty returns all names.</param>
+    /// <param name="cancellationToken">Token used to cancel the enumeration.</param>
+    /// <returns>An async sequence of secret names.</returns>
+    IAsyncEnumerable<string> ListNamesAsync(string? prefix = null, CancellationToken cancellationToken = default);
 }

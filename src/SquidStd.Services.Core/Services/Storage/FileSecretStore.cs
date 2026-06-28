@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text;
 using SquidStd.Core.Data.Storage;
 using SquidStd.Core.Interfaces.Secrets;
@@ -65,6 +66,23 @@ public sealed class FileSecretStore : ISecretStore
         var protectedData = _secretProtector.Protect(plaintext);
 
         await _storageService.SaveAsync(ToStorageKey(name), protectedData, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async IAsyncEnumerable<string> ListNamesAsync(
+        string? prefix = null, [EnumeratorCancellation] CancellationToken cancellationToken = default
+    )
+    {
+        const string suffix = ".secret";
+        var keyPrefix = string.IsNullOrEmpty(prefix) ? null : prefix;
+
+        await foreach (var key in _storageService.ListKeysAsync(keyPrefix, cancellationToken).ConfigureAwait(false))
+        {
+            if (key.EndsWith(suffix, StringComparison.Ordinal))
+            {
+                yield return key[..^suffix.Length];
+            }
+        }
     }
 
     private static string ToStorageKey(string name)
