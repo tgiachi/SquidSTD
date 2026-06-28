@@ -40,7 +40,9 @@ public sealed class ZipFileSystem : IVirtualFileSystem, IAsyncDisposable, IDispo
         return buffer.ToArray();
     }
 
-    public async ValueTask WriteAllBytesAsync(string path, ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+    public async ValueTask WriteAllBytesAsync(
+        string path, ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default
+    )
     {
         var name = VfsPath.Normalize(path);
         _archive.GetEntry(name)?.Delete();
@@ -77,7 +79,9 @@ public sealed class ZipFileSystem : IVirtualFileSystem, IAsyncDisposable, IDispo
         return ValueTask.FromResult(true);
     }
 
-    public async IAsyncEnumerable<VfsEntry> ListAsync(string? prefix = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<VfsEntry> ListAsync(
+        string? prefix = null, [EnumeratorCancellation] CancellationToken cancellationToken = default
+    )
     {
         var normalizedPrefix = string.IsNullOrEmpty(prefix) ? null : VfsPath.Normalize(prefix);
 

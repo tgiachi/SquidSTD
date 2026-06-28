@@ -23,6 +23,7 @@ public class PhysicalFileSystemTests
             {
                 entries.Add(e.Path);
             }
+
             Assert.Contains("docs/cv.pdf", entries);
 
             Assert.True(await fs.DeleteAsync("docs/cv.pdf"));

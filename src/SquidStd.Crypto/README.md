@@ -67,3 +67,46 @@ await keyring.LoadAsync(container.Resolve<IPgpKeyStore>());
   read before decrypting; the encrypt and sign stream paths flow straight through.
 - Passphrases are supplied per operation and never persisted (only passphrase-protected secret blocks are
   stored).
+
+## Crypto vault (encrypted virtual filesystem)
+
+`CryptoFileSystem` is an `ILockableFileSystem` that **decorates any `IVirtualFileSystem`**
+(`SquidStd.Vfs`), encrypting file content and names. `Crypto(Zip("vault.dat"))` is a single-file encrypted
+vault you unlock with a passphrase, write to, and lock again.
+
+```csharp
+using DryIoc;
+using SquidStd.Crypto.Vfs.Extensions;
+using SquidStd.Vfs.Abstractions.Interfaces;
+
+// Single-file vault (crypto over a zip backend), registered as a singleton.
+container.RegisterCryptoVault("/var/lib/app/vault.dat");
+
+var vault = container.Resolve<ILockableFileSystem>();
+vault.Unlock("my passphrase");          // derives the key (Argon2id)
+await vault.WriteAllBytesAsync("docs/cv.pdf", bytes);
+byte[]? back = await vault.ReadAllBytesAsync("docs/cv.pdf");
+vault.Lock();                            // flushes, prunes, zeroes the key
+```
+
+Compose other backends directly:
+
+```csharp
+using SquidStd.Crypto.Vfs.Services;
+using SquidStd.Vfs.Services;
+
+var folderVault = new CryptoFileSystem(new PhysicalFileSystem("/secure/dir"));
+```
+
+### Notes
+
+- **Unlock with a passphrase**: a 256-bit key is derived with **Argon2id** (salt + cost params live in the
+  cleartext header). Per-purpose subkeys are derived with HKDF-SHA256. The passphrase is never persisted.
+- **Per-entry encryption**: each file is stored as **chunked AES-GCM** (64 KiB chunks), so large files stream
+  with bounded memory and tampering/truncation is detected.
+- **Encrypted name index**: logical paths and structure live in an encrypted index; backing entries use opaque
+  ids, so a locked vault leaks neither file names nor layout.
+- **Read-write, lockable**: add/update/delete any time while unlocked; `Lock()`/`Dispose()` flush the encrypted
+  index, prune orphaned blobs, and zero the key with `CryptographicOperations.ZeroMemory`.
+- A wrong passphrase fails the index authentication tag → `CryptographicException`; operations on a locked
+  vault throw `InvalidOperationException`.

@@ -9,7 +9,9 @@ namespace SquidStd.Vfs.Services;
 /// <summary>An in-memory virtual filesystem. Ephemeral; useful for tests and as a backend decorator target.</summary>
 public sealed class InMemoryFileSystem : IVirtualFileSystem
 {
-    private readonly ConcurrentDictionary<string, (byte[] Data, DateTimeOffset Modified)> _files = new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, (byte[] Data, DateTimeOffset Modified)> _files = new(
+        StringComparer.Ordinal
+    );
 
     public ValueTask<bool> ExistsAsync(string path, CancellationToken cancellationToken = default)
     {
@@ -21,7 +23,9 @@ public sealed class InMemoryFileSystem : IVirtualFileSystem
         return ValueTask.FromResult(_files.TryGetValue(VfsPath.Normalize(path), out var entry) ? entry.Data : null);
     }
 
-    public ValueTask WriteAllBytesAsync(string path, ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+    public ValueTask WriteAllBytesAsync(
+        string path, ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default
+    )
     {
         _files[VfsPath.Normalize(path)] = (data.ToArray(), DateTimeOffset.UtcNow);
 
@@ -46,7 +50,9 @@ public sealed class InMemoryFileSystem : IVirtualFileSystem
         return ValueTask.FromResult(_files.TryRemove(VfsPath.Normalize(path), out _));
     }
 
-    public async IAsyncEnumerable<VfsEntry> ListAsync(string? prefix = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<VfsEntry> ListAsync(
+        string? prefix = null, [EnumeratorCancellation] CancellationToken cancellationToken = default
+    )
     {
         var normalizedPrefix = string.IsNullOrEmpty(prefix) ? null : VfsPath.Normalize(prefix);
 

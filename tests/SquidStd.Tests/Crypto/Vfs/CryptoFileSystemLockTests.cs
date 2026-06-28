@@ -18,8 +18,7 @@ public class CryptoFileSystemLockTests
         var vault = new CryptoFileSystem(new InMemoryFileSystem(), FastOptions());
 
         Assert.False(vault.IsUnlocked);
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            () => vault.WriteAllBytesAsync("a", new byte[] { 1 }).AsTask()
+        await Assert.ThrowsAsync<InvalidOperationException>(() => vault.WriteAllBytesAsync("a", new byte[] { 1 }).AsTask()
         );
 
         vault.Unlock("pw");

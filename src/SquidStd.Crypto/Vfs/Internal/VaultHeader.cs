@@ -4,7 +4,14 @@ namespace SquidStd.Crypto.Vfs.Internal;
 
 /// <summary>Cleartext vault header: format magic/version, Argon2id salt + cost params, and chunk size.</summary>
 internal sealed record VaultHeader(
-    string Magic, int Version, byte[] Salt, int MemoryKib, int Iterations, int Parallelism, int ChunkSize)
+    string Magic,
+    int Version,
+    byte[] Salt,
+    int MemoryKib,
+    int Iterations,
+    int Parallelism,
+    int ChunkSize
+)
 {
     public byte[] Serialize()
     {

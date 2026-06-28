@@ -10,6 +10,8 @@ internal sealed class VaultIndex
 {
     private readonly Dictionary<string, VaultIndexEntry> _entries;
 
+    public IReadOnlyDictionary<string, VaultIndexEntry> Entries => _entries;
+
     public VaultIndex()
     {
         _entries = new Dictionary<string, VaultIndexEntry>(StringComparer.Ordinal);
@@ -19,8 +21,6 @@ internal sealed class VaultIndex
     {
         _entries = entries;
     }
-
-    public IReadOnlyDictionary<string, VaultIndexEntry> Entries => _entries;
 
     public void Set(string path, VaultIndexEntry entry)
     {

@@ -27,6 +27,7 @@ public class CryptoFileSystemTests
         {
             paths.Add(e.Path);
         }
+
         Assert.Equal(["docs/cv.pdf"], paths);
 
         Assert.True(await vault.DeleteAsync("docs/cv.pdf"));

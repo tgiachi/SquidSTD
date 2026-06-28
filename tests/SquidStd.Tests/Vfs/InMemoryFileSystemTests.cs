@@ -19,6 +19,7 @@ public class InMemoryFileSystemTests
         {
             paths.Add(e.Path);
         }
+
         Assert.Equal(["a/b.txt"], paths);
 
         Assert.True(await fs.DeleteAsync("a/b.txt"));

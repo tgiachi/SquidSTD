@@ -18,13 +18,13 @@ public sealed class CryptoFileSystem : ILockableFileSystem, IDisposable
     private byte[]? _masterKey;
     private VaultIndex? _index;
 
+    public bool IsUnlocked => _masterKey is not null;
+
     public CryptoFileSystem(IVirtualFileSystem inner, CryptoVaultOptions? options = null)
     {
         _inner = inner;
         _options = options ?? new CryptoVaultOptions();
     }
-
-    public bool IsUnlocked => _masterKey is not null;
 
     public void Unlock(string passphrase)
     {
@@ -36,8 +36,13 @@ public sealed class CryptoFileSystem : ILockableFileSystem, IDisposable
         if (headerBytes is null)
         {
             header = new VaultHeader(
-                "SQVFS1", 1, RandomNumberGenerator.GetBytes(16),
-                _options.Argon2MemoryKib, _options.Argon2Iterations, _options.Argon2Parallelism, _options.ChunkSize
+                "SQVFS1",
+                1,
+                RandomNumberGenerator.GetBytes(16),
+                _options.Argon2MemoryKib,
+                _options.Argon2Iterations,
+                _options.Argon2Parallelism,
+                _options.ChunkSize
             );
             _inner.WriteAllBytesAsync(HeaderPath, header.Serialize()).AsTask().GetAwaiter().GetResult();
         }
@@ -104,7 +109,9 @@ public sealed class CryptoFileSystem : ILockableFileSystem, IDisposable
         return output.ToArray();
     }
 
-    public async ValueTask WriteAllBytesAsync(string path, ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+    public async ValueTask WriteAllBytesAsync(
+        string path, ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default
+    )
     {
         EnsureUnlocked();
         var normalized = VfsPath.Normalize(path);
@@ -149,7 +156,9 @@ public sealed class CryptoFileSystem : ILockableFileSystem, IDisposable
         return true;
     }
 
-    public async IAsyncEnumerable<VfsEntry> ListAsync(string? prefix = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<VfsEntry> ListAsync(
+        string? prefix = null, [EnumeratorCancellation] CancellationToken cancellationToken = default
+    )
     {
         EnsureUnlocked();
         var normalizedPrefix = string.IsNullOrEmpty(prefix) ? null : VfsPath.Normalize(prefix);
@@ -220,6 +229,11 @@ public sealed class CryptoFileSystem : ILockableFileSystem, IDisposable
         }
     }
 
+    public void Dispose()
+    {
+        Lock();
+    }
+
     private sealed class VaultWriteStream : MemoryStream
     {
         private readonly CryptoFileSystem _owner;
@@ -240,10 +254,5 @@ public sealed class CryptoFileSystem : ILockableFileSystem, IDisposable
 
             base.Dispose(disposing);
         }
-    }
-
-    public void Dispose()
-    {
-        Lock();
     }
 }

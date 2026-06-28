@@ -33,8 +33,7 @@ public class EntryCipherTests
 
         using var wrong = new EntryCipher(RandomNumberGenerator.GetBytes(32), 65536);
         encrypted.Position = 0;
-        await Assert.ThrowsAsync<AuthenticationTagMismatchException>(
-            () => wrong.DecryptAsync(encrypted, new MemoryStream())
+        await Assert.ThrowsAsync<AuthenticationTagMismatchException>(() => wrong.DecryptAsync(encrypted, new MemoryStream())
         );
     }
 }

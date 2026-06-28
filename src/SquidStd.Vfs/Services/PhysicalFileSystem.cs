@@ -31,7 +31,9 @@ public sealed class PhysicalFileSystem : IVirtualFileSystem
             : null;
     }
 
-    public async ValueTask WriteAllBytesAsync(string path, ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+    public async ValueTask WriteAllBytesAsync(
+        string path, ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default
+    )
     {
         var full = Resolve(path);
         Directory.CreateDirectory(Path.GetDirectoryName(full)!);
@@ -72,7 +74,9 @@ public sealed class PhysicalFileSystem : IVirtualFileSystem
         return ValueTask.FromResult(true);
     }
 
-    public async IAsyncEnumerable<VfsEntry> ListAsync(string? prefix = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<VfsEntry> ListAsync(
+        string? prefix = null, [EnumeratorCancellation] CancellationToken cancellationToken = default
+    )
     {
         if (!Directory.Exists(_root))
         {
