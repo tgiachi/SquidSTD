@@ -159,6 +159,10 @@ public sealed class SquidStdUdpServer : INetworkServer, IAsyncDisposable, IDispo
             loops = [.. _receiveLoops];
             _listeners.Clear();
             _receiveLoops.Clear();
+
+            // Drop the endpoint→listener routes: their UdpClients are about to be disposed, so a
+            // later Start must not reuse a stale, disposed socket from SendToAsync.
+            _endpointListeners.Clear();
         }
 
         if (cts is not null)

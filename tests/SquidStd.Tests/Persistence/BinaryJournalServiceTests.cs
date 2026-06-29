@@ -1,3 +1,5 @@
+using System.Buffers.Binary;
+using SquidStd.Core.Utils;
 using SquidStd.Persistence.Abstractions.Data;
 using SquidStd.Persistence.Abstractions.Types;
 using SquidStd.Persistence.Services;
@@ -74,6 +76,31 @@ public sealed class BinaryJournalServiceTests : IDisposable
         await using var reopened = new BinaryJournalService(JournalPath);
 
         Assert.Empty(await reopened.ReadAllAsync());
+    }
+
+    [Fact]
+    public async Task ReadAll_DiscardsRecordShorterThanFixedHeader_WithoutThrowing()
+    {
+        await using (var journal = new BinaryJournalService(JournalPath))
+        {
+            await journal.AppendAsync(Entry(1));
+        }
+
+        // Append a well-framed but undersized record (valid length + checksum, but fewer bytes than
+        // the fixed entry header). The reader must discard it as a truncated tail, not crash decoding.
+        var bytes = (await File.ReadAllBytesAsync(JournalPath)).ToList();
+        var shortRecord = new byte[] { 1, 2, 3, 4, 5 };
+        var frameHeader = new byte[8];
+        BinaryPrimitives.WriteInt32LittleEndian(frameHeader, shortRecord.Length);
+        BinaryPrimitives.WriteUInt32LittleEndian(frameHeader.AsSpan(4), ChecksumUtils.Compute(shortRecord));
+        bytes.AddRange(frameHeader);
+        bytes.AddRange(shortRecord);
+        await File.WriteAllBytesAsync(JournalPath, bytes.ToArray());
+
+        await using var reopened = new BinaryJournalService(JournalPath);
+        var entries = (await reopened.ReadAllAsync()).ToArray();
+
+        Assert.Equal([1], entries.Select(e => e.SequenceId));
     }
 
     [Fact]

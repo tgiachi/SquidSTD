@@ -243,6 +243,11 @@ public sealed class UdpSessionManager<TState> : ISessionManager<TState>, IDispos
         if (_byEndpoint.TryRemove(endPoint, out var entry))
         {
             _byId.TryRemove(entry.Session.SessionId, out _);
+
+            // Mark the connection closed so holders observe IsConnected == false after a sweep
+            // removal. CloseAsync is idempotent, so the explicit-close path (which routes here via the
+            // close callback) is unaffected.
+            _ = entry.Session.Connection.CloseAsync();
             RaiseSessionRemoved(entry.Session);
         }
     }

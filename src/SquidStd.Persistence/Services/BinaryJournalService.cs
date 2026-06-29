@@ -141,7 +141,9 @@ public sealed class BinaryJournalService : IJournalService, IAsyncDisposable
             var length = BinaryPrimitives.ReadInt32LittleEndian(bytes.AsSpan(offset));
             var checksum = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(offset + 4));
 
-            if (length <= 0 || offset + FrameHeaderSize + length > bytes.Length)
+            // A record shorter than the fixed entry header cannot be decoded (Decode reads the header
+            // unconditionally); treat it as a truncated tail rather than letting it crash startup.
+            if (length < JournalRecordCodec.FixedHeader || offset + FrameHeaderSize + length > bytes.Length)
             {
                 _logger.Warning("Journal {Path}: truncated record at offset {Offset}; discarding tail", _path, offset);
 

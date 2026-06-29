@@ -10,7 +10,7 @@ namespace SquidStd.Persistence.Internal;
 /// </summary>
 internal static class JournalRecordCodec
 {
-    private const int FixedHeader = 8 + 8 + 2 + 1 + 4;
+    internal const int FixedHeader = 8 + 8 + 2 + 1 + 4;
 
     public static byte[] Encode(JournalEntry entry)
     {

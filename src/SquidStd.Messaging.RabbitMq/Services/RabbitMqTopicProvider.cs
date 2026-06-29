@@ -129,13 +129,27 @@ public sealed class RabbitMqTopicProvider : ITopicProvider
             }
         }
 
-        await channel.ExchangeDeclareAsync(
-            topic,
-            ExchangeType.Fanout,
-            false,
-            false,
-            cancellationToken: cancellationToken
-        );
+        try
+        {
+            await channel.ExchangeDeclareAsync(
+                topic,
+                ExchangeType.Fanout,
+                false,
+                false,
+                cancellationToken: cancellationToken
+            );
+        }
+        catch
+        {
+            // The declare failed, so the exchange is not actually established: undo the optimistic
+            // mark so a later call retries instead of assuming the topology exists.
+            lock (_exchangeSync)
+            {
+                _declared.Remove(topic);
+            }
+
+            throw;
+        }
     }
 
     private sealed class Subscription : IDisposable

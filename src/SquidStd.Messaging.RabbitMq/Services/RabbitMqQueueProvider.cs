@@ -148,11 +148,27 @@ public sealed class RabbitMqQueueProvider : IQueueProvider
             }
         }
 
-        // Dead-letter queues are terminal: declare them plainly, no DLX.
-        if (queueName.EndsWith(_messagingOptions.DeadLetterQueueSuffix, StringComparison.Ordinal))
+        try
         {
+            // Dead-letter queues are terminal: declare them plainly, no DLX.
+            if (queueName.EndsWith(_messagingOptions.DeadLetterQueueSuffix, StringComparison.Ordinal))
+            {
+                await channel.QueueDeclareAsync(
+                    queueName,
+                    true,
+                    false,
+                    false,
+                    new Dictionary<string, object?> { ["x-queue-type"] = "quorum" },
+                    cancellationToken: cancellationToken
+                );
+
+                return;
+            }
+
+            var deadLetterQueue = queueName + _messagingOptions.DeadLetterQueueSuffix;
+
             await channel.QueueDeclareAsync(
-                queueName,
+                deadLetterQueue,
                 true,
                 false,
                 false,
@@ -160,34 +176,32 @@ public sealed class RabbitMqQueueProvider : IQueueProvider
                 cancellationToken: cancellationToken
             );
 
-            return;
+            await channel.QueueDeclareAsync(
+                queueName,
+                true,
+                false,
+                false,
+                new Dictionary<string, object?>
+                {
+                    ["x-queue-type"] = "quorum",
+                    ["x-delivery-limit"] = _messagingOptions.MaxDeliveryAttempts,
+                    ["x-dead-letter-exchange"] = string.Empty,
+                    ["x-dead-letter-routing-key"] = deadLetterQueue
+                },
+                cancellationToken: cancellationToken
+            );
         }
-
-        var deadLetterQueue = queueName + _messagingOptions.DeadLetterQueueSuffix;
-
-        await channel.QueueDeclareAsync(
-            deadLetterQueue,
-            true,
-            false,
-            false,
-            new Dictionary<string, object?> { ["x-queue-type"] = "quorum" },
-            cancellationToken: cancellationToken
-        );
-
-        await channel.QueueDeclareAsync(
-            queueName,
-            true,
-            false,
-            false,
-            new Dictionary<string, object?>
+        catch
+        {
+            // A declare failed, so the topology is not actually established: undo the optimistic
+            // mark so a later call retries instead of assuming the queues exist.
+            lock (_topologySync)
             {
-                ["x-queue-type"] = "quorum",
-                ["x-delivery-limit"] = _messagingOptions.MaxDeliveryAttempts,
-                ["x-dead-letter-exchange"] = string.Empty,
-                ["x-dead-letter-routing-key"] = deadLetterQueue
-            },
-            cancellationToken: cancellationToken
-        );
+                _declared.Remove(queueName);
+            }
+
+            throw;
+        }
     }
 
     private sealed class Subscription : IDisposable

@@ -49,6 +49,7 @@ public sealed class PersistenceService : IPersistenceService, IAsyncDisposable
         _registry.Freeze();
 
         var maxSequenceId = 0L;
+        var snapshotThresholds = new Dictionary<ushort, long>();
 
         foreach (var descriptor in _registry.GetRegisteredDescriptors())
         {
@@ -60,12 +61,17 @@ public sealed class PersistenceService : IPersistenceService, IAsyncDisposable
             }
 
             ((IInternalEntityApplier)descriptor).LoadBucket(_stateStore, loaded.Bucket);
+            snapshotThresholds[descriptor.TypeId] = loaded.LastSequenceId;
             maxSequenceId = Math.Max(maxSequenceId, loaded.LastSequenceId);
         }
 
         foreach (var entry in await _journalService.ReadAllAsync(cancellationToken))
         {
-            if (entry.SequenceId <= maxSequenceId)
+            // Replay each entry against its own type's snapshot watermark, not a global maximum: a
+            // single global threshold would skip journal entries newer than a lagging type's snapshot
+            // (e.g. after a partial snapshot save where one bucket persisted and another did not),
+            // silently dropping that type's recent writes.
+            if (entry.SequenceId <= snapshotThresholds.GetValueOrDefault(entry.TypeId))
             {
                 continue;
             }
