@@ -66,6 +66,15 @@ container.ApplyPersistedEntityRegistrations();   // builds descriptors into IPer
 | `SnapshotService`                     | Atomic per-type binary snapshot files with payload checksum.  |
 | `RegisterPersistedEntity<T,TKey>()`   | DI helper recording an entity for descriptor construction.    |
 
+### Durability
+
+`PersistenceConfig.DurabilityMode` selects how writes reach disk. `Buffered` (default) flushes to the OS
+cache — fast, and safe across a process crash. `Durable` fsyncs each journal append and the snapshot temp
+file before its atomic rename, so committed data survives power loss. Pass it through when constructing the
+services: `new BinaryJournalService(path, config.DurabilityMode)` and
+`new SnapshotService(dir, suffix, config.DurabilityMode)`. (.NET has no portable directory fsync, so the
+guarantee is per-file content durability plus atomic rename.)
+
 ## Related
 
 - Tutorial: [Persistence](https://tgiachi.github.io/squid-std/tutorials/persistence.html)

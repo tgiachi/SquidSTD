@@ -19,7 +19,7 @@ public sealed class SnapshotServiceTests : IDisposable
         var service = Create();
         await service.SaveBucketAsync(Bucket(), 42);
 
-        var loaded = await service.LoadBucketAsync("Player");
+        var loaded = await service.LoadBucketAsync("Player", 1);
 
         Assert.NotNull(loaded);
         Assert.Equal(42, loaded.LastSequenceId);
@@ -29,7 +29,7 @@ public sealed class SnapshotServiceTests : IDisposable
 
     [Fact]
     public async Task LoadBucket_MissingFile_ReturnsNull()
-        => Assert.Null(await Create().LoadBucketAsync("Absent"));
+        => Assert.Null(await Create().LoadBucketAsync("Absent", 1));
 
     [Fact]
     public async Task LoadBucket_CorruptPayload_ReturnsNull()
@@ -41,7 +41,7 @@ public sealed class SnapshotServiceTests : IDisposable
         bytes[^1] ^= 0xFF; // corrupt the payload so checksum mismatches
         await File.WriteAllBytesAsync(path, bytes);
 
-        Assert.Null(await service.LoadBucketAsync("Player"));
+        Assert.Null(await service.LoadBucketAsync("Player", 1));
     }
 
     [Fact]
@@ -50,9 +50,9 @@ public sealed class SnapshotServiceTests : IDisposable
         var service = Create();
         await service.SaveBucketAsync(Bucket(), 1);
 
-        await service.DeleteBucketAsync("Player");
+        await service.DeleteBucketAsync("Player", 1);
 
-        Assert.Null(await service.LoadBucketAsync("Player"));
+        Assert.Null(await service.LoadBucketAsync("Player", 1));
     }
 
     public void Dispose()

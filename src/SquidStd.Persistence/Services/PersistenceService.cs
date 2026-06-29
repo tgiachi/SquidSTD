@@ -22,6 +22,7 @@ public sealed class PersistenceService : IPersistenceService, IAsyncDisposable
     private readonly IPersistenceEntityRegistry _registry;
     private readonly ISnapshotService _snapshotService;
     private readonly PersistenceStateStore _stateStore = new();
+    private readonly SemaphoreSlim _snapshotLock = new(1, 1);
     private CancellationTokenSource? _autosaveCts;
     private Task? _autosaveLoop;
 
@@ -53,7 +54,7 @@ public sealed class PersistenceService : IPersistenceService, IAsyncDisposable
 
         foreach (var descriptor in _registry.GetRegisteredDescriptors())
         {
-            var loaded = await _snapshotService.LoadBucketAsync(descriptor.TypeName, cancellationToken);
+            var loaded = await _snapshotService.LoadBucketAsync(descriptor.TypeName, descriptor.TypeId, cancellationToken);
 
             if (loaded is null)
             {
@@ -109,61 +110,72 @@ public sealed class PersistenceService : IPersistenceService, IAsyncDisposable
 
     public async ValueTask SaveSnapshotAsync(CancellationToken cancellationToken = default)
     {
-        long capturedSequenceId;
-        List<EntitySnapshotBucket> buckets = [];
-        List<string> emptyTypeNames = [];
-
-        await _stateStore.WriteLock.WaitAsync(cancellationToken);
+        // One snapshot at a time: autosave, an explicit call, and StopAsync must not interleave their
+        // capture/save/trim phases, or a lower-sequence snapshot could land after a higher-sequence trim.
+        await _snapshotLock.WaitAsync(cancellationToken);
 
         try
         {
-            capturedSequenceId = _stateStore.LastSequenceId;
+            long capturedSequenceId;
+            List<EntitySnapshotBucket> buckets = [];
+            List<(string TypeName, ushort TypeId)> emptyTypes = [];
 
-            foreach (var descriptor in _registry.GetRegisteredDescriptors())
+            await _stateStore.WriteLock.WaitAsync(cancellationToken);
+
+            try
             {
-                lock (_stateStore.SyncRoot)
-                {
-                    var bucket = ((IInternalEntityApplier)descriptor).CaptureBucket(_stateStore);
+                capturedSequenceId = _stateStore.LastSequenceId;
 
-                    if (bucket is null)
+                foreach (var descriptor in _registry.GetRegisteredDescriptors())
+                {
+                    lock (_stateStore.SyncRoot)
                     {
-                        emptyTypeNames.Add(descriptor.TypeName);
-                    }
-                    else
-                    {
-                        buckets.Add(bucket);
+                        var bucket = ((IInternalEntityApplier)descriptor).CaptureBucket(_stateStore);
+
+                        if (bucket is null)
+                        {
+                            emptyTypes.Add((descriptor.TypeName, descriptor.TypeId));
+                        }
+                        else
+                        {
+                            buckets.Add(bucket);
+                        }
                     }
                 }
+            }
+            finally
+            {
+                _stateStore.WriteLock.Release();
+            }
+
+            if (_eventBus is not null)
+            {
+                await _eventBus.PublishAsync(new SnapshotSaveStartedEvent(capturedSequenceId), cancellationToken);
+            }
+
+            foreach (var bucket in buckets)
+            {
+                await _snapshotService.SaveBucketAsync(bucket, capturedSequenceId, cancellationToken);
+            }
+
+            foreach (var (typeName, typeId) in emptyTypes)
+            {
+                await _snapshotService.DeleteBucketAsync(typeName, typeId, cancellationToken);
+            }
+
+            await _journalService.TrimThroughSequenceAsync(capturedSequenceId, cancellationToken);
+
+            if (_eventBus is not null)
+            {
+                await _eventBus.PublishAsync(
+                    new SnapshotSaveCompletedEvent(capturedSequenceId, buckets.Count),
+                    cancellationToken
+                );
             }
         }
         finally
         {
-            _stateStore.WriteLock.Release();
-        }
-
-        if (_eventBus is not null)
-        {
-            await _eventBus.PublishAsync(new SnapshotSaveStartedEvent(capturedSequenceId), cancellationToken);
-        }
-
-        foreach (var bucket in buckets)
-        {
-            await _snapshotService.SaveBucketAsync(bucket, capturedSequenceId, cancellationToken);
-        }
-
-        foreach (var typeName in emptyTypeNames)
-        {
-            await _snapshotService.DeleteBucketAsync(typeName, cancellationToken);
-        }
-
-        await _journalService.TrimThroughSequenceAsync(capturedSequenceId, cancellationToken);
-
-        if (_eventBus is not null)
-        {
-            await _eventBus.PublishAsync(
-                new SnapshotSaveCompletedEvent(capturedSequenceId, buckets.Count),
-                cancellationToken
-            );
+            _snapshotLock.Release();
         }
     }
 

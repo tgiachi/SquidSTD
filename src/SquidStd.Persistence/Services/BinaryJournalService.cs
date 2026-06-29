@@ -3,6 +3,7 @@ using Serilog;
 using SquidStd.Core.Utils;
 using SquidStd.Persistence.Abstractions.Data;
 using SquidStd.Persistence.Abstractions.Interfaces.Persistence;
+using SquidStd.Persistence.Abstractions.Types.Persistence;
 using SquidStd.Persistence.Internal;
 using ILogger = Serilog.ILogger;
 
@@ -19,12 +20,18 @@ public sealed class BinaryJournalService : IJournalService, IAsyncDisposable
     private readonly SemaphoreSlim _ioLock = new(1, 1);
     private readonly ILogger _logger = Log.ForContext<BinaryJournalService>();
     private readonly string _path;
+    private readonly DurabilityMode _durability;
 
-    public BinaryJournalService(string journalFilePath, bool enableFileLock = true)
+    public BinaryJournalService(
+        string journalFilePath,
+        DurabilityMode durability = DurabilityMode.Buffered,
+        bool enableFileLock = true
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(journalFilePath);
 
         _path = Path.GetFullPath(journalFilePath);
+        _durability = durability;
         _ = enableFileLock;
 
         var directory = Path.GetDirectoryName(_path);
@@ -43,8 +50,13 @@ public sealed class BinaryJournalService : IJournalService, IAsyncDisposable
 
         try
         {
-            await using var stream = new FileStream(_path, FileMode.Append, FileAccess.Write, FileShare.Read);
+            await using var stream = OpenAppendStream();
             await WriteRecordAsync(stream, entry, cancellationToken);
+
+            if (_durability == DurabilityMode.Durable)
+            {
+                stream.Flush(flushToDisk: true);
+            }
         }
         finally
         {
@@ -62,11 +74,16 @@ public sealed class BinaryJournalService : IJournalService, IAsyncDisposable
 
         try
         {
-            await using var stream = new FileStream(_path, FileMode.Append, FileAccess.Write, FileShare.Read);
+            await using var stream = OpenAppendStream();
 
             for (var i = 0; i < entries.Count; i++)
             {
                 await WriteRecordAsync(stream, entries[i], cancellationToken);
+            }
+
+            if (_durability == DurabilityMode.Durable)
+            {
+                stream.Flush(flushToDisk: true);
             }
         }
         finally
@@ -129,6 +146,13 @@ public sealed class BinaryJournalService : IJournalService, IAsyncDisposable
         {
             _ioLock.Release();
         }
+    }
+
+    private FileStream OpenAppendStream()
+    {
+        var options = _durability == DurabilityMode.Durable ? FileOptions.WriteThrough : FileOptions.None;
+
+        return new FileStream(_path, FileMode.Append, FileAccess.Write, FileShare.Read, bufferSize: 4096, options);
     }
 
     private List<JournalEntry> ParseAll(byte[] bytes)

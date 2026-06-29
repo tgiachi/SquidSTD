@@ -30,6 +30,7 @@ public sealed class SquidTcpServer : INetworkServer, IAsyncDisposable, IDisposab
     private readonly ILogger _logger = Log.ForContext<SquidTcpServer>();
     private readonly Lock _middlewareSync = new();
     private readonly int _receiveBufferSize;
+    private readonly int _maxFrameLength;
     private readonly SquidStdTcpServerTlsOptions? _tlsOptions;
     private Task? _acceptLoopTask;
     private CancellationTokenSource? _listenerCancellationTokenSource;
@@ -74,7 +75,8 @@ public sealed class SquidTcpServer : INetworkServer, IAsyncDisposable, IDisposab
         int receiveBufferSize = 8192,
         int historyBufferCapacity = 65536,
         SquidStdTcpServerTlsOptions? tlsOptions = null,
-        Func<ConnectionPipeline>? connectionPipelineFactory = null
+        Func<ConnectionPipeline>? connectionPipelineFactory = null,
+        int maxFrameLength = 1024 * 1024
     )
     {
         _endPoint = endPoint;
@@ -83,6 +85,7 @@ public sealed class SquidTcpServer : INetworkServer, IAsyncDisposable, IDisposab
         _historyBufferCapacity = historyBufferCapacity;
         _tlsOptions = tlsOptions;
         _connectionPipelineFactory = connectionPipelineFactory;
+        _maxFrameLength = maxFrameLength;
     }
 
     /// <inheritdoc />
@@ -210,7 +213,8 @@ public sealed class SquidTcpServer : INetworkServer, IAsyncDisposable, IDisposab
                     framer,
                     codec,
                     _receiveBufferSize,
-                    _historyBufferCapacity
+                    _historyBufferCapacity,
+                    _maxFrameLength
                 );
                 WireClientEvents(client);
 

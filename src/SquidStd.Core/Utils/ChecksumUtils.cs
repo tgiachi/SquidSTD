@@ -21,4 +21,24 @@ public static class ChecksumUtils
 
         return hash;
     }
+
+    /// <summary>Computes the FNV-1a 32-bit checksum over two spans, in order, as if concatenated.</summary>
+    public static uint Compute(ReadOnlySpan<byte> first, ReadOnlySpan<byte> second)
+    {
+        var hash = FnvOffsetBasis;
+
+        for (var i = 0; i < first.Length; i++)
+        {
+            hash ^= first[i];
+            hash *= FnvPrime;
+        }
+
+        for (var i = 0; i < second.Length; i++)
+        {
+            hash ^= second[i];
+            hash *= FnvPrime;
+        }
+
+        return hash;
+    }
 }

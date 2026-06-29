@@ -1,5 +1,6 @@
 using System.Buffers.Binary;
 using System.Text;
+using SquidStd.Core.Utils;
 using SquidStd.Persistence.Abstractions.Data;
 
 namespace SquidStd.Persistence.Internal;
@@ -11,6 +12,16 @@ namespace SquidStd.Persistence.Internal;
 /// </summary>
 internal static class SnapshotEnvelopeCodec
 {
+    /// <summary>Byte offset of the 4-byte checksum field: after Version (4) and LastSequenceId (8).</summary>
+    internal const int ChecksumOffset = 12;
+
+    /// <summary>
+    /// FNV-1a checksum over the whole encoded envelope except its own 4 checksum bytes — covering Version,
+    /// LastSequenceId, TypeId, TypeName, SchemaVersion and Payload (Version &gt;= 2 snapshots).
+    /// </summary>
+    public static uint ComputeFullChecksum(ReadOnlySpan<byte> encoded)
+        => ChecksumUtils.Compute(encoded[..ChecksumOffset], encoded[(ChecksumOffset + 4)..]);
+
     public static byte[] Encode(SnapshotFileEnvelope envelope)
     {
         var nameBytes = Encoding.UTF8.GetBytes(envelope.Bucket.TypeName);

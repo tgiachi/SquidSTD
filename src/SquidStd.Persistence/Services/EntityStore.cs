@@ -69,15 +69,18 @@ public sealed class EntityStore<TEntity, TKey> : IEntityStore<TEntity, TKey>
         try
         {
             JournalEntry entry;
+            TEntity clone;
+            TKey key;
+            long next;
 
             lock (_stateStore.SyncRoot)
             {
-                var clone = _descriptor.Clone(entity);
-                var key = _descriptor.GetKey(clone);
-                Bucket()[key] = clone;
+                clone = _descriptor.Clone(entity);
+                key = _descriptor.GetKey(clone);
+                next = _stateStore.LastSequenceId + 1; // computed, not yet committed
                 entry = new JournalEntry
                 {
-                    SequenceId = ++_stateStore.LastSequenceId,
+                    SequenceId = next,
                     TimestampUnixMilliseconds = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                     TypeId = _descriptor.TypeId,
                     Operation = JournalEntityOperationType.Upsert,
@@ -85,7 +88,14 @@ public sealed class EntityStore<TEntity, TKey> : IEntityStore<TEntity, TKey>
                 };
             }
 
+            // Write-ahead: the journal must be durable before the in-memory state reflects the change.
             await _journalService.AppendAsync(entry, cancellationToken);
+
+            lock (_stateStore.SyncRoot)
+            {
+                Bucket()[key] = clone;
+                _stateStore.LastSequenceId = next;
+            }
         }
         finally
         {
@@ -100,17 +110,19 @@ public sealed class EntityStore<TEntity, TKey> : IEntityStore<TEntity, TKey>
         try
         {
             JournalEntry entry;
+            long next;
 
             lock (_stateStore.SyncRoot)
             {
-                if (!Bucket().Remove(id))
+                if (!Bucket().ContainsKey(id))
                 {
                     return false;
                 }
 
+                next = _stateStore.LastSequenceId + 1;
                 entry = new JournalEntry
                 {
-                    SequenceId = ++_stateStore.LastSequenceId,
+                    SequenceId = next,
                     TimestampUnixMilliseconds = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                     TypeId = _descriptor.TypeId,
                     Operation = JournalEntityOperationType.Remove,
@@ -118,7 +130,14 @@ public sealed class EntityStore<TEntity, TKey> : IEntityStore<TEntity, TKey>
                 };
             }
 
+            // Write-ahead: append before applying so a failed append leaves the entity in place.
             await _journalService.AppendAsync(entry, cancellationToken);
+
+            lock (_stateStore.SyncRoot)
+            {
+                Bucket().Remove(id);
+                _stateStore.LastSequenceId = next;
+            }
 
             return true;
         }

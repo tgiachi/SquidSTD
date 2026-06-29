@@ -20,9 +20,11 @@ public sealed class SquidStdTcpClient : INetworkConnection, IAsyncDisposable, ID
 {
     private const int DefaultReceiveBufferSize = 8192;
     private const int DefaultHistoryBufferCapacity = 65536;
+    private const int DefaultMaxFrameLength = 1024 * 1024;
     private static long _sessionIdSequence;
 
     private readonly INetFramer? _framer;
+    private readonly int _maxFrameLength;
     private readonly CancellationTokenSource _internalCancellationTokenSource = new();
 
     private readonly ILogger _logger = Log.ForContext<SquidStdTcpClient>();
@@ -137,7 +139,8 @@ public sealed class SquidStdTcpClient : INetworkConnection, IAsyncDisposable, ID
         INetFramer? framer = null,
         ITransportCodec? codec = null,
         int receiveBufferSize = DefaultReceiveBufferSize,
-        int historyBufferCapacity = DefaultHistoryBufferCapacity
+        int historyBufferCapacity = DefaultHistoryBufferCapacity,
+        int maxFrameLength = DefaultMaxFrameLength
     ) : this(
         socket,
         new NetworkStream(socket, false),
@@ -145,7 +148,8 @@ public sealed class SquidStdTcpClient : INetworkConnection, IAsyncDisposable, ID
         framer,
         codec,
         receiveBufferSize,
-        historyBufferCapacity
+        historyBufferCapacity,
+        maxFrameLength
     )
     {
     }
@@ -160,7 +164,8 @@ public sealed class SquidStdTcpClient : INetworkConnection, IAsyncDisposable, ID
         INetFramer? framer = null,
         ITransportCodec? codec = null,
         int receiveBufferSize = DefaultReceiveBufferSize,
-        int historyBufferCapacity = DefaultHistoryBufferCapacity
+        int historyBufferCapacity = DefaultHistoryBufferCapacity,
+        int maxFrameLength = DefaultMaxFrameLength
     )
     {
         ArgumentNullException.ThrowIfNull(socket);
@@ -173,6 +178,7 @@ public sealed class SquidStdTcpClient : INetworkConnection, IAsyncDisposable, ID
         _codec = codec;
         _receiveBuffer = new CircularBuffer<byte>(historyBufferCapacity);
         ReceiveBufferSize = receiveBufferSize;
+        _maxFrameLength = maxFrameLength;
         SessionId = Interlocked.Increment(ref _sessionIdSequence);
     }
 
@@ -484,6 +490,16 @@ public sealed class SquidStdTcpClient : INetworkConnection, IAsyncDisposable, ID
 
             if (!_framer.TryReadFrame(view, out var frameLength))
             {
+                // Incomplete frame. If the buffer already exceeds the cap, the in-progress frame is
+                // oversized (or the peer is streaming junk that never frames): reject and let the
+                // receive loop close the connection before the buffer grows further.
+                if (_pendingLength > _maxFrameLength)
+                {
+                    throw new InvalidDataException(
+                        $"Incoming frame exceeds the maximum of {_maxFrameLength} bytes."
+                    );
+                }
+
                 break;
             }
 
@@ -493,6 +509,13 @@ public sealed class SquidStdTcpClient : INetworkConnection, IAsyncDisposable, ID
                 _pendingLength = 0;
 
                 break;
+            }
+
+            if (frameLength > _maxFrameLength)
+            {
+                throw new InvalidDataException(
+                    $"Incoming frame of {frameLength} bytes exceeds the maximum of {_maxFrameLength} bytes."
+                );
             }
 
             // Fresh copy so handlers can safely retain the payload.

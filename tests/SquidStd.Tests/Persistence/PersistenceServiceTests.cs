@@ -174,14 +174,16 @@ public sealed class PersistenceServiceTests : IDisposable
             return _inner.SaveBucketAsync(bucket, lastSequenceId, cancellationToken);
         }
 
-        public ValueTask<PersistedBucket?> LoadBucketAsync(string typeName, CancellationToken cancellationToken = default)
+        public ValueTask<PersistedBucket?> LoadBucketAsync(
+            string typeName, ushort typeId, CancellationToken cancellationToken = default
+        )
         {
-            return _inner.LoadBucketAsync(typeName, cancellationToken);
+            return _inner.LoadBucketAsync(typeName, typeId, cancellationToken);
         }
 
-        public ValueTask DeleteBucketAsync(string typeName, CancellationToken cancellationToken = default)
+        public ValueTask DeleteBucketAsync(string typeName, ushort typeId, CancellationToken cancellationToken = default)
         {
-            return _inner.DeleteBucketAsync(typeName, cancellationToken);
+            return _inner.DeleteBucketAsync(typeName, typeId, cancellationToken);
         }
     }
 }
