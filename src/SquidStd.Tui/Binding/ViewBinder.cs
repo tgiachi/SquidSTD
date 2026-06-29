@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Windows.Input;
 using SquidStd.Tui.Internal;
 
 namespace SquidStd.Tui.Binding;
@@ -89,6 +90,31 @@ public sealed partial class ViewBinder : IDisposable
             using (guard.Enter())
             {
                 writeToSource();
+            }
+        });
+    }
+
+    /// <summary>
+    /// Binds a command to a control: <paramref name="subscribeTrigger" /> activates the command (when it
+    /// can execute), and <paramref name="setEnabled" /> tracks <see cref="ICommand.CanExecute" />.
+    /// </summary>
+    public void Command(ICommand command, Action<bool> setEnabled, Action<Action> subscribeTrigger)
+    {
+        setEnabled(command.CanExecute(null));
+
+        void CanHandler(object? sender, EventArgs e)
+        {
+            _marshal(() => setEnabled(command.CanExecute(null)));
+        }
+
+        command.CanExecuteChanged += CanHandler;
+        _subscriptions.Add(new Unsubscriber(() => command.CanExecuteChanged -= CanHandler));
+
+        subscribeTrigger(() =>
+        {
+            if (command.CanExecute(null))
+            {
+                command.Execute(null);
             }
         });
     }
