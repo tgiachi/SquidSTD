@@ -20,7 +20,10 @@ public sealed class InMemoryFileSystem : IVirtualFileSystem
 
     public ValueTask<byte[]?> ReadAllBytesAsync(string path, CancellationToken cancellationToken = default)
     {
-        return ValueTask.FromResult(_files.TryGetValue(VfsPath.Normalize(path), out var entry) ? entry.Data : null);
+        // Return a copy: the stored array must not be aliased to callers, who may mutate what they read.
+        return ValueTask.FromResult(
+            _files.TryGetValue(VfsPath.Normalize(path), out var entry) ? (byte[])entry.Data.Clone() : null
+        );
     }
 
     public ValueTask WriteAllBytesAsync(

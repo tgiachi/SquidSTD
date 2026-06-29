@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using System.Security.Cryptography;
 using System.Text;
 using SquidStd.Crypto.Vfs.Internal;
@@ -34,6 +35,21 @@ public class EntryCipherTests
         using var wrong = new EntryCipher(RandomNumberGenerator.GetBytes(32), 65536);
         encrypted.Position = 0;
         await Assert.ThrowsAsync<AuthenticationTagMismatchException>(() => wrong.DecryptAsync(encrypted, new MemoryStream())
+        );
+    }
+
+    [Fact]
+    public async Task Decrypt_RecordLengthExceedingChunkSize_Throws_WithoutAllocating()
+    {
+        const int chunkSize = 65536;
+
+        // A record header whose unauthenticated length prefix claims a chunk larger than the cipher's
+        // configured chunk size must be rejected before allocation, not used to size a buffer.
+        var header = new byte[4 + 12];
+        BinaryPrimitives.WriteInt32BigEndian(header, chunkSize + 1);
+
+        using var cipher = new EntryCipher(RandomNumberGenerator.GetBytes(32), chunkSize);
+        await Assert.ThrowsAsync<InvalidDataException>(() => cipher.DecryptAsync(new MemoryStream(header), new MemoryStream())
         );
     }
 }

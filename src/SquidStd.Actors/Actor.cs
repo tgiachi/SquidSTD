@@ -21,7 +21,7 @@ public abstract class Actor<TMessage> : IAsyncDisposable
     private readonly CancellationTokenSource _shutdown;
     private readonly ConcurrentDictionary<IActorRequestCore, byte> _outstanding;
     private readonly ILogger _logger;
-    private bool _disposed;
+    private int _disposed;
 
     /// <summary>Number of messages waiting in the mailbox.</summary>
     public int PendingCount
@@ -163,7 +163,7 @@ public abstract class Actor<TMessage> : IAsyncDisposable
 
     private void ThrowIfDisposed()
     {
-        if (_disposed)
+        if (Volatile.Read(ref _disposed) != 0)
         {
             throw new ObjectDisposedException(GetType().Name);
         }
@@ -172,12 +172,11 @@ public abstract class Actor<TMessage> : IAsyncDisposable
     /// <summary>Completes the mailbox, drains in-flight work, and faults any still-pending requests.</summary>
     public async ValueTask DisposeAsync()
     {
-        if (_disposed)
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
         {
             return;
         }
 
-        _disposed = true;
         _shutdown.Cancel();
         _mailbox.Complete();
 

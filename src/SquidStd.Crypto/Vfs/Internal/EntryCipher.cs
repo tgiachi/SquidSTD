@@ -43,6 +43,13 @@ internal sealed class EntryCipher : IDisposable
             var length = BinaryPrimitives.ReadInt32BigEndian(header);
             var nonce = header.AsMemory(4, NonceSize);
 
+            // The length prefix is read from the (unauthenticated) record header. Bound it before
+            // allocating so a corrupt or tampered vault cannot cause OOM or a negative-size crash.
+            if (length < 0 || length > _chunkSize)
+            {
+                throw new InvalidDataException("Encrypted entry record length is out of range.");
+            }
+
             var cipher = new byte[length];
             await ReadExactAsync(input, cipher, cancellationToken).ConfigureAwait(false);
             var tag = new byte[TagSize];

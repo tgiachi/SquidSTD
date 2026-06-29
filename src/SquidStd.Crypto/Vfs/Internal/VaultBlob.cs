@@ -27,6 +27,13 @@ internal static class VaultBlob
 
     public static byte[] Decrypt(byte[] key, byte[] blob)
     {
+        // A blob must hold at least a nonce and a tag; a shorter buffer (corrupt or truncated index)
+        // would otherwise produce a negative-length slice and throw an opaque ArgumentOutOfRange.
+        if (blob.Length < NonceSize + TagSize)
+        {
+            throw new InvalidDataException("Encrypted blob is too short to contain a nonce and tag.");
+        }
+
         var nonce = blob.AsSpan(0, NonceSize);
         var tag = blob.AsSpan(blob.Length - TagSize, TagSize);
         var cipher = blob.AsSpan(NonceSize, blob.Length - NonceSize - TagSize);

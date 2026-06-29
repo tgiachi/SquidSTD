@@ -105,6 +105,15 @@ public sealed class PhysicalFileSystem : IVirtualFileSystem
 
     private string Resolve(string path)
     {
-        return Path.Combine(_root, VfsPath.Normalize(path));
+        var full = Path.GetFullPath(Path.Combine(_root, VfsPath.Normalize(path)));
+
+        // Defend against segments that survive normalization yet escape the root (e.g. a Windows
+        // drive-rooted segment such as "C:/x", which Path.Combine would resolve outside _root).
+        if (full != _root && !full.StartsWith(_root + Path.DirectorySeparatorChar, StringComparison.Ordinal))
+        {
+            throw new ArgumentException($"Path '{path}' escapes the filesystem root.", nameof(path));
+        }
+
+        return full;
     }
 }

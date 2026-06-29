@@ -25,4 +25,17 @@ public class InMemoryFileSystemTests
         Assert.True(await fs.DeleteAsync("a/b.txt"));
         Assert.Null(await fs.ReadAllBytesAsync("a/b.txt"));
     }
+
+    [Fact]
+    public async Task ReadAllBytesAsync_ReturnsCopy_MutatingResultDoesNotCorruptStore()
+    {
+        var fs = new InMemoryFileSystem();
+        await fs.WriteAllBytesAsync("note.txt", Encoding.UTF8.GetBytes("hi"));
+
+        var first = (await fs.ReadAllBytesAsync("note.txt"))!;
+        first[0] = (byte)'X'; // a caller mutating what it read must not alter the stored bytes
+
+        var second = (await fs.ReadAllBytesAsync("note.txt"))!;
+        Assert.Equal("hi", Encoding.UTF8.GetString(second));
+    }
 }

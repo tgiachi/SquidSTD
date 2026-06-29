@@ -27,4 +27,17 @@ public class ActorLifecycleTests
         await Assert.ThrowsAsync<ObjectDisposedException>(async () => await actor.TellAsync(new Append("x"))
         );
     }
+
+    [Fact]
+    public async Task DisposeAsync_CalledConcurrentlyTwice_IsIdempotent()
+    {
+        var actor = new ProbeActor();
+
+        // The dispose guard is claimed atomically, so concurrent disposers must not both run teardown.
+        var first = actor.DisposeAsync();
+        var second = actor.DisposeAsync();
+
+        await first;
+        await second;
+    }
 }
