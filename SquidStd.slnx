@@ -41,6 +41,7 @@
         <Project Path="src/SquidStd.Vfs.Abstractions/SquidStd.Vfs.Abstractions.csproj"/>
         <Project Path="src/SquidStd.Vfs/SquidStd.Vfs.csproj"/>
         <Project Path="src/SquidStd.Vfs.S3/SquidStd.Vfs.S3.csproj"/>
+        <Project Path="src/SquidStd.Vfs.Database/SquidStd.Vfs.Database.csproj"/>
         <Project Path="src/SquidStd.Secrets.Aws/SquidStd.Secrets.Aws.csproj"/>
         <Project Path="src/SquidStd.Tui/SquidStd.Tui.csproj"/>
     </Folder>

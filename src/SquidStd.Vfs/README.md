@@ -60,6 +60,32 @@ Logical paths are normalized (forward slashes, root-relative) and reject `..` tr
 | `VfsDirectories`        | Named directory layout (`DirectoriesConfig` analogue) over any backend. |
 | `RegisterVfsExtensions` | `RegisterVfs(...)` registration.                                        |
 
+## Decorators
+
+Decorators wrap any `IVirtualFileSystem` to add behaviour without touching the backend. Stack them in any order.
+
+| Decorator | Description |
+|---|---|
+| `ReadOnlyFileSystem(inner)` | Delegates all reads to `inner`; rejects every mutation with `InvalidOperationException`. |
+| `ScopedFileSystem(inner, prefix)` | Roots `inner` at a path prefix (chroot-like). All paths are resolved relative to the scope; list results are returned relative to it too. |
+| `OverlayFileSystem(base, overlay)` | Reads overlay-first then falls back to base. Writes and deletes go to the overlay only. List returns the union of both; overlay entries shadow base entries with the same path. |
+| `CachingFileSystem(remote, cache)` | Read-through cache: reads prefer the remote and refresh the cache copy on success; on a transport failure they fall back to the (possibly stale) cache. Writes are write-through (remote then cache) and fail when the remote is unreachable. |
+
+Composition example — S3 with a local disk cache for resilience to an unstable connection:
+
+```csharp
+// S3 with a local disk cache for resilience to an unstable connection.
+var fs = new CachingFileSystem(
+    remote: s3FileSystem,
+    cache:  new PhysicalFileSystem("/var/cache/app"));
+```
+
+Decorators are not registered via DI helpers; construct them explicitly and pass the result to `RegisterVfs(...)`:
+
+```csharp
+container.RegisterVfs(_ => new ReadOnlyFileSystem(new PhysicalFileSystem("/var/lib/app/data")));
+```
+
 ## Related
 
 - Tutorial: [Virtual filesystem](https://tgiachi.github.io/squid-std/tutorials/vfs.html)
