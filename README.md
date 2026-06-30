@@ -44,11 +44,14 @@ it bundles the foundations you reach for again and again behind small, well-defi
   mailboxes), job system, timer/cron scheduler, metrics and health checks.
 - **Messaging & caching** — in-memory, RabbitMQ and AWS SQS/SNS transports; in-memory and Redis caches.
 - **Data & storage** — FreeSql data access, binary persistence (snapshot + WAL), local / S3 / MinIO
-  object storage, and a virtual filesystem (physical / zip / in-memory + an encrypted vault).
+  object storage, and a virtual filesystem (physical / zip / in-memory + an encrypted vault, plus
+  S3-compatible and database-backed backends and composable decorators).
 - **Search, mail & workers** — Elasticsearch indexing with a constrained LINQ provider, IMAP/POP3
   mail polling and an outbound mail queue, and a worker / manager runtime.
 - **Networking, scripting & observability** — TCP/UDP servers with a framing/middleware pipeline,
   Lua scripting and Scriban templating, and OpenTelemetry tracing + metrics export.
+- **Terminal UI** — MVVM for terminal apps via `SquidStd.Tui`: observable ViewModels, a fluent
+  binder (+ `AutoBind` and a declarative DSL), ViewModel-first navigation, DryIoc wiring.
 
 Everything is modular: take only the packages you need, each behind a clean abstraction with an
 in-memory implementation for tests and an external backend for production.
@@ -195,13 +198,15 @@ dotnet new squidstd-manager -n Acme.Manager --messaging inmemory
 | `SquidStd.Storage` | Local file storage backend (`AddFileStorage`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Storage/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Storage.svg)](https://www.nuget.org/packages/SquidStd.Storage/) |
 | `SquidStd.Storage.S3` | S3/MinIO storage backend (`AddS3Storage`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Storage.S3/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Storage.S3.svg)](https://www.nuget.org/packages/SquidStd.Storage.S3/) |
 | `SquidStd.Vfs.Abstractions` | Virtual filesystem contracts (`IVirtualFileSystem`, `ILockableFileSystem`, `VfsPath`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Vfs.Abstractions/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Vfs.Abstractions.svg)](https://www.nuget.org/packages/SquidStd.Vfs.Abstractions/) |
-| `SquidStd.Vfs` | Virtual filesystem providers — physical, in-memory, and zip — plus `VfsDirectories`, a VFS-backed `DirectoriesConfig`. | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Vfs/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Vfs.svg)](https://www.nuget.org/packages/SquidStd.Vfs/) |
+| `SquidStd.Vfs` | Virtual filesystem providers — physical, in-memory, and zip — plus composable decorators (`ReadOnlyFileSystem`, `ScopedFileSystem`, `OverlayFileSystem`, `CachingFileSystem`) and `VfsDirectories`. | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Vfs/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Vfs.svg)](https://www.nuget.org/packages/SquidStd.Vfs/) |
+| `SquidStd.Vfs.S3` | S3-compatible VFS backend — AWS S3, MinIO, Cloudflare R2, Backblaze B2 — via the MinIO SDK (`RegisterS3FileSystem`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Vfs.S3/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Vfs.S3.svg)](https://www.nuget.org/packages/SquidStd.Vfs.S3/) |
+| `SquidStd.Vfs.Database` | Database-backed VFS storing files as rows via SquidStd.Database / FreeSql (`RegisterDatabaseFileSystem`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Vfs.Database/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Vfs.Database.svg)](https://www.nuget.org/packages/SquidStd.Vfs.Database/) |
 
 ### Security — crypto & secrets
 
 | Package | Description | Links |
 |---------|-------------|-------|
-| `SquidStd.Crypto` | OpenPGP key management/operations over an indexed keyring (`SquidStd.Crypto.Pgp`, `RegisterPgp`) plus the encrypted VFS vault decorator (Argon2id + per-entry AES-GCM). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Crypto/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Crypto.svg)](https://www.nuget.org/packages/SquidStd.Crypto/) |
+| `SquidStd.Crypto` | OpenPGP key management/operations over an indexed keyring (`SquidStd.Crypto.Pgp`, `RegisterPgp`), password-based encryption (`PasswordCipher`, Argon2id + AES-256-GCM with a self-describing envelope), and the encrypted VFS vault decorator. | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Crypto/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Crypto.svg)](https://www.nuget.org/packages/SquidStd.Crypto/) |
 | `SquidStd.Secrets.Aws` | AWS adapters for the secret seams — KMS envelope `ISecretProtector` and Secrets Manager `ISecretStore`. | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Secrets.Aws/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Secrets.Aws.svg)](https://www.nuget.org/packages/SquidStd.Secrets.Aws/) |
 
 ### Search
@@ -226,6 +231,12 @@ dotnet new squidstd-manager -n Acme.Manager --messaging inmemory
 | `SquidStd.Workers.Abstractions` | Worker/manager shared contracts (`JobRequest`, `WorkerHeartbeat`, `WorkerInfo`, `WorkerChannels`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Workers.Abstractions/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Workers.Abstractions.svg)](https://www.nuget.org/packages/SquidStd.Workers.Abstractions/) |
 | `SquidStd.Workers` | Worker runtime: consume jobs, dispatch to `IJobHandler`s, publish heartbeats (`AddWorkers`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Workers/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Workers.svg)](https://www.nuget.org/packages/SquidStd.Workers/) |
 | `SquidStd.Workers.Manager` | Job enqueue, heartbeat registry, offline sweep, opt-in ASP.NET endpoints (`AddWorkerManager`). | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Workers.Manager/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Workers.Manager.svg)](https://www.nuget.org/packages/SquidStd.Workers.Manager/) |
+
+### User interface
+
+| Package | Description | Links |
+|---------|-------------|-------|
+| `SquidStd.Tui` | MVVM for terminal apps on Terminal.Gui v2 — observable ViewModels, a fluent binder (+ `AutoBind` and a declarative DSL), ViewModel-first navigation, DryIoc wiring. | [![readme](https://img.shields.io/badge/readme-1390A3.svg)](src/SquidStd.Tui/README.md) · [![NuGet](https://img.shields.io/nuget/v/SquidStd.Tui.svg)](https://www.nuget.org/packages/SquidStd.Tui/) |
 
 ### Scripting & templating
 

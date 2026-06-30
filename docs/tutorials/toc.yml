@@ -44,5 +44,7 @@
   href: vfs.md
 - name: Crypto (PGP)
   href: crypto.md
+- name: Terminal UI (MVVM)
+  href: tui.md
 - name: Secrets (KMS / Secrets Manager)
   href: secrets.md

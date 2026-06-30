@@ -43,6 +43,37 @@ survives a restart.
 
 [!code-csharp[](../../samples/SquidStd.Samples.Crypto/Program.cs#step-4)]
 
+## Password-based encryption
+
+`PasswordCipher` encrypts a payload directly under a password — no key management required. Argon2id
+derives the key, AES-256-GCM seals the data, and the result is a self-describing, versioned envelope
+(salt, nonce, tag and KDF cost are embedded). Decryption needs only the password and the blob.
+
+```csharp
+using SquidStd.Crypto.Password;
+using SquidStd.Crypto.Password.Data;
+
+// Bytes round-trip.
+byte[] blob = PasswordCipher.Encrypt(payloadBytes, "correct horse battery staple");
+byte[] back = PasswordCipher.Decrypt(blob, "correct horse battery staple");
+
+// Text round-trip — the envelope is base64-encoded, safe to store in config or JSON.
+string protectedText = PasswordCipher.EncryptString("a secret", "pw");
+string clear         = PasswordCipher.DecryptString(protectedText, "pw");
+```
+
+The cost of the Argon2id key derivation defaults to `PbkdfCost.Moderate`. Raise it when protecting
+long-lived secrets:
+
+```csharp
+// PbkdfCost.Sensitive — slower derivation, stronger resistance to offline attacks.
+byte[] strong = PasswordCipher.Encrypt(payloadBytes, "pw", PbkdfCost.Sensitive);
+```
+
+A wrong password or tampered data raises `PasswordDecryptionException`. Use `PasswordCipher` for
+user-supplied passwords; for app-key or KMS encryption use `CryptoUtils` / `ISecretProtector`
+instead.
+
 ## Run it
 
 ```bash

@@ -80,6 +80,10 @@
   href: vfs-abstractions.md
 - name: SquidStd.Vfs
   href: vfs.md
+- name: SquidStd.Vfs.S3
+  href: vfs-s3.md
+- name: SquidStd.Vfs.Database
+  href: vfs-database.md
 - name: SquidStd.Scripting.Lua
   href: scripting-lua.md
 - name: SquidStd.Templating
@@ -114,6 +118,8 @@
   href: telemetry-opentelemetry.md
 - name: SquidStd.Aws.Abstractions
   href: aws-abstractions.md
+- name: SquidStd.Tui
+  href: tui.md
 - name: SquidStd.Crypto
   href: crypto.md
 - name: SquidStd.Secrets.Aws
