@@ -88,20 +88,25 @@ public sealed class FileWatcherServiceTests : IDisposable
     [Fact]
     public async Task Watch_RapidWritesToSameFile_DebouncesToSingleEvent()
     {
+        // A generous debounce window so the rapid writes reliably collapse into one event even when a
+        // loaded CI runner pauses (scheduler/GC) between writes: a 200ms window was prone to splitting
+        // the burst across two windows and emitting two events.
+        var rapidDebounce = TimeSpan.FromSeconds(1);
         var directory = NewTempDirectory();
         var file = Path.Combine(directory, "busy.txt");
         using var bus = new EventBusService();
         var collector = Subscribe(bus);
-        using var watcher = new FileWatcherService(bus, Debounce);
+        using var watcher = new FileWatcherService(bus, rapidDebounce);
         watcher.Watch(directory);
 
+        // Synchronous, tight loop: no await points the scheduler can preempt mid-burst.
         for (var i = 0; i < 5; i++)
         {
-            await File.WriteAllTextAsync(file, $"v{i}");
+            File.WriteAllText(file, $"v{i}");
         }
 
         Assert.True(await collector.WaitForAsync(1, Timeout));
-        await Task.Delay(Debounce * 4);
+        await Task.Delay(rapidDebounce * 2);
 
         Assert.Single(collector.Events, e => Path.GetFileName(e.FullPath) == "busy.txt");
     }
