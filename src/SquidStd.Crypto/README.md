@@ -50,6 +50,30 @@ await keyring.SaveAsync(container.Resolve<IPgpKeyStore>());
 await keyring.LoadAsync(container.Resolve<IPgpKeyStore>());
 ```
 
+## Password-based encryption
+
+`PasswordCipher` encrypts a payload under a password — Argon2id derives the key, AES-256-GCM seals the data,
+and the result is a self-describing, versioned envelope (salt, nonce, tag and KDF cost are embedded, so
+decryption needs only the password and the blob).
+
+```csharp
+using SquidStd.Crypto.Password;
+using SquidStd.Crypto.Password.Data;
+
+byte[] blob = PasswordCipher.Encrypt(payloadBytes, "correct horse battery staple");
+byte[] back = PasswordCipher.Decrypt(blob, "correct horse battery staple");
+
+// Text + base64 envelope for storing in config/JSON:
+string protectedText = PasswordCipher.EncryptString("a secret", "pw");
+string clear         = PasswordCipher.DecryptString(protectedText, "pw");
+
+// Tune the Argon2id cost (defaults to PbkdfCost.Moderate):
+byte[] strong = PasswordCipher.Encrypt(payloadBytes, "pw", PbkdfCost.Sensitive);
+```
+
+A wrong password or tampered data raises `PasswordDecryptionException`. For raw-key or app-key/KMS
+encryption use `CryptoUtils` / `ISecretProtector` instead.
+
 ## Key types
 
 | Type                | Purpose                                                                                   |
@@ -60,6 +84,8 @@ await keyring.LoadAsync(container.Resolve<IPgpKeyStore>());
 | `FilePgpKeyStore`   | One armored `.asc` per key (gpg-interoperable).                                           |
 | `AesGcmPgpKeyStore` | The whole keyring serialized to a single file, encrypted at rest via `ISecretProtector`.  |
 | `CryptoFileSystem`  | `ILockableFileSystem` that encrypts content and names over any `IVirtualFileSystem`.      |
+| `PasswordCipher`    | Password-based encryption: Argon2id + AES-256-GCM with a self-describing envelope.       |
+| `PbkdfCost`         | Argon2id cost presets (Interactive / Moderate / Sensitive) + custom.                     |
 
 ## Key stores
 
